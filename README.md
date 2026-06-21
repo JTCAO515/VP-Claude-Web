@@ -6,7 +6,7 @@ Active repository: `https://github.com/JTCAO515/VP-Codex-Web`
 
 ## Current Version
 
-`v6.0.5` upgrades Chat into a professional consultation workspace with mode-specific prompts, answer depth controls, model routing, and configurable external API adapters.
+`v6.0.6` wires the Chat model route to DeepSeek V4 Flash by default while keeping the professional consultation workspace, answer depth controls, and configurable external API adapters.
 
 ## Product Surface
 
@@ -41,7 +41,7 @@ node --test web/tests/*.test.js
 ## Environment
 
 - `DEEPSEEK_API_KEY`: optional; enables remote AI answers for `/api/chat`.
-- `DEEPSEEK_MODEL`: optional; defaults to `deepseek-chat`.
+- `DEEPSEEK_MODEL`: optional; defaults to `deepseek-v4-flash`.
 - `OPENAI_COMPATIBLE_API_KEY`: optional key for another OpenAI-compatible chat completions provider.
 - `OPENAI_COMPATIBLE_BASE_URL`: optional base URL for the compatible provider, for example a `/v1` endpoint.
 - `OPENAI_COMPATIBLE_MODEL`: optional model name for the compatible provider.

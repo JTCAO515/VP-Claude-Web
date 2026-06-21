@@ -75,7 +75,7 @@ def _provider_routes():
             "id": "deepseek",
             "label": "DeepSeek",
             "available": bool(os.environ.get("DEEPSEEK_API_KEY")),
-            "model": os.environ.get("DEEPSEEK_MODEL", "deepseek-chat"),
+            "model": os.environ.get("DEEPSEEK_MODEL", "deepseek-v4-flash"),
             "description": "Remote chat completions through DeepSeek when DEEPSEEK_API_KEY is configured.",
         },
         {
@@ -240,7 +240,7 @@ def _remote_answer(message, provider, mode, depth):
         return _chat_completion(
             "https://api.deepseek.com/chat/completions",
             api_key,
-            os.environ.get("DEEPSEEK_MODEL", "deepseek-chat"),
+            os.environ.get("DEEPSEEK_MODEL", "deepseek-v4-flash"),
             prompt,
         )
     if provider == "openai-compatible":
