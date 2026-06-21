@@ -1,138 +1,84 @@
-# VisePanda · VP-Codex-Web · v5.0.9
+# VisePanda
 
-> AI China Travel Platform — Panda Chinese Style · AI Chat Planning · 36-City Knowledge Base
+VisePanda is an English-language China travel workspace for international visitors. It combines city discovery, visa readiness, saved trips, practical travel tools, and a streaming AI guide behind a small Vercel + Python WSGI deployment.
 
-Active Codex working repository: `https://github.com/JTCAO515/VP-Codex-Web`
+Active repository: `https://github.com/JTCAO515/VP-Codex-Web`
 
-## Product in One Line
+## Current Version
 
-**An AI platform that lets travelers to China get personalized trip plans by chatting like with a local friend.** Powered by DeepSeek V4 Flash + 36-city curated knowledge base — covers destination recommendations, day-by-day itineraries, local food/hotel/transport tips, and travel toolkit.
+`v6.0.0` is a clean rewrite. The new implementation keeps the product direction, curated JSON data, image assets, and Vercel deployment shape, but replaces the application code with a new backend, frontend, and test suite.
 
-**Not a generic AI assistant — a China-specialized AI travel planner.**
+## Product Surface
 
-## Latest Version v5.0.9
-
-| Module | Status |
-|--------|--------|
-| 🏗️ Foundation contracts (auth/admin/trips/config) | ✅ Landed in `tests/` + `web/tests/` |
-| 🔐 Auth/Admin consistency (`vp_token` / `display_name` / `status`) | ✅ Closed out |
-| 📋 Trips full-content model (`preview` + `content`) | ✅ Landed |
-| 🧰 Tools main-nav integration | ✅ Wired into the main site |
-| 🏠 Editorial Atlas home structure (`hero-actions` / `trust-layer` / `editorial-city-rail` / `planner-entry`) | ✅ Landed and refined |
-| 💬 Chat Atlas action rail | ✅ Landed |
-| 📋 Trips recent / saved grouped structure | ✅ Landed with atlas note |
-| 🏙 Cities filter rail / editorial lead | ✅ Landed |
-| 📱 Portrait mobile UX pass (Home / Chat / Cities / Trips / Tools / bottom nav) | ✅ Landed |
-| 🤳 Mobile detail pass (Chat quick scroll / thumb-first Trips / Tools gallery / Cities browse notes) | ✅ Landed |
-| 🇬🇧 English-native website pass (UI + runtime city/food/hotel data) | ✅ Landed |
-| 🛠️ Admin Atlas overview hero | ✅ Landed |
-| 🧪 Regression commands (`python3 -m unittest discover -s tests -v` / `node --test`) | ✅ Part of the release flow |
-| 🧰 Usable Tools detail sheets + English-only i18n compatibility layer | ✅ Landed |
-| 🛡️ Production Stability Pass | Sign-in recovery / image fallback / loading feedback / mobile nav visibility | ✅ Landed in `v5.0.9` |
+- Plan: first-screen travel workspace with destination input, featured cities, and readiness checklist.
+- Ask: streaming AI travel guide with a deterministic local fallback when no DeepSeek key is configured.
+- Cities: searchable China destination cards built from the curated city dataset.
+- Tools: packing, pricing, phrase, emergency, and visa helper views.
+- Trips: authenticated saved trips with a guest local draft mode.
+- Admin: minimal user management console gated by explicit admin credentials.
 
 ## Tech Stack
 
-- **Backend**: Python WSGI (pure stdlib, zero pip dependencies)
-- **Frontend**: Pure HTML + CSS + JS (Vanilla SPA, Panda × Chinese design + Editorial Atlas information structure)
-- **LLM**: DeepSeek V4 Flash (OpenAI-compatible SSE streaming)
-- **Map**: AMap (Gaode) — Leaflet fallback when AMap key not configured
-- **Deployment**: Vercel Serverless (@vercel/python)
-- **Storage**: SQLite for auth / session / trips / chat history via `api/auth.py`
-- **Data**: 36-city knowledge base JSON + toolkit / visa / FAQ datasets
-- **Design**: Panda × Chinese aesthetic, dark/light dual themes
+- Backend: Python WSGI, standard library only.
+- Frontend: static HTML, CSS, and vanilla JavaScript.
+- Deployment: Vercel `@vercel/python`, all routes through `api/index.py`.
+- Storage: SQLite for users, sessions, password resets, and trips.
+- Data: JSON datasets in `data/` plus image assets in `static/img/`.
 
-## Current Frontend Structure
+## Local Run
 
-| Tab | Feature |
-|-----|---------|
-| 🏠 Home | Editorial Atlas Hero + Trust Layer + City Rail + Planner Entry |
-| 💬 Chat | SSE streaming AI chat + Atlas action rail |
-| 🗺️ Map | Full China overview with 36 city markers |
-| 📋 Trips | Recent / Saved archive grouped structure |
-| 🏙 Cities | 36 city detail cards with food/hotel/tips data |
-| 🧰 Tools | Packing / pricing / visa / phrases / emergency toolkit |
-| 👥 Admin | Ops/Admin overview hero + user management table |
-
-## Quick Start (Local Test)
-
-```bash
-python3 -c "
-from api.index import app
-from wsgiref.simple_server import make_server
-httpd = make_server('', 8765, app)
-print('→ http://127.0.0.1:8765')
-httpd.serve_forever()
-"
-
-curl http://127.0.0.1:8765/api/health
+```powershell
+python -c "from api.index import app; from wsgiref.simple_server import make_server; server = make_server('127.0.0.1', 8765, app); print('http://127.0.0.1:8765'); server.serve_forever()"
 ```
 
-## API Endpoints
+Useful checks:
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/health` | Health check + version |
-| `POST /api/chat` | AI chat (SSE streaming) |
-| `GET /api/cities` | City list |
-| `GET /api/cities/:city` | City detail (attractions/food/tips) |
-| `GET /api/map` | All city map coordinates (36 cities) |
-| `GET /api/config` | Client config (AMap key, etc.) |
-| `GET /api/estimate` | Price estimates by city |
-| `POST /api/validate` | Trip plan validation |
-| `GET /api/tools/:name` | Tool data |
-| `/*` | Static frontend files |
-
-## Project Structure
-
-```
-├── api/
-│   └── index.py          Vercel WSGI handler (all routes)
-├── web/
-│   ├── index.html        SPA entry point
-│   ├── app.css           Panda Chinese style system
-│   ├── app.js            Frontend logic (chat/nav/map/trips/tools/auth)
-│   └── tests/            Node structure tests for Atlas/foundation
-├── tests/
-│   └── *.py              Python unittest contract coverage
-├── data/
-│   ├── cities.json       36-city knowledge base
-│   ├── food.json         Food data
-│   ├── hotels.json       Hotel data
-│   ├── tips.json         Local tips
-│   ├── faq.json          FAQ knowledge base (10 categories)
-│   └── tools.json        Travel toolkit
-├── static/
-│   └── img/              City images
-├── vercel.json           Deployment config
-├── CHANGELOG.md          Version history
-├── PLAN.md               Iteration roadmap
-├── PRD_PRODUCT_ANALYSIS.md  Product strategy
-├── README.md             This file
-└── HANDOFF.md            Project handoff doc
+```powershell
+python -m unittest discover -s tests -v
+node --test web/tests/*.test.js
 ```
 
-## Version History
+## Environment
 
-See [CHANGELOG.md](CHANGELOG.md) for full version history.
+- `DEEPSEEK_API_KEY`: optional; enables remote AI answers for `/api/chat`.
+- `DEEPSEEK_MODEL`: optional; defaults to `deepseek-chat`.
+- `AUTH_DB_PATH`: optional SQLite path for local or test storage.
+- `ADMIN_EMAIL` and `ADMIN_PASSWORD`: optional admin seed. Weak defaults such as `admin123` are ignored.
+- `AUTH_EXPOSE_RESET_TOKEN=1`: test-only reset token exposure.
 
-## Planning Docs
+## API
 
-- [Agent Transfer Index](docs/2026-06-20-agent-transfer-index.md)
-- [Commercial Upgrade Plan](docs/2026-06-20-commercial-upgrade-plan.md)
-- [Engineering Handoff Notes](docs/2026-06-20-engineering-handoff-notes.md)
-- [First-Week Takeover Checklist](docs/2026-06-20-first-week-takeover-checklist.md)
-- [High-Risk Files Guide](docs/2026-06-20-high-risk-files-guide.md)
-- [Production Regression Manual](docs/2026-06-20-production-regression-manual.md)
-- [Next 2-4 Weeks Priority Guide](docs/2026-06-20-next-2-4-weeks-priority-guide.md)
-- [Technical Debt Boundaries](docs/2026-06-20-technical-debt-boundaries.md)
-- [Module Ownership Guide](docs/2026-06-20-module-ownership-guide.md)
+- `GET /api/health`
+- `GET /api/config`
+- `POST /api/chat`
+- `GET /api/cities`
+- `GET /api/cities/:id`
+- `GET /api/map`
+- `GET /api/tools`
+- `GET /api/tools/:id`
+- `GET /api/visa/countries`
+- `GET /api/visa/info?nationality=us`
+- `POST /api/visa/generate`
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/logout`
+- `GET /api/auth/me`
+- `POST /api/auth/update-profile`
+- `POST /api/auth/forgot-password`
+- `POST /api/auth/reset-password`
+- `GET /api/trips`
+- `POST /api/trips`
+- `DELETE /api/trips/:id`
+- `GET /api/admin/users`
+- `DELETE /api/admin/users/:id`
 
-## Current Implementation Notes
+## Structure
 
-- Foundation phase has already landed in code: auth/admin/trips/config contract tests live under `tests/`.
-- Main-page Atlas rollout is at the structural layer: homepage, chat, trips, tools, and admin all have the new containers and entry points.
-- Current persistence is SQLite-backed in `/workspace/VP-Hermes-Web/api/auth.py`; this repo is no longer documented as relying on Supabase for the active auth/trip/chat path.
-
-## Iteration Roadmap
-
-See [PLAN.md](PLAN.md) for detailed iteration plan.
+```text
+api/        WSGI router and API modules
+data/       JSON knowledge and policy datasets
+static/img/ Visual assets used by the app
+tests/      Python contract tests
+web/        Static app, PWA manifest, service worker, and Node tests
+vercel.json Vercel routing configuration
+```
