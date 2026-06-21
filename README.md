@@ -6,12 +6,12 @@ Active repository: `https://github.com/JTCAO515/VP-Codex-Web`
 
 ## Current Version
 
-`v6.0.4` upgrades the front-end visual system: shared design tokens, steadier cards, clearer controls, and a more polished mobile portrait workspace.
+`v6.0.5` upgrades Chat into a professional consultation workspace with mode-specific prompts, answer depth controls, model routing, and configurable external API adapters.
 
 ## Product Surface
 
 - Plan: first-screen travel workspace with destination input, featured cities, and readiness checklist.
-- Ask: streaming AI travel guide with a deterministic local fallback when no DeepSeek key is configured.
+- Ask: streaming AI travel guide with consultation modes, professional presets, model routing, and a deterministic local fallback.
 - Cities: searchable China destination cards built from the curated city dataset.
 - Tools: packing, pricing, phrase, emergency, and visa helper views.
 - Trips: authenticated saved trips with a guest local draft mode.
@@ -42,6 +42,9 @@ node --test web/tests/*.test.js
 
 - `DEEPSEEK_API_KEY`: optional; enables remote AI answers for `/api/chat`.
 - `DEEPSEEK_MODEL`: optional; defaults to `deepseek-chat`.
+- `OPENAI_COMPATIBLE_API_KEY`: optional key for another OpenAI-compatible chat completions provider.
+- `OPENAI_COMPATIBLE_BASE_URL`: optional base URL for the compatible provider, for example a `/v1` endpoint.
+- `OPENAI_COMPATIBLE_MODEL`: optional model name for the compatible provider.
 - `AUTH_DB_PATH`: optional SQLite path for local or test storage.
 - `ADMIN_EMAIL` and `ADMIN_PASSWORD`: optional admin seed. Weak defaults such as `admin123` are ignored.
 - `AUTH_EXPOSE_RESET_TOKEN=1`: test-only reset token exposure.

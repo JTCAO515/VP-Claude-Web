@@ -3,6 +3,12 @@ const state = {
   user: null,
   cities: [],
   tools: [],
+  chat: {
+    mode: "itinerary",
+    provider: "auto",
+    depth: "standard",
+    optionsLoaded: false,
+  },
   authMode: "login",
 };
 
@@ -104,11 +110,39 @@ function renderTags(parent, items) {
   parent.appendChild(wrap);
 }
 
+function populateSelect(selector, items, selected) {
+  const select = $(selector);
+  if (!select || !items?.length) return;
+  select.replaceChildren(...items.map((item) => {
+    const option = document.createElement("option");
+    option.value = item.id;
+    option.textContent = item.available === false ? `${item.label} (not configured)` : item.label;
+    option.disabled = item.available === false;
+    option.title = item.description || "";
+    return option;
+  }));
+  const enabled = items.find((item) => item.id === selected && item.available !== false) || items.find((item) => item.available !== false);
+  if (enabled) select.value = enabled.id;
+}
+
 function renderFacts(parent, className, items) {
   const wrap = document.createElement("div");
   wrap.className = className;
   items.filter(Boolean).forEach((item) => wrap.appendChild(createText("span", "", item)));
   if (wrap.children.length) parent.appendChild(wrap);
+}
+
+async function loadChatOptions() {
+  try {
+    const data = await api("/api/chat");
+    populateSelect("#chatMode", data.modes, state.chat.mode);
+    populateSelect("#chatProvider", data.providers, state.chat.provider);
+    populateSelect("#chatDepth", data.depths, state.chat.depth);
+    state.chat.optionsLoaded = true;
+    setStatus("#chatStatus", "Auto route ready. Choose a mode or start with a preset.");
+  } catch (error) {
+    setStatus("#chatStatus", "Chat options are using local defaults.", "error");
+  }
 }
 
 function cityCard(city) {
@@ -240,14 +274,26 @@ function addMessage(author, text, kind = "") {
   return $("p", node);
 }
 
-async function sendChat(message) {
+function currentChatSettings(overrides = {}) {
+  return {
+    mode: overrides.mode || $("#chatMode")?.value || state.chat.mode,
+    provider: overrides.provider || $("#chatProvider")?.value || state.chat.provider,
+    depth: overrides.depth || $("#chatDepth")?.value || state.chat.depth,
+  };
+}
+
+async function sendChat(message, overrides = {}) {
+  const settings = currentChatSettings(overrides);
+  state.chat = { ...state.chat, ...settings };
+  setStatus("#chatStatus", "Thinking through the route...");
   addMessage("You", message, "user");
   const target = addMessage("VisePanda", "");
+  const targetMessage = target.closest(".message");
   try {
     const response = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ message, ...settings }),
     });
     if (!response.ok || !response.body) {
       throw new Error("I could not reach the guide service. Please try again.");
@@ -264,6 +310,10 @@ async function sendChat(message) {
       lines.forEach((line) => {
         if (!line.startsWith("data:")) return;
         const payload = JSON.parse(line.slice(5).trim());
+        if (payload.meta) {
+          $("span", targetMessage).textContent = `VisePanda - ${payload.meta.modeLabel} - ${payload.meta.providerLabel}`;
+          setStatus("#chatStatus", `${payload.meta.modeLabel} via ${payload.meta.providerLabel}`);
+        }
         if (payload.token) target.textContent += payload.token;
       });
       $("#chatLog").scrollTop = $("#chatLog").scrollHeight;
@@ -351,8 +401,18 @@ function bindEvents() {
   $$(".nav__item").forEach((button) => button.addEventListener("click", () => setView(button.dataset.view)));
   $$("[data-prompt]").forEach((button) => button.addEventListener("click", async () => {
     setView("chat");
-    await sendChat(button.dataset.prompt);
+    if (button.dataset.mode && $("#chatMode")) $("#chatMode").value = button.dataset.mode;
+    if (button.dataset.depth && $("#chatDepth")) $("#chatDepth").value = button.dataset.depth;
+    await sendChat(button.dataset.prompt, { mode: button.dataset.mode, depth: button.dataset.depth });
   }));
+  ["#chatMode", "#chatProvider", "#chatDepth"].forEach((selector) => {
+    const control = $(selector);
+    if (!control) return;
+    control.addEventListener("change", () => {
+      state.chat = { ...state.chat, ...currentChatSettings() };
+      setStatus("#chatStatus", "Chat settings updated.");
+    });
+  });
   $("#citySearch").addEventListener("input", loadCities);
   $("#chatForm").addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -441,8 +501,8 @@ function bindEvents() {
 async function boot() {
   bindEvents();
   document.body.dataset.view = "dashboard";
-  addMessage("VisePanda", "Tell me where you want to go, how many days you have, and your travel style. I will shape a practical China route.");
-  await Promise.all([loadCities(), restoreSession()]);
+  addMessage("VisePanda", "Tell me your nationality, travel month, total days, budget band, and what you care about most. I can answer as an itinerary strategist, entry analyst, budget planner, transit planner, food guide, safety checker, or city fit comparator.");
+  await Promise.all([loadCities(), restoreSession(), loadChatOptions()]);
 }
 
 document.addEventListener("DOMContentLoaded", boot);

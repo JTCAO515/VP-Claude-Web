@@ -30,11 +30,24 @@ class ApiContractTests(unittest.TestCase):
         self.assertEqual(visa["policy"]["country"], "United States")
 
     def test_chat_streams_server_sent_events(self):
-        code, body, headers = request("POST", "/api/chat", {"message": "Plan Beijing and Chengdu for 7 days"})
+        code, body, headers = request("POST", "/api/chat", {
+            "message": "Plan Beijing and Chengdu for 7 days",
+            "mode": "itinerary",
+            "provider": "local-guide",
+            "depth": "expert",
+        })
         self.assertEqual(code, 200)
         self.assertIn("text/event-stream", headers["Content-Type"])
         self.assertIn("data:", body)
+        self.assertIn("providerLabel", body)
         self.assertIn("Beijing", body)
+
+    def test_chat_options_expose_modes_and_routes(self):
+        code, data, _ = request("GET", "/api/chat")
+        self.assertEqual(code, 200)
+        self.assertIn("itinerary", {mode["id"] for mode in data["modes"]})
+        self.assertIn("local-guide", {provider["id"] for provider in data["providers"]})
+        self.assertIn("expert", {depth["id"] for depth in data["depths"]})
 
 
 if __name__ == "__main__":

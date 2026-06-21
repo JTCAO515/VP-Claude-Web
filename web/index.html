@@ -6,7 +6,7 @@
     <title>VisePanda | China Travel Workspace</title>
     <meta name="description" content="Plan China travel with city intelligence, visa guidance, readiness tools, and an AI trip assistant.">
     <link rel="manifest" href="/web/manifest.json">
-    <link rel="stylesheet" href="/web/app.css?v=20260621-v604">
+    <link rel="stylesheet" href="/web/app.css?v=20260621-v605-chat">
   </head>
   <body>
     <header class="topbar">
@@ -101,11 +101,59 @@
           <h2>Ask VisePanda</h2>
         </div>
         <div class="chat-shell">
-          <div class="chat-prompts" aria-label="Suggested questions">
-            <button type="button" data-prompt="Give me a calm 3 day Shanghai itinerary with food and metro tips.">Shanghai 3 days</button>
-            <button type="button" data-prompt="What should I prepare before landing in mainland China?">Before landing</button>
-            <button type="button" data-prompt="Help me choose between Chengdu and Xi'an for a first trip.">Choose a city</button>
+          <div class="chat-toolbar" aria-label="Chat settings">
+            <label>
+              Mode
+              <select id="chatMode">
+                <option value="itinerary">Itinerary strategist</option>
+                <option value="entry">Entry and visa analyst</option>
+                <option value="budget">Budget analyst</option>
+                <option value="transit">Transit planner</option>
+                <option value="food">Food and culture guide</option>
+                <option value="safety">Safety and readiness checker</option>
+                <option value="city-fit">City fit comparator</option>
+                <option value="custom">General travel consultant</option>
+              </select>
+            </label>
+            <label>
+              Model route
+              <select id="chatProvider">
+                <option value="auto">Auto route</option>
+                <option value="local-guide">Local guide</option>
+              </select>
+            </label>
+            <label>
+              Depth
+              <select id="chatDepth">
+                <option value="standard">Standard</option>
+                <option value="quick">Quick</option>
+                <option value="expert">Expert</option>
+              </select>
+            </label>
           </div>
+          <div class="chat-prompts" aria-label="Professional question presets">
+            <section class="preset-group">
+              <h3>Route</h3>
+              <button type="button" data-mode="itinerary" data-depth="expert" data-prompt="Create a 10 day first-time China itinerary for a US traveler. Compare Beijing-Shanghai-Xi'an against Beijing-Chengdu-Shanghai, include rail logic, daily pacing, hotel areas, and what to skip.">10 day route audit</button>
+              <button type="button" data-mode="city-fit" data-depth="standard" data-prompt="Compare Beijing, Shanghai, Chengdu, Xi'an, and Guilin for a first-time traveler who likes food, history, and comfortable transport. Rank them and explain tradeoffs.">City fit ranking</button>
+            </section>
+            <section class="preset-group">
+              <h3>Entry</h3>
+              <button type="button" data-mode="entry" data-depth="expert" data-prompt="Build a China entry readiness checklist for a US passport holder visiting for tourism. Include visa assumptions, transit questions, documents, payment setup, apps, and what must be verified before booking.">Entry checklist</button>
+              <button type="button" data-mode="safety" data-depth="standard" data-prompt="Create a pre-departure risk and backup plan for mainland China covering emergency numbers, medicine, translation, maps, payment failure, and hotel registration.">Backup plan</button>
+            </section>
+            <section class="preset-group">
+              <h3>Spend</h3>
+              <button type="button" data-mode="budget" data-depth="expert" data-prompt="Estimate a realistic 7 day China budget for two travelers across Beijing and Shanghai. Break down lodging, meals, attractions, metro, taxis, rail, and payment friction.">Budget model</button>
+              <button type="button" data-mode="transit" data-depth="standard" data-prompt="Compare high-speed rail versus domestic flights for Beijing to Xi'an to Shanghai. Include booking friction for foreigners, station or airport transfers, delays, and comfort.">Rail vs flight</button>
+            </section>
+            <section class="preset-group">
+              <h3>Local</h3>
+              <button type="button" data-mode="food" data-depth="standard" data-prompt="Plan a Chengdu food-focused day with dish names, neighborhoods, spice warnings, ordering tips, and a calmer alternative for travelers who do not handle heat well.">Food day</button>
+              <button type="button" data-mode="custom" data-depth="expert" data-prompt="Act as a China travel consultant. Interview me with the minimum questions needed to design a professional route, then explain how each answer will change the plan.">Consult me</button>
+            </section>
+          </div>
+          <p class="view-status chat-status" id="chatStatus" role="status" aria-live="polite">Auto route ready. Choose a mode or start with a preset.</p>
           <div class="chat-log" id="chatLog" aria-live="polite"></div>
           <form class="chat-form" id="chatForm">
             <textarea id="chatInput" rows="3" placeholder="Ask for a route, budget, visa checklist, or city comparison"></textarea>
@@ -201,6 +249,6 @@
       <article class="message"><span></span><p></p></article>
     </template>
 
-    <script src="/web/app.js?v=20260621-v604" defer></script>
+    <script src="/web/app.js?v=20260621-v605-chat" defer></script>
   </body>
 </html>
