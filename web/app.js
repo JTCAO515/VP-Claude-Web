@@ -104,6 +104,13 @@ function renderTags(parent, items) {
   parent.appendChild(wrap);
 }
 
+function renderFacts(parent, className, items) {
+  const wrap = document.createElement("div");
+  wrap.className = className;
+  items.filter(Boolean).forEach((item) => wrap.appendChild(createText("span", "", item)));
+  if (wrap.children.length) parent.appendChild(wrap);
+}
+
 function cityCard(city) {
   const article = document.createElement("article");
   article.className = "city-card";
@@ -114,7 +121,7 @@ function cityCard(city) {
   const body = document.createElement("div");
   body.className = "city-card__body";
   body.appendChild(createText("h3", "", city.name));
-  body.appendChild(createText("p", "meta", `${city.province} | ${city.duration} | ${city.bestSeason}`));
+  renderFacts(body, "city-card__facts", [city.province, city.duration, city.bestSeason]);
   body.appendChild(createText("p", "meta", city.vibe));
   renderTags(body, city.highlights || []);
   article.appendChild(body);
@@ -296,9 +303,8 @@ function tripCard(trip) {
   const card = document.createElement("article");
   card.className = "trip-card";
   card.appendChild(createText("h3", "", trip.title));
-  card.appendChild(createText("p", "meta", trip.destination || "China"));
   const dates = [trip.startDate, trip.endDate].filter(Boolean).join(" to ");
-  if (dates) card.appendChild(createText("p", "meta", dates));
+  renderFacts(card, "trip-card__facts", [trip.destination || "China", dates]);
   return card;
 }
 

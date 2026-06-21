@@ -6,7 +6,7 @@ Active repository: `https://github.com/JTCAO515/VP-Codex-Web`
 
 ## Current Version
 
-`v6.0.3` continues the clean rewrite line with mobile UX hardening: clearer loading, empty, error, and success states plus phone-first account and saved-trip flows.
+`v6.0.4` upgrades the front-end visual system: shared design tokens, steadier cards, clearer controls, and a more polished mobile portrait workspace.
 
 ## Product Surface
 

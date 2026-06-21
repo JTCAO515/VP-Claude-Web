@@ -6,7 +6,7 @@
     <title>VisePanda | China Travel Workspace</title>
     <meta name="description" content="Plan China travel with city intelligence, visa guidance, readiness tools, and an AI trip assistant.">
     <link rel="manifest" href="/web/manifest.json">
-    <link rel="stylesheet" href="/web/app.css?v=20260621-v603">
+    <link rel="stylesheet" href="/web/app.css?v=20260621-v604">
   </head>
   <body>
     <header class="topbar">
@@ -145,7 +145,10 @@
             <p class="eyebrow">Saved plans</p>
             <h2>Trips</h2>
           </div>
-          <button class="secondary" id="refreshTrips" type="button">Refresh</button>
+          <button class="secondary" id="refreshTrips" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2"></path><path d="M3 12A9 9 0 0 1 18.5 5.8"></path><path d="M18 2v4h4"></path><path d="M6 22v-4H2"></path></svg>
+            Refresh
+          </button>
         </div>
         <p class="view-status" id="tripStatus" role="status" aria-live="polite"></p>
         <form class="trip-form" id="tripForm">
@@ -153,7 +156,10 @@
           <input name="destination" placeholder="Destination" aria-label="Destination">
           <input name="startDate" type="date" aria-label="Start date">
           <input name="endDate" type="date" aria-label="End date">
-          <button class="primary" type="submit">Save trip</button>
+          <button class="primary" type="submit">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"></path><path d="M17 21v-8H7v8"></path><path d="M7 3v5h8"></path></svg>
+            Save trip
+          </button>
         </form>
         <div class="trip-list" id="tripList"></div>
       </section>
@@ -195,6 +201,6 @@
       <article class="message"><span></span><p></p></article>
     </template>
 
-    <script src="/web/app.js?v=20260621-v603" defer></script>
+    <script src="/web/app.js?v=20260621-v604" defer></script>
   </body>
 </html>

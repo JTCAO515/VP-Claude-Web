@@ -1,14 +1,42 @@
 :root {
-  --ink: #172126;
-  --muted: #60707a;
-  --line: #d9e4e8;
-  --panel: #ffffff;
-  --soft: #f4f8f9;
-  --sky: #1f9ac7;
-  --leaf: #2d8a63;
-  --orange: #df6d2d;
-  --orange-dark: #b9501f;
-  --shadow: 0 18px 48px rgba(23, 33, 38, 0.12);
+  --bg: #f6f9f8;
+  --bg-elevated: #fbfdfc;
+  --surface: #ffffff;
+  --surface-soft: #f1f7f7;
+  --surface-tint: #e7f2f4;
+  --text: #172126;
+  --text-muted: #5b6c75;
+  --text-subtle: #71818a;
+  --border: #d9e4e8;
+  --border-strong: #b9d2da;
+  --brand: #1f9ac7;
+  --brand-strong: #0d6380;
+  --accent: #df6d2d;
+  --accent-strong: #b9501f;
+  --success: #2d8a63;
+  --warning: #b7791f;
+  --danger: #b42318;
+  --radius: 8px;
+  --shadow-soft: 0 8px 24px rgba(23, 33, 38, 0.06);
+  --shadow-raised: 0 14px 34px rgba(23, 33, 38, 0.11);
+  --shadow-sticky: 0 18px 44px rgba(23, 33, 38, 0.2);
+  --focus-ring: 0 0 0 3px rgba(31, 154, 199, 0.18);
+  --space-1: 6px;
+  --space-2: 10px;
+  --space-3: 14px;
+  --space-4: 18px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --ink: var(--text);
+  --muted: var(--text-muted);
+  --line: var(--border);
+  --panel: var(--surface);
+  --soft: var(--surface-soft);
+  --sky: var(--brand);
+  --leaf: var(--success);
+  --orange: var(--accent);
+  --orange-dark: var(--accent-strong);
+  --shadow: var(--shadow-raised);
   color-scheme: light;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -19,7 +47,7 @@
 
 body {
   margin: 0;
-  background: #f7faf9;
+  background: var(--bg);
   color: var(--ink);
   min-height: 100vh;
 }
@@ -33,7 +61,11 @@ textarea {
 
 button {
   cursor: pointer;
-  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 button:disabled {
@@ -62,7 +94,7 @@ svg {
   gap: 24px;
   min-height: 72px;
   padding: 12px clamp(18px, 4vw, 48px);
-  background: rgba(247, 250, 249, 0.92);
+  background: rgba(246, 249, 248, 0.92);
   border-bottom: 1px solid var(--line);
   backdrop-filter: blur(16px);
 }
@@ -92,7 +124,7 @@ svg {
   gap: 6px;
   min-height: 58px;
   padding: 8px 18px;
-  background: rgba(247, 250, 249, 0.92);
+  background: rgba(246, 249, 248, 0.92);
   border-bottom: 1px solid var(--line);
   backdrop-filter: blur(16px);
 }
@@ -121,8 +153,9 @@ svg {
 }
 
 .nav__item.is-active {
-  background: #e6f2f5;
-  color: #0b5d78;
+  background: var(--surface-tint);
+  color: var(--brand-strong);
+  box-shadow: inset 0 0 0 1px rgba(31, 154, 199, 0.16);
 }
 
 .icon-button {
@@ -131,7 +164,7 @@ svg {
   width: 42px;
   height: 42px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: var(--panel);
   color: var(--ink);
 }
@@ -143,7 +176,7 @@ svg {
   min-height: calc(100vh - 116px);
   max-height: 760px;
   border-bottom: 1px solid var(--line);
-  background: var(--panel);
+  background: var(--bg-elevated);
 }
 
 .hero__media {
@@ -219,8 +252,8 @@ h3 {
   border: 1px solid #cfe0e5;
   border-radius: 999px;
   padding: 0 14px;
-  background: #f0f8f8;
-  color: #195f74;
+  background: var(--surface-soft);
+  color: var(--brand-strong);
   font-weight: 800;
 }
 
@@ -251,8 +284,8 @@ select,
 textarea {
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fff;
+  border-radius: var(--radius);
+  background: var(--surface);
   color: var(--ink);
   outline: 0;
 }
@@ -273,7 +306,7 @@ input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--sky);
-  box-shadow: 0 0 0 3px rgba(31, 154, 199, 0.16);
+  box-shadow: var(--focus-ring);
 }
 
 button:focus-visible,
@@ -292,7 +325,7 @@ textarea:focus-visible {
   justify-content: center;
   gap: 8px;
   min-height: 46px;
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 0 18px;
   font-weight: 800;
 }
@@ -301,6 +334,7 @@ textarea:focus-visible {
   border: 1px solid var(--orange);
   background: var(--orange);
   color: #fff;
+  box-shadow: 0 8px 18px rgba(223, 109, 45, 0.18);
 }
 
 .primary:hover {
@@ -319,8 +353,8 @@ textarea:focus-visible {
 .tool-card:hover,
 .city-card:hover,
 .trip-card:hover {
-  border-color: #b9d5dd;
-  box-shadow: 0 12px 32px rgba(23, 33, 38, 0.1);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-raised);
 }
 
 .section {
@@ -353,7 +387,11 @@ textarea:focus-visible {
 }
 
 .view-status[data-tone="error"] {
-  color: #b42318;
+  color: var(--danger);
+}
+
+.view-status[data-tone="success"] {
+  color: var(--success);
 }
 
 .search {
@@ -383,16 +421,16 @@ textarea:focus-visible {
 .trip-card,
 .chat-shell {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: var(--panel);
-  box-shadow: 0 8px 24px rgba(23, 33, 38, 0.06);
+  box-shadow: var(--shadow-soft);
 }
 
 .empty-state,
 .skeleton-card {
-  border: 1px dashed #bfd4db;
-  border-radius: 8px;
-  background: #fff;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
   padding: 18px;
 }
 
@@ -428,7 +466,7 @@ textarea:focus-visible {
 
 .skeleton-card span:first-child {
   height: 120px;
-  border-radius: 8px;
+  border-radius: var(--radius);
 }
 
 .skeleton-card span:last-child {
@@ -454,10 +492,44 @@ textarea:focus-visible {
   padding: 18px;
 }
 
+.city-card__body,
+.tool-card,
+.trip-card {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.city-card__body h3,
+.tool-card h3,
+.trip-card h3 {
+  margin-bottom: 0;
+}
+
+.city-card__facts,
+.trip-card__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.city-card__facts span,
+.trip-card__facts span {
+  min-height: 26px;
+  border: 1px solid #d9e8ec;
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: var(--surface-soft);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
 .meta {
   color: var(--muted);
   font-size: 0.9rem;
   line-height: 1.55;
+  margin-bottom: 0;
 }
 
 .tags {
@@ -510,7 +582,7 @@ textarea:focus-visible {
 .chat-prompts {
   padding: 14px 16px;
   border-bottom: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface);
 }
 
 .chat-log {
@@ -529,7 +601,7 @@ textarea:focus-visible {
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 14px 16px;
-  background: #fff;
+  background: var(--surface);
 }
 
 .message.is-user {
@@ -559,7 +631,7 @@ textarea:focus-visible {
   gap: 12px;
   padding: 16px;
   border-top: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface);
 }
 
 .tool-grid {
@@ -572,6 +644,7 @@ textarea:focus-visible {
 
 .tool-card button {
   margin-top: 12px;
+  justify-self: start;
 }
 
 .tool-detail {
@@ -602,7 +675,7 @@ textarea:focus-visible {
 
 .auth-dialog {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: var(--panel);
   box-shadow: var(--shadow);
   width: min(520px, calc(100vw - 32px));
@@ -650,9 +723,9 @@ textarea:focus-visible {
   display: grid;
   align-items: center;
   border: 1px solid #bdd7de;
-  border-radius: 8px;
+  border-radius: var(--radius);
   padding: 10px 14px;
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   box-shadow: var(--shadow);
   opacity: 0;
@@ -744,9 +817,9 @@ textarea:focus-visible {
     padding: 6px;
     overflow: visible;
     border: 1px solid rgba(185, 213, 221, 0.92);
-    border-radius: 18px;
+    border-radius: var(--radius);
     background: rgba(255, 255, 255, 0.94);
-    box-shadow: 0 18px 44px rgba(23, 33, 38, 0.2);
+    box-shadow: var(--shadow-sticky);
     backdrop-filter: blur(18px);
   }
 
@@ -755,7 +828,7 @@ textarea:focus-visible {
     gap: 3px;
     min-width: 0;
     min-height: 54px;
-    border-radius: 12px;
+    border-radius: var(--radius);
     font-size: 0.72rem;
   }
 
@@ -830,9 +903,9 @@ textarea:focus-visible {
     gap: 10px;
     padding: 10px;
     border: 1px solid var(--line);
-    border-radius: 8px;
-    background: #fff;
-    box-shadow: 0 10px 26px rgba(23, 33, 38, 0.08);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow-soft);
   }
 
   .planner label:first-child {
@@ -974,8 +1047,8 @@ textarea:focus-visible {
     gap: 10px;
     padding: 12px;
     border: 1px solid var(--line);
-    border-radius: 8px;
-    background: #fff;
+    border-radius: var(--radius);
+    background: var(--surface);
   }
 
   .auth-dialog {
@@ -985,7 +1058,7 @@ textarea:focus-visible {
     max-width: none;
     max-height: calc(100dvh - 34px);
     margin: 0;
-    border-radius: 8px;
+    border-radius: var(--radius);
     overflow: auto;
   }
 
