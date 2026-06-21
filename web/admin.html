@@ -203,7 +203,7 @@
     if (!confirm('Delete this user? This cannot be undone.')) return;
     try {
       const data = await api(API + '/api/admin/users/' + userId, { method: 'DELETE' });
-      if (data.success) {
+      if (!data.error) {
         toast('User deleted', 'success');
         loadUsers();
       } else {

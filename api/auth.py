@@ -15,13 +15,15 @@ Database: data/users.db
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import os
+import secrets
 import sqlite3
 import time
 import urllib.request
 import uuid
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from urllib.parse import parse_qs
 
@@ -38,6 +40,8 @@ TOKEN_SECONDS = TOKEN_DAYS * 24 * 3600
 
 # ── Admin override key (optional, set env ADMIN_KEY for extra security) ──
 ADMIN_KEY = os.environ.get("ADMIN_KEY", "vp-admin-2026")
+DEFAULT_ADMIN_EMAIL = "admin@go2china.space"
+DEFAULT_ADMIN_PASSWORD = "admin123"
 
 # ── Google OAuth ──
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
@@ -151,17 +155,26 @@ def init_db():
     """)
     conn.execute("CREATE INDEX IF NOT EXISTS idx_reset_token ON password_reset_tokens(token)")
 
-    # Seed default admin user (safe to run repeatedly)
-    admin_email = os.environ.get("ADMIN_EMAIL", "admin@go2china.space")
-    admin_password = os.environ.get("ADMIN_PASSWORD", "admin123")
-    existing = conn.execute("SELECT id FROM users WHERE email = ?", (admin_email,)).fetchone()
-    if existing is None:
-        pw_hash, salt = _hash_password(admin_password)
-        admin_id = uuid.uuid4().hex[:16]
-        conn.execute(
-            "INSERT INTO users (id, email, password_hash, salt, display_name, role, status) VALUES (?, ?, ?, ?, ?, 'admin', 'active')",
-            (admin_id, admin_email, pw_hash, salt, "Admin")
-        )
+    # Seed an admin only when a real password is explicitly configured.
+    admin_email = (os.environ.get("ADMIN_EMAIL") or "").strip().lower()
+    admin_password = os.environ.get("ADMIN_PASSWORD") or ""
+    if admin_email and admin_password and admin_password != DEFAULT_ADMIN_PASSWORD:
+        existing = conn.execute("SELECT id FROM users WHERE email = ?", (admin_email,)).fetchone()
+        if existing is None:
+            pw_hash, salt = _hash_password(admin_password)
+            admin_id = uuid.uuid4().hex[:16]
+            conn.execute(
+                "INSERT INTO users (id, email, password_hash, salt, display_name, role, status) VALUES (?, ?, ?, ?, ?, 'admin', 'active')",
+                (admin_id, admin_email, pw_hash, salt, "Admin")
+            )
+    default_admin = conn.execute("SELECT id, password_hash, salt FROM users WHERE email = ?", (DEFAULT_ADMIN_EMAIL,)).fetchone()
+    if default_admin:
+        default_hash, _ = _hash_password(DEFAULT_ADMIN_PASSWORD, default_admin["salt"])
+        if hmac.compare_digest(default_hash, default_admin["password_hash"]):
+            conn.execute(
+                "UPDATE users SET status = 'disabled', updated_at = datetime('now') WHERE id = ?",
+                (default_admin["id"],)
+            )
 
     conn.commit()
     conn.close()
@@ -204,6 +217,32 @@ def _read_post(environ) -> dict:
         return {}
 
 
+_RATE_LIMITS: dict[str, list[float]] = {}
+
+
+def _client_ip(environ) -> str:
+    forwarded = environ.get("HTTP_X_FORWARDED_FOR", "")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return environ.get("REMOTE_ADDR", "unknown")
+
+
+def _rate_key(environ, action: str, subject: str = "") -> str:
+    return f"{action}:{_client_ip(environ)}:{subject.lower()[:128]}"
+
+
+def _is_rate_limited(key: str, *, limit: int, window_seconds: int) -> bool:
+    now = time.time()
+    cutoff = now - window_seconds
+    hits = [ts for ts in _RATE_LIMITS.get(key, []) if ts >= cutoff]
+    if len(hits) >= limit:
+        _RATE_LIMITS[key] = hits
+        return True
+    hits.append(now)
+    _RATE_LIMITS[key] = hits
+    return False
+
+
 def _hash_password(password: str, salt: str = None) -> tuple[str, str]:
     """Hash password with salt. Returns (hash, salt)."""
     if salt is None:
@@ -213,7 +252,7 @@ def _hash_password(password: str, salt: str = None) -> tuple[str, str]:
 
 
 def _generate_token() -> str:
-    return uuid.uuid4().hex + uuid.uuid4().hex  # 64 hex chars
+    return secrets.token_hex(32)
 
 
 def _get_user_from_token(token: str) -> dict | None:
@@ -270,10 +309,8 @@ def handle_register(environ, start_response):
     if err:
         return _json_error(start_response, err)
 
-    # Check if first user → admin
     conn = _get_db()
-    user_count = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
-    role = "admin" if user_count == 0 else "user"
+    role = "user"
 
     # Check duplicate
     existing = conn.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
@@ -312,6 +349,9 @@ def handle_login(environ, start_response):
     if not email or not password:
         return _json_error(start_response, "Email and password required")
 
+    if _is_rate_limited(_rate_key(environ, "login", email), limit=10, window_seconds=300):
+        return _json_error(start_response, "Too many login attempts. Please try again later.", "429 Too Many Requests")
+
     conn = _get_db()
     row = conn.execute(
         "SELECT id, email, password_hash, salt, display_name, role, status FROM users WHERE email = ?",
@@ -328,7 +368,7 @@ def handle_login(environ, start_response):
         return _json_error(start_response, "Account is not active", "403 Forbidden")
 
     expected_hash, _ = _hash_password(password, user["salt"])
-    if expected_hash != user["password_hash"]:
+    if not hmac.compare_digest(expected_hash, user["password_hash"]):
         conn.close()
         return _json_error(start_response, "Invalid email or password", "401 Unauthorized")
 
@@ -842,9 +882,21 @@ def handle_update_profile(environ, start_response):
     # Password
     if "password" in data and data["password"]:
         pw = data["password"]
-        if len(pw) < 4:
+        current_password = data.get("current_password") or ""
+        if not current_password:
             conn.close()
-            return _json_error(start_response, "Password must be at least 4 characters")
+            return _json_error(start_response, "Current password is required to change password", "400 Bad Request")
+        row = conn.execute("SELECT password_hash, salt FROM users WHERE id = ?", (user["id"],)).fetchone()
+        if row is None:
+            conn.close()
+            return _json_error(start_response, "User not found", "404 Not Found")
+        current_hash, _ = _hash_password(current_password, row["salt"])
+        if not hmac.compare_digest(current_hash, row["password_hash"]):
+            conn.close()
+            return _json_error(start_response, "Current password is incorrect", "403 Forbidden")
+        if len(pw) < 6:
+            conn.close()
+            return _json_error(start_response, "Password must be at least 6 characters")
         pw_hash, salt = _hash_password(pw)
         updates.append("password_hash = ?")
         params.append(pw_hash)
@@ -878,6 +930,8 @@ def handle_forgot_password(environ, start_response):
         return _json_error(start_response, "Email is required")
 
     email = data["email"].strip().lower()
+    if _is_rate_limited(_rate_key(environ, "forgot-password", email), limit=5, window_seconds=3600):
+        return _json_error(start_response, "Too many reset requests. Please try again later.", "429 Too Many Requests")
     conn = _get_db()
     user = conn.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
 
@@ -889,18 +943,16 @@ def handle_forgot_password(environ, start_response):
         # Invalidate old unused tokens for this user
         conn.execute("UPDATE password_reset_tokens SET used = 1 WHERE user_id = ? AND used = 0", (user_id,))
 
-        token = uuid.uuid4().hex[:32]
-        token_id = uuid.uuid4().hex[:16]
-        expires = (datetime.utcnow() + timedelta(hours=1)).strftime("%Y-%m-%d %H:%M:%S")
+        token = secrets.token_hex(32)
+        token_id = secrets.token_hex(16)
+        expires = (datetime.now(UTC).replace(tzinfo=None) + timedelta(hours=1)).strftime("%Y-%m-%d %H:%M:%S")
 
         conn.execute(
             "INSERT INTO password_reset_tokens (id, user_id, token, expires_at) VALUES (?, ?, ?, ?)",
             (token_id, user_id, token, expires)
         )
-        # Include the token in response so the frontend can show it
-        # In production, this would be sent via email instead
-        response["reset_token"] = token
-        response["user_id"] = user_id
+        if os.environ.get("AUTH_EXPOSE_RESET_TOKEN") == "1":
+            response["reset_token"] = token
 
     conn.commit()
     conn.close()
@@ -919,8 +971,11 @@ def handle_reset_password(environ, start_response):
     if not token or not password:
         return _json_error(start_response, "Token and new password are required")
 
-    if len(password) < 4:
-        return _json_error(start_response, "Password must be at least 4 characters")
+    if len(password) < 6:
+        return _json_error(start_response, "Password must be at least 6 characters")
+
+    if _is_rate_limited(_rate_key(environ, "reset-password", token), limit=8, window_seconds=3600):
+        return _json_error(start_response, "Too many reset attempts. Please try again later.", "429 Too Many Requests")
 
     conn = _get_db()
     row = conn.execute(
@@ -934,7 +989,7 @@ def handle_reset_password(environ, start_response):
 
     token_data = dict(row)
     expires = datetime.strptime(token_data["expires_at"], "%Y-%m-%d %H:%M:%S")
-    if datetime.utcnow() > expires:
+    if datetime.now(UTC).replace(tzinfo=None) > expires:
         conn.close()
         return _json_error(start_response, "Reset token has expired", "400 Bad Request")
 

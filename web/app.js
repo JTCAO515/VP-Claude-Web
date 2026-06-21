@@ -1237,7 +1237,7 @@ const VP = (function(){
       <div class="msg-avatar">${role === 'assistant' || role === 'bot' ? getPandaAvatar() : '👤'}</div>
       <div class="msg-body">
         <div class="msg-sender">${role === 'assistant' || role === 'bot' ? 'VisePanda' : 'You'}</div>
-        <div class="msg-text">${role === 'user' ? text.replace(/\n/g, '<br>') : renderMD(text)}</div>
+        <div class="msg-text">${role === 'user' ? escHtml(text).replace(/\n/g, '<br>') : renderMD(text)}</div>
       </div>
     `;
     container.appendChild(msg);
@@ -2499,8 +2499,8 @@ const VP = (function(){
         errEl.classList.remove('hidden');
         return;
       }
-      if (!pw || pw.length < 4) {
-        errEl.textContent = 'Password must be at least 4 characters.';
+      if (!pw || pw.length < 6) {
+        errEl.textContent = 'Password must be at least 6 characters.';
         errEl.classList.remove('hidden');
         return;
       }
@@ -2804,6 +2804,8 @@ const VP = (function(){
       succEl.classList.add('hidden');
 
       var name = document.getElementById('settings-name').value.trim();
+      var currentPwEl = document.getElementById('settings-current-password');
+      var currentPw = currentPwEl ? currentPwEl.value : '';
       var pw = document.getElementById('settings-password').value;
       var pw2 = document.getElementById('settings-password-confirm').value;
 
@@ -2819,15 +2821,24 @@ const VP = (function(){
         return;
       }
 
-      if (pw && pw.length < 4) {
-        errEl.textContent = 'Password must be at least 4 characters.';
+      if (pw && !currentPw) {
+        errEl.textContent = 'Enter your current password to change password.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      if (pw && pw.length < 6) {
+        errEl.textContent = 'Password must be at least 6 characters.';
         errEl.classList.remove('hidden');
         return;
       }
 
       var body = {};
       if (name) body.display_name = name;
-      if (pw) body.password = pw;
+      if (pw) {
+        body.current_password = currentPw;
+        body.password = pw;
+      }
 
       fetch('/api/auth/update-profile', {
         method: 'POST',
@@ -2848,6 +2859,7 @@ const VP = (function(){
         succEl.textContent = 'Settings saved!';
         succEl.classList.remove('hidden');
         // Clear password fields
+        if (currentPwEl) currentPwEl.value = '';
         document.getElementById('settings-password').value = '';
         document.getElementById('settings-password-confirm').value = '';
       }).catch(function(){

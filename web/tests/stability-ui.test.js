@@ -14,6 +14,12 @@ test('auth trigger exposes stable modal hooks', () => {
   assert.match(appJs, /safeInitStep/);
 });
 
+test('auth and chat escape high-risk user-controlled fields', () => {
+  assert.match(html, /id="settings-current-password"/);
+  assert.match(appJs, /role === 'user' \? escHtml\(text\)\.replace/);
+  assert.match(appJs, /body\.current_password = currentPw/);
+});
+
 test('view shell exposes loading and error containers', () => {
   assert.match(html, /id="global-loading-state"/);
   assert.match(html, /id="global-error-state"/);
