@@ -1,4 +1,4 @@
-const CACHE_NAME = "visepanda-shell-v605-chat";
+const CACHE_NAME = "visepanda-shell-v607-auth2";
 const APP_SHELL = [
   "/",
   "/web/index.html",

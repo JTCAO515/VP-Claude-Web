@@ -6,7 +6,7 @@
     <title>VisePanda | China Travel Workspace</title>
     <meta name="description" content="Plan China travel with city intelligence, visa guidance, readiness tools, and an AI trip assistant.">
     <link rel="manifest" href="/web/manifest.json">
-    <link rel="stylesheet" href="/web/app.css?v=20260621-v605-chat">
+    <link rel="stylesheet" href="/web/app.css?v=20260622-v607-auth2">
   </head>
   <body>
     <header class="topbar">
@@ -227,11 +227,21 @@
           <p class="muted" id="authStatus">Save trips across devices and manage your profile.</p>
         </div>
         <form class="auth-form" id="authForm">
-          <input name="name" placeholder="Name" aria-label="Name">
           <input name="email" type="email" placeholder="Email" aria-label="Email" required>
           <input name="password" type="password" placeholder="Password" aria-label="Password" minlength="8" required>
           <button class="primary" type="submit">Continue</button>
           <button class="link-button" type="button" id="toggleAuthMode">Create an account</button>
+          <a class="secondary google-login" id="googleLogin" href="/api/auth/google/start">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 12h7"></path><path d="M18 15.5A7 7 0 1 1 16.8 7"></path></svg>
+            Continue with Google
+          </a>
+        </form>
+        <form class="auth-form is-hidden" id="verifyForm">
+          <input name="email" type="email" placeholder="Email" aria-label="Email" required>
+          <input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" aria-label="Verification code" required>
+          <button class="primary" type="submit">Verify email</button>
+          <button class="secondary" type="button" id="resendVerification">Resend code</button>
+          <button class="link-button" type="button" id="backToSignIn">Back to sign in</button>
         </form>
         <form class="profile-form is-hidden" id="profileForm">
           <input name="name" placeholder="Display name" aria-label="Display name">
@@ -249,6 +259,6 @@
       <article class="message"><span></span><p></p></article>
     </template>
 
-    <script src="/web/app.js?v=20260621-v605-chat" defer></script>
+    <script src="/web/app.js?v=20260622-v607-auth2" defer></script>
   </body>
 </html>

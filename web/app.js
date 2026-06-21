@@ -10,6 +10,11 @@ const state = {
     optionsLoaded: false,
   },
   authMode: "login",
+  pendingEmail: "",
+  authConfig: {
+    google: false,
+    emailVerification: true,
+  },
 };
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -143,6 +148,15 @@ async function loadChatOptions() {
   } catch (error) {
     setStatus("#chatStatus", "Chat options are using local defaults.", "error");
   }
+}
+
+async function loadAuthConfig() {
+  try {
+    state.authConfig = await api("/api/auth/config");
+  } catch {
+    state.authConfig = { google: false, emailVerification: true };
+  }
+  updateAuthUi();
 }
 
 function cityCard(city) {
@@ -374,12 +388,24 @@ async function saveTrip(form) {
 
 function updateAuthUi() {
   const signedIn = Boolean(state.user);
-  $("#authTitle").textContent = signedIn ? "Profile" : state.authMode === "login" ? "Sign in" : "Create account";
-  $("#authStatus").textContent = signedIn ? `Signed in as ${state.user.email}` : "Save trips across devices and manage your profile.";
+  const verifying = state.authMode === "verify" && !signedIn;
+  $("#authTitle").textContent = signedIn ? "Profile" : verifying ? "Verify email" : state.authMode === "login" ? "Sign in" : "Create account";
+  $("#authStatus").textContent = signedIn
+    ? `Signed in as ${state.user.email}`
+    : verifying
+      ? `Enter the code sent to ${state.pendingEmail || "your email"}.`
+      : state.authMode === "login"
+        ? "Use your email and password, or continue with Google."
+        : "Create an account with email and password. We will send a verification code.";
   $("#authButton").title = signedIn ? state.user.email : "Account";
-  $("#authForm").classList.toggle("is-hidden", signedIn);
+  $("#authForm").classList.toggle("is-hidden", signedIn || verifying);
+  $("#verifyForm").classList.toggle("is-hidden", !verifying);
   $("#profileForm").classList.toggle("is-hidden", !signedIn);
   $("#toggleAuthMode").textContent = state.authMode === "login" ? "Create an account" : "Sign in instead";
+  $("#googleLogin").classList.toggle("is-hidden", !state.authConfig.google);
+  if (verifying && state.pendingEmail) {
+    $("#verifyForm").elements.email.value = state.pendingEmail;
+  }
   if (signedIn) {
     $("#profileForm").elements.name.value = state.user.name || "";
   }
@@ -395,6 +421,16 @@ async function restoreSession() {
     sessionStorage.removeItem("vp_token");
   }
   updateAuthUi();
+}
+
+function handleAuthReturn() {
+  const params = new URLSearchParams(window.location.search);
+  const authError = params.get("auth_error");
+  if (authError) showToast(authError, "error");
+  if (params.get("auth") === "google") showToast("Signed in with Google");
+  if (authError || params.get("auth")) {
+    history.replaceState({}, "", window.location.pathname);
+  }
 }
 
 function bindEvents() {
@@ -432,8 +468,9 @@ function bindEvents() {
   });
   $("#tripForm").addEventListener("submit", async (event) => {
     event.preventDefault();
-    const button = event.currentTarget.querySelector("button");
-    await withButtonBusy(button, "Saving", () => saveTrip(event.currentTarget));
+    const form = event.currentTarget;
+    const button = form.querySelector("button");
+    await withButtonBusy(button, "Saving", () => saveTrip(form));
   });
   $("#refreshTrips").addEventListener("click", (event) => withButtonBusy(event.currentTarget, "Refreshing", loadTrips));
   $("#authButton").addEventListener("click", () => {
@@ -444,18 +481,29 @@ function bindEvents() {
     state.authMode = state.authMode === "login" ? "register" : "login";
     updateAuthUi();
   });
+  $("#backToSignIn").addEventListener("click", () => {
+    state.authMode = "login";
+    updateAuthUi();
+  });
   $("#authForm").addEventListener("submit", async (event) => {
     event.preventDefault();
-    const body = Object.fromEntries(new FormData(event.currentTarget).entries());
+    const form = event.currentTarget;
+    const body = Object.fromEntries(new FormData(form).entries());
     const endpoint = state.authMode === "login" ? "/api/auth/login" : "/api/auth/register";
-    const button = event.currentTarget.querySelector("button[type='submit']");
+    const button = form.querySelector("button[type='submit']");
     await withButtonBusy(button, "Working", async () => {
       try {
         const data = await api(endpoint, { method: "POST", body: JSON.stringify(body) });
+        let message = "Account ready";
         if (data.token) {
           state.token = data.token;
           sessionStorage.setItem("vp_token", state.token);
           state.user = data.user;
+        } else if (data.requiresVerification) {
+          state.pendingEmail = data.email || body.email;
+          state.authMode = "verify";
+          $("#verifyForm").elements.code.value = data.verificationCode || "";
+          message = data.delivery === "sent" ? "Verification code sent" : "Verification code ready";
         } else {
           state.authMode = "login";
           const login = await api("/api/auth/login", { method: "POST", body: JSON.stringify(body) });
@@ -463,9 +511,48 @@ function bindEvents() {
           sessionStorage.setItem("vp_token", state.token);
           state.user = login.user;
         }
-        event.currentTarget.reset();
+        form.reset();
         updateAuthUi();
-        showToast("Account ready");
+        showToast(message);
+      } catch (error) {
+        if (error.message.includes("Verify your email")) {
+          state.pendingEmail = body.email;
+          state.authMode = "verify";
+          updateAuthUi();
+        }
+        showToast(error.message, "error");
+      }
+    });
+  });
+  $("#verifyForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const body = Object.fromEntries(new FormData(form).entries());
+    const button = form.querySelector("button[type='submit']");
+    await withButtonBusy(button, "Verifying", async () => {
+      try {
+        const data = await api("/api/auth/verify-email", { method: "POST", body: JSON.stringify(body) });
+        state.token = data.token;
+        sessionStorage.setItem("vp_token", state.token);
+        state.user = data.user;
+        state.pendingEmail = "";
+        form.reset();
+        updateAuthUi();
+        showToast("Email verified");
+      } catch (error) {
+        showToast(error.message, "error");
+      }
+    });
+  });
+  $("#resendVerification").addEventListener("click", async (event) => {
+    const email = $("#verifyForm").elements.email.value || state.pendingEmail;
+    await withButtonBusy(event.currentTarget, "Sending", async () => {
+      try {
+        const data = await api("/api/auth/resend-verification", { method: "POST", body: JSON.stringify({ email }) });
+        state.pendingEmail = data.email || email;
+        if (data.verificationCode) $("#verifyForm").elements.code.value = data.verificationCode;
+        updateAuthUi();
+        showToast(data.delivery === "sent" ? "Verification code sent" : "Verification code ready");
       } catch (error) {
         showToast(error.message, "error");
       }
@@ -473,14 +560,15 @@ function bindEvents() {
   });
   $("#profileForm").addEventListener("submit", async (event) => {
     event.preventDefault();
-    const body = Object.fromEntries(new FormData(event.currentTarget).entries());
-    const button = event.currentTarget.querySelector("button[type='submit']");
+    const form = event.currentTarget;
+    const body = Object.fromEntries(new FormData(form).entries());
+    const button = form.querySelector("button[type='submit']");
     await withButtonBusy(button, "Updating", async () => {
       try {
         const data = await api("/api/auth/update-profile", { method: "POST", body: JSON.stringify(body) });
         state.user = data.user;
-        event.currentTarget.elements.currentPassword.value = "";
-        event.currentTarget.elements.newPassword.value = "";
+        form.elements.currentPassword.value = "";
+        form.elements.newPassword.value = "";
         updateAuthUi();
         showToast("Profile updated");
       } catch (error) {
@@ -499,10 +587,11 @@ function bindEvents() {
 }
 
 async function boot() {
+  handleAuthReturn();
   bindEvents();
   document.body.dataset.view = "dashboard";
   addMessage("VisePanda", "Tell me your nationality, travel month, total days, budget band, and what you care about most. I can answer as an itinerary strategist, entry analyst, budget planner, transit planner, food guide, safety checker, or city fit comparator.");
-  await Promise.all([loadCities(), restoreSession(), loadChatOptions()]);
+  await Promise.all([loadCities(), restoreSession(), loadChatOptions(), loadAuthConfig()]);
 }
 
 document.addEventListener("DOMContentLoaded", boot);

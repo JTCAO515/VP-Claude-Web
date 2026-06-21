@@ -54,7 +54,20 @@ def request(method, path, body=None, token=None, query=""):
 
 
 def register_and_login(email="traveler@example.com", password="SecurePass123!"):
-    request("POST", "/api/auth/register", {"email": email, "password": password, "name": "Traveler"})
+    old = os.environ.get("AUTH_EXPOSE_EMAIL_CODE")
+    os.environ["AUTH_EXPOSE_EMAIL_CODE"] = "1"
+    try:
+        code, registered, _ = request("POST", "/api/auth/register", {"email": email, "password": password})
+        if code == 201:
+            code, verified, _ = request("POST", "/api/auth/verify-email", {"email": email, "code": registered["verificationCode"]})
+            assert code == 200, verified
+        else:
+            assert code == 409, registered
+    finally:
+        if old is None:
+            os.environ.pop("AUTH_EXPOSE_EMAIL_CODE", None)
+        else:
+            os.environ["AUTH_EXPOSE_EMAIL_CODE"] = old
     code, data, _ = request("POST", "/api/auth/login", {"email": email, "password": password})
     assert code == 200, data
     return data["token"], data["user"]

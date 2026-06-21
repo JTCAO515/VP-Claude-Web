@@ -6,7 +6,7 @@ def public_config():
         "app": {
             "name": "VisePanda",
             "domain": "go2china.space",
-            "version": "6.0.6",
+            "version": "6.0.7",
             "environment": os.environ.get("VERCEL_ENV") or os.environ.get("ENVIRONMENT", "local"),
         },
         "features": {
@@ -15,6 +15,11 @@ def public_config():
             "chat": True,
             "visa": True,
             "admin": True,
+        },
+        "auth": {
+            "emailVerification": True,
+            "google": bool(os.environ.get("GOOGLE_CLIENT_ID") and os.environ.get("GOOGLE_CLIENT_SECRET")),
+            "emailProvider": "resend" if os.environ.get("RESEND_API_KEY") else "development",
         },
         "ai": {
             "provider": "deepseek" if os.environ.get("DEEPSEEK_API_KEY") else "local-guide",

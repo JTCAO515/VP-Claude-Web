@@ -27,7 +27,7 @@ test("mobile portrait interaction shell has thumb-friendly controls", () => {
   assert.match(html, /data-prompt="Plan a first-time 7 day China route/);
 });
 
-test("v6.0.6 exposes mobile status surfaces", () => {
+test("v6.0.7 exposes mobile status surfaces", () => {
   assert.match(html, /id="cityStatus"/);
   assert.match(html, /id="toolStatus"/);
   assert.match(html, /id="tripStatus"/);
@@ -38,16 +38,16 @@ test("v6.0.6 exposes mobile status surfaces", () => {
   assert.match(css, /\.sheet-handle/);
 });
 
-test("v6.0.6 uses shared visual system tokens", () => {
+test("v6.0.7 uses shared visual system tokens", () => {
   assert.match(css, /--surface:/);
   assert.match(css, /--focus-ring:/);
   assert.match(css, /--shadow-raised:/);
   assert.match(css, /\.city-card__facts/);
   assert.match(css, /\.trip-card__facts/);
-  assert.match(html, /20260621-v605/);
+  assert.match(html, /20260622-v607-auth2/);
 });
 
-test("v6.0.6 exposes professional chat controls", () => {
+test("v6.0.7 exposes professional chat controls", () => {
   assert.match(html, /id="chatMode"/);
   assert.match(html, /id="chatProvider"/);
   assert.match(html, /id="chatDepth"/);
@@ -56,3 +56,16 @@ test("v6.0.6 exposes professional chat controls", () => {
   assert.match(css, /\.chat-toolbar/);
   assert.match(css, /\.preset-group/);
 });
+
+test("v6.0.7 exposes email verification and Google auth controls", () => {
+  assert.match(html, /id="googleLogin"/);
+  assert.match(html, /id="verifyForm"/);
+  assert.match(html, /id="resendVerification"/);
+  assert.doesNotMatch(html, /name="name" placeholder="Name"/);
+  assert.match(appJs(), /\/api\/auth\/verify-email/);
+  assert.match(appJs(), /\/api\/auth\/resend-verification/);
+});
+
+function appJs() {
+  return fs.readFileSync(path.join(root, "app.js"), "utf8");
+}

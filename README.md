@@ -6,7 +6,7 @@ Active repository: `https://github.com/JTCAO515/VP-Codex-Web`
 
 ## Current Version
 
-`v6.0.6` wires the Chat model route to DeepSeek V4 Flash by default while keeping the professional consultation workspace, answer depth controls, and configurable external API adapters.
+`v6.0.7` modernizes account access with email-code verification, password login without name collection, and Google OAuth hooks while keeping the DeepSeek V4 Flash chat route.
 
 ## Product Surface
 
@@ -40,6 +40,10 @@ node --test web/tests/*.test.js
 
 ## Environment
 
+- `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`: optional; enables Google OAuth login.
+- `GOOGLE_REDIRECT_URI`: optional; defaults to `/api/auth/google/callback` on the app base URL.
+- `RESEND_API_KEY` and `EMAIL_FROM`: optional; sends email verification codes through Resend.
+- `AUTH_EXPOSE_EMAIL_CODE=1`: test-only verification code exposure.
 - `DEEPSEEK_API_KEY`: optional; enables remote AI answers for `/api/chat`.
 - `DEEPSEEK_MODEL`: optional; defaults to `deepseek-v4-flash`.
 - `OPENAI_COMPATIBLE_API_KEY`: optional key for another OpenAI-compatible chat completions provider.
@@ -63,6 +67,10 @@ node --test web/tests/*.test.js
 - `GET /api/visa/info?nationality=us`
 - `POST /api/visa/generate`
 - `POST /api/auth/register`
+- `POST /api/auth/verify-email`
+- `POST /api/auth/resend-verification`
+- `GET /api/auth/google/start`
+- `GET /api/auth/google/callback`
 - `POST /api/auth/login`
 - `POST /api/auth/logout`
 - `GET /api/auth/me`
