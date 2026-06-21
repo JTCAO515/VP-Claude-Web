@@ -1,5 +1,16 @@
 # Changelog
 
+## v6.0.8 - 2026-06-22
+
+### Changed
+- Reworked the first screen into a mobile-first planning workspace with quicker prompts, a compact visual panel, and entry/route/local snapshot cards.
+- Strengthened the bottom navigation into clearer app-style tabs with selected state semantics and a more visible active indicator.
+- Added a thumb-friendly mobile Ask AI shortcut that jumps directly into the chat workflow.
+- Refined the visual system with a brighter sky travel palette, cleaner card rhythm, and improved mobile spacing.
+
+### Regression
+- Updated frontend structure tests for tab semantics, mobile Ask access, and the new planning surface.
+
 ## v5.0.9 — 2026-06-20
 
 ### Fixed

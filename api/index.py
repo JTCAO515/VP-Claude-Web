@@ -14,7 +14,7 @@ def application(environ, start_response):
         return json_response(start_response, {"ok": True}, environ=environ)
 
     if path == "/api/health":
-        return json_response(start_response, {"ok": True, "service": "VisePanda", "version": "6.0.7"}, environ=environ)
+        return json_response(start_response, {"ok": True, "service": "VisePanda", "version": "6.0.8"}, environ=environ)
 
     if path == "/api/config":
         return json_response(start_response, public_config(), environ=environ)

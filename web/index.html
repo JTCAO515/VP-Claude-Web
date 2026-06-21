@@ -6,7 +6,7 @@
     <title>VisePanda | China Travel Workspace</title>
     <meta name="description" content="Plan China travel with city intelligence, visa guidance, readiness tools, and an AI trip assistant.">
     <link rel="manifest" href="/web/manifest.json">
-    <link rel="stylesheet" href="/web/app.css?v=20260622-v607-auth2">
+    <link rel="stylesheet" href="/web/app.css?v=20260622-v608-mobile-ui3">
   </head>
   <body>
     <header class="topbar">
@@ -18,38 +18,37 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.7-4 4.4-6 8-6s6.3 2 8 6"></path></svg>
       </button>
     </header>
-    <nav class="nav" aria-label="Primary">
-      <button class="nav__item is-active" data-view="dashboard">
+    <nav class="nav" aria-label="Primary" role="tablist">
+      <button class="nav__item is-active" id="tab-dashboard" data-view="dashboard" role="tab" aria-selected="true" aria-controls="panel-dashboard">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11 12 4l9 7"></path><path d="M5 10v10h14V10"></path><path d="M9 20v-6h6v6"></path></svg>
         <span>Plan</span>
       </button>
-      <button class="nav__item" data-view="chat">
+      <button class="nav__item" id="tab-chat" data-view="chat" role="tab" aria-selected="false" aria-controls="panel-chat">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"></path></svg>
         <span>Ask</span>
       </button>
-      <button class="nav__item" data-view="cities">
+      <button class="nav__item" id="tab-cities" data-view="cities" role="tab" aria-selected="false" aria-controls="panel-cities">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 22V8l7-4 9 4v14"></path><path d="M4 14h16"></path><path d="M8 22v-4h8v4"></path></svg>
         <span>Cities</span>
       </button>
-      <button class="nav__item" data-view="tools">
+      <button class="nav__item" id="tab-tools" data-view="tools" role="tab" aria-selected="false" aria-controls="panel-tools">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 7 9 2 4 7"></path><path d="M9 2v13"></path><path d="M20 17l-5 5-5-5"></path><path d="M15 22V9"></path></svg>
         <span>Tools</span>
       </button>
-      <button class="nav__item" data-view="trips">
+      <button class="nav__item" id="tab-trips" data-view="trips" role="tab" aria-selected="false" aria-controls="panel-trips">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-3-6 3Z"></path><path d="M9 8h6"></path><path d="M9 12h4"></path></svg>
         <span>Trips</span>
       </button>
     </nav>
 
     <main>
-      <section class="hero" data-view-panel="dashboard">
-        <div class="hero__media">
-          <img src="/static/img/great-wall.jpg" alt="Great Wall landscape">
-        </div>
+      <section class="hero" id="panel-dashboard" data-view-panel="dashboard" role="tabpanel" aria-labelledby="tab-dashboard">
         <div class="hero__content">
-          <p class="eyebrow">China travel planning for international visitors</p>
-          <h1>VisePanda</h1>
-          <p class="lead">Build a trip around real city fit, visa readiness, daily logistics, and a practical AI guide that knows what overseas travelers usually miss.</p>
+          <div class="hero__copy">
+            <p class="eyebrow">China travel planning for international visitors</p>
+            <h1>VisePanda</h1>
+            <p class="lead">Build a trip around real city fit, visa readiness, daily logistics, and a practical AI guide that knows what overseas travelers usually miss.</p>
+          </div>
           <div class="prompt-rail" aria-label="Quick planning prompts">
             <button type="button" data-prompt="Plan a first-time 7 day China route with simple rail transfers.">First trip</button>
             <button type="button" data-prompt="Compare Beijing, Shanghai, Chengdu, and Xi'an for a food-focused trip.">Food route</button>
@@ -73,6 +72,27 @@
               Ask AI
             </button>
           </form>
+          <div class="home-snapshot" aria-label="Planning focus">
+            <article>
+              <strong>Entry</strong>
+              <span>Visa, transit, documents</span>
+            </article>
+            <article>
+              <strong>Route</strong>
+              <span>Rail logic and pacing</span>
+            </article>
+            <article>
+              <strong>Local</strong>
+              <span>Payments, maps, food</span>
+            </article>
+          </div>
+        </div>
+        <div class="hero__media">
+          <img src="/static/img/great-wall.jpg" alt="Great Wall landscape">
+          <div class="hero__media-note">
+            <strong>Plan with context</strong>
+            <span>City fit, readiness, and daily logistics in one workspace.</span>
+          </div>
         </div>
       </section>
 
@@ -95,7 +115,7 @@
         </aside>
       </section>
 
-      <section class="workspace section is-hidden" data-view-panel="chat">
+      <section class="workspace section is-hidden" id="panel-chat" data-view-panel="chat" role="tabpanel" aria-labelledby="tab-chat">
         <div class="section__head">
           <p class="eyebrow">AI Guide</p>
           <h2>Ask VisePanda</h2>
@@ -165,7 +185,7 @@
         </div>
       </section>
 
-      <section class="workspace section is-hidden" data-view-panel="cities">
+      <section class="workspace section is-hidden" id="panel-cities" data-view-panel="cities" role="tabpanel" aria-labelledby="tab-cities">
         <div class="section__head row">
           <div>
             <p class="eyebrow">Destinations</p>
@@ -177,7 +197,7 @@
         <div class="city-grid" id="cityGrid"></div>
       </section>
 
-      <section class="workspace section is-hidden" data-view-panel="tools">
+      <section class="workspace section is-hidden" id="panel-tools" data-view-panel="tools" role="tabpanel" aria-labelledby="tab-tools">
         <div class="section__head">
           <p class="eyebrow">Before you go</p>
           <h2>Travel Tools</h2>
@@ -187,7 +207,7 @@
         <div class="tool-detail" id="toolDetail"></div>
       </section>
 
-      <section class="workspace section is-hidden" data-view-panel="trips">
+      <section class="workspace section is-hidden" id="panel-trips" data-view-panel="trips" role="tabpanel" aria-labelledby="tab-trips">
         <div class="section__head row">
           <div>
             <p class="eyebrow">Saved plans</p>
@@ -212,6 +232,11 @@
         <div class="trip-list" id="tripList"></div>
       </section>
     </main>
+
+    <button class="mobile-ask-fab" id="mobileAskButton" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"></path></svg>
+      Ask AI
+    </button>
 
     <dialog class="auth-dialog" id="authDialog">
       <div class="sheet-handle" aria-hidden="true"></div>
@@ -259,6 +284,6 @@
       <article class="message"><span></span><p></p></article>
     </template>
 
-    <script src="/web/app.js?v=20260622-v607-auth2" defer></script>
+    <script src="/web/app.js?v=20260622-v608-mobile-ui3" defer></script>
   </body>
 </html>

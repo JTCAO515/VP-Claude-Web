@@ -94,11 +94,23 @@ async function api(path, options = {}) {
 
 function setView(view) {
   document.body.dataset.view = view;
-  $$(".nav__item").forEach((button) => button.classList.toggle("is-active", button.dataset.view === view));
-  $$("[data-view-panel]").forEach((panel) => panel.classList.toggle("is-hidden", panel.dataset.viewPanel !== view));
+  $$(".nav__item").forEach((button) => {
+    const active = button.dataset.view === view;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-selected", active ? "true" : "false");
+    button.tabIndex = active ? 0 : -1;
+  });
+  $$("[data-view-panel]").forEach((panel) => {
+    const hidden = panel.dataset.viewPanel !== view;
+    panel.classList.toggle("is-hidden", hidden);
+    panel.toggleAttribute("hidden", hidden);
+  });
   if (view === "cities") loadCities();
   if (view === "tools") loadTools();
   if (view === "trips") loadTrips();
+  if (window.matchMedia("(max-width: 560px)").matches) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 }
 
 function createText(tag, className, value) {
@@ -435,6 +447,10 @@ function handleAuthReturn() {
 
 function bindEvents() {
   $$(".nav__item").forEach((button) => button.addEventListener("click", () => setView(button.dataset.view)));
+  $("#mobileAskButton").addEventListener("click", () => {
+    setView("chat");
+    setTimeout(() => $("#chatInput")?.focus(), 180);
+  });
   $$("[data-prompt]").forEach((button) => button.addEventListener("click", async () => {
     setView("chat");
     if (button.dataset.mode && $("#chatMode")) $("#chatMode").value = button.dataset.mode;

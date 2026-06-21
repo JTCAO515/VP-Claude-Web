@@ -6,7 +6,7 @@ def public_config():
         "app": {
             "name": "VisePanda",
             "domain": "go2china.space",
-            "version": "6.0.7",
+            "version": "6.0.8",
             "environment": os.environ.get("VERCEL_ENV") or os.environ.get("ENVIRONMENT", "local"),
         },
         "features": {

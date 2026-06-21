@@ -6,7 +6,7 @@ Active repository: `https://github.com/JTCAO515/VP-Codex-Web`
 
 ## Current Version
 
-`v6.0.7` modernizes account access with email-code verification, password login without name collection, and Google OAuth hooks while keeping the DeepSeek V4 Flash chat route.
+`v6.0.8` refines the mobile portrait experience with a planning-first home surface, clearer app-style tabs, a thumb-friendly Ask AI shortcut, and brighter travel-product UI polish.
 
 ## Product Surface
 
