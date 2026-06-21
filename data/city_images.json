@@ -1,0 +1,164 @@
+{
+  "beijing": {
+    "image": "city-beijing.jpg",
+    "tags": [
+      "history"
+    ]
+  },
+  "shanghai": {
+    "image": "city-shanghai.jpg",
+    "tags": [
+      "city"
+    ]
+  },
+  "chengdu": {
+    "image": "city-chengdu.jpg",
+    "tags": [
+      "food"
+    ]
+  },
+  "xian": {
+    "image": "city-xian.jpg",
+    "tags": [
+      "history"
+    ]
+  },
+  "guangzhou": {
+    "image": "city-guangzhou.jpg",
+    "tags": [
+      "city"
+    ]
+  },
+  "hangzhou": {
+    "image": "city-hangzhou.jpg",
+    "tags": [
+      "nature"
+    ]
+  },
+  "guilin": {
+    "image": "city-guilin.jpg",
+    "tags": [
+      "nature"
+    ]
+  },
+  "chongqing": {
+    "image": "city-chongqing.jpg",
+    "tags": [
+      "city"
+    ]
+  },
+  "kunming": {
+    "image": "city-kunming.jpg",
+    "tags": [
+      "nature"
+    ]
+  },
+  "shenzhen": {
+    "image": "city-shenzhen.jpg",
+    "tags": [
+      "city"
+    ]
+  },
+  "suzhou": {
+    "image": "city-suzhou.jpg",
+    "tags": [
+      "culture"
+    ]
+  },
+  "nanjing": {
+    "image": "city-nanjing.jpg",
+    "tags": [
+      "history"
+    ]
+  },
+  "xiamen": {
+    "image": "city-xiamen.jpg",
+    "tags": [
+      "city"
+    ]
+  },
+  "qingdao": {
+    "image": "city-qingdao.jpg",
+    "tags": [
+      "city"
+    ]
+  },
+  "dalian": {
+    "image": "city-dalian.jpg",
+    "tags": [
+      "city"
+    ]
+  },
+  "harbin": {
+    "image": "city-harbin.jpg",
+    "tags": [
+      "city"
+    ]
+  },
+  "lhasa": {
+    "image": "city-lhasa.jpg",
+    "tags": [
+      "nature"
+    ]
+  },
+  "zhangjiajie": {
+    "image": "city-zhangjiajie.jpg",
+    "tags": [
+      "nature"
+    ]
+  },
+  "huangshan": {
+    "image": "city-huangshan.jpg",
+    "tags": [
+      "nature"
+    ]
+  },
+  "sanya": {
+    "image": "city-sanya.jpg",
+    "tags": [
+      "nature"
+    ]
+  },
+  "wuhan": {
+    "image": "city-wuhan.jpg",
+    "tags": [
+      "city"
+    ]
+  },
+  "dali": {
+    "image": "city-dali.jpg",
+    "tags": [
+      "nature"
+    ]
+  },
+  "lijiang": {
+    "image": "city-lijiang.jpg",
+    "tags": [
+      "nature"
+    ]
+  },
+  "guiyang": {
+    "image": "city-guiyang.jpg",
+    "tags": [
+      "nature"
+    ]
+  },
+  "dunhuang": {
+    "image": "city-dunhuang.jpg",
+    "tags": [
+      "history"
+    ]
+  },
+  "luoyang": {
+    "image": "city-luoyang.jpg",
+    "tags": [
+      "history"
+    ]
+  },
+  "kaifeng": {
+    "image": "city-kaifeng.jpg",
+    "tags": [
+      "history"
+    ]
+  }
+}

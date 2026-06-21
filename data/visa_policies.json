@@ -1,0 +1,103 @@
+{
+  "us": {
+    "country": "United States",
+    "nationality": "American",
+    "visa_required": true,
+    "visa_type": "L Visa (Tourist)",
+    "processing_time": "4-7 business days",
+    "validity": "10 years, multiple entry",
+    "max_stay": "60 days per entry",
+    "fee": "$185",
+    "documents_required": [
+      "Valid passport (6+ months validity)",
+      "Completed visa application form",
+      "Recent passport photo (2x2 inch)",
+      "Flight itinerary",
+      "Hotel reservation",
+      "Bank statement (last 3 months)",
+      "Travel insurance"
+    ],
+    "special_notes": "EVUS enrollment required before travel ($8, valid 2 years). All applicants 14+ must interview at consulate unless renewing within 48 months.",
+    "country_code": "us"
+  },
+  "uk": {
+    "country": "United Kingdom",
+    "nationality": "British",
+    "visa_required": true,
+    "visa_type": "L Visa (Tourist)",
+    "processing_time": "4-7 business days",
+    "validity": "2 years, multiple entry",
+    "max_stay": "30 days per entry",
+    "fee": "£151",
+    "documents_required": [
+      "Valid passport (6+ months validity)",
+      "Completed visa application form",
+      "Recent passport photo",
+      "Flight itinerary",
+      "Hotel reservation",
+      "Bank statement (last 3 months)",
+      "Proof of employment or study"
+    ],
+    "special_notes": "Biometric enrollment required. Some nationalities eligible for 24-hour express service.",
+    "country_code": "gb"
+  },
+  "australia": {
+    "country": "Australia",
+    "nationality": "Australian",
+    "visa_required": true,
+    "visa_type": "S1 Visa (Tourist)",
+    "processing_time": "3-5 business days",
+    "validity": "1 year, single/multiple entry",
+    "max_stay": "30 days per entry",
+    "fee": "A$150",
+    "documents_required": [
+      "Valid passport (6+ months validity)",
+      "Completed visa application form",
+      "Recent passport photo",
+      "Flight itinerary",
+      "Hotel reservation",
+      "Bank statement (last 3 months)"
+    ],
+    "special_notes": "eVisitor (online) available for Australian passport holders. 10-year multiple entry visa also available for frequent travelers.",
+    "country_code": "au"
+  },
+  "canada": {
+    "country": "Canada",
+    "nationality": "Canadian",
+    "visa_required": true,
+    "visa_type": "L Visa (Tourist)",
+    "processing_time": "5-10 business days",
+    "validity": "Up to 10 years, multiple entry",
+    "max_stay": "60 days per entry",
+    "fee": "CAD $100",
+    "documents_required": [
+      "Valid passport (6+ months validity)",
+      "Completed visa application form",
+      "Recent passport photo",
+      "Flight itinerary",
+      "Hotel reservation",
+      "Bank statement (last 3 months)",
+      "Proof of employment"
+    ],
+    "special_notes": "Biometric interview required for first-time applicants. Canada citizens should check if 15-day visa-free pilot applies (check latest policy).",
+    "country_code": "ca"
+  },
+  "schengen": {
+    "country": "Schengen Area",
+    "nationality": "Schengen (EU/EEA)",
+    "visa_required": false,
+    "visa_type": "Visa-free (pilot program)",
+    "processing_time": "N/A",
+    "validity": "15 days visa-free (pilot, check status)",
+    "max_stay": "15 days per visit",
+    "fee": "€0 (visa-free pilot)",
+    "documents_required": [
+      "Valid passport (6+ months validity)",
+      "Return flight ticket",
+      "Hotel reservation",
+      "Travel insurance recommended"
+    ],
+    "special_notes": "China's 2024 visa-free pilot allows 15-day stays for citizens of France, Germany, Italy, Netherlands, Spain, and other European countries. Check official policy before travel as terms may have changed.",
+    "country_code": "eu"
+  }
+}

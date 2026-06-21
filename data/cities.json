@@ -1,0 +1,835 @@
+{
+  "beijing": {
+    "name_en": "Beijing",
+    "name_cn": "北京",
+    "province": "Beijing",
+    "best_season": "Spring/Autumn (Mar–May, Sep–Nov)",
+    "days": "3-7 days",
+    "budget_tip": "Accommodation is pricey — try hutong guesthouses or hotels outside 3rd Ring Road",
+    "vibe": "Historic grandeur + Modern capital",
+    "keywords": [
+      "Forbidden City（故宫）",
+      "Great Wall（长城）",
+      "Hutongs（胡同）",
+      "Peking Duck（烤鸭）",
+      "Peking Opera（京剧）",
+      "798 Art District",
+      "Tiananmen Square（天安门）"
+    ],
+    "highlights": [
+      "Forbidden City（故宫）",
+      "Great Wall（长城）",
+      "Hutongs（胡同）",
+      "Peking Duck（烤鸭）"
+    ],
+    "image": "/static/img/city-beijing.jpg"
+  },
+  "shanghai": {
+    "name_en": "Shanghai",
+    "name_cn": "上海",
+    "province": "Shanghai",
+    "best_season": "Spring/Autumn (Mar–May, Oct–Nov)",
+    "days": "2-5 days",
+    "budget_tip": "Bund/Lujiazui accommodation is expensive — French Concession B&Bs offer better value",
+    "vibe": "Chic metropolis + Shanghai-style culture",
+    "keywords": [
+      "The Bund（外滩）",
+      "Disneyland（迪士尼）",
+      "French Concession（法租界）",
+      "Soup Dumplings（小笼包）",
+      "Yu Garden（豫园）",
+      "Lujiazui（陆家嘴）"
+    ],
+    "highlights": [
+      "The Bund（外滩）",
+      "Disneyland（迪士尼）",
+      "French Concession（法租界）",
+      "Soup Dumplings（小笼包）"
+    ],
+    "image": "/static/img/city-shanghai.jpg"
+  },
+  "chengdu": {
+    "name_en": "Chengdu",
+    "name_cn": "成都",
+    "province": "Sichuan",
+    "best_season": "Spring/Autumn (Mar–Jun, Sep–Nov)",
+    "days": "3-6 days",
+    "budget_tip": "Food is incredibly cheap, accommodation also very affordable",
+    "vibe": "Food capital + Laid-back lifestyle",
+    "keywords": [
+      "Hotpot（火锅）",
+      "Pandas（熊猫）",
+      "Kuanzhai Alley（宽窄巷子）",
+      "Dujiangyan（都江堰）",
+      "Chuanchuan（串串）",
+      "Teahouse（茶馆）"
+    ],
+    "highlights": [
+      "Hotpot（火锅）",
+      "Pandas（熊猫）",
+      "Kuanzhai Alley（宽窄巷子）",
+      "Dujiangyan（都江堰）"
+    ],
+    "image": "/static/img/city-chengdu.jpg"
+  },
+  "xian": {
+    "name_en": "Xi'an",
+    "name_cn": "西安",
+    "province": "Shaanxi",
+    "best_season": "Spring/Autumn (Mar–May, Sep–Oct)",
+    "days": "2-4 days",
+    "budget_tip": "Overall quite affordable, Terracotta Warriors ticket is pricier",
+    "vibe": "Ancient capital of 13 dynasties",
+    "keywords": [
+      "Terracotta Warriors（兵马俑）",
+      "Ancient City Wall（古城墙）",
+      "Muslim Quarter（回民街）",
+      "Big Wild Goose Pagoda（大雁塔）",
+      "Biangbiang Noodles（biangbiang面）"
+    ],
+    "highlights": [
+      "Terracotta Warriors（兵马俑）",
+      "Ancient City Wall（古城墙）",
+      "Muslim Quarter（回民街）",
+      "Big Wild Goose Pagoda（大雁塔）"
+    ],
+    "image": "/static/img/city-xian.jpg"
+  },
+  "guilin": {
+    "name_en": "Guilin",
+    "name_cn": "桂林",
+    "province": "Guangxi",
+    "best_season": "Apr–Oct (watch for rainy season)",
+    "days": "3-5 days",
+    "budget_tip": "Yangshuo West Street has options for every budget",
+    "vibe": "Finest landscape under heaven",
+    "keywords": [
+      "Li River（漓江）",
+      "Yangshuo（阳朔）",
+      "Elephant Trunk Hill（象鼻山）",
+      "Longji Rice Terraces（龙脊梯田）",
+      "Ten Mile Gallery（十里画廊）"
+    ],
+    "highlights": [
+      "Li River（漓江）",
+      "Yangshuo（阳朔）",
+      "Elephant Trunk Hill（象鼻山）",
+      "Longji Rice Terraces（龙脊梯田）"
+    ],
+    "image": "/static/img/city-guilin.jpg"
+  },
+  "yunnan": {
+    "name_en": "Yunnan",
+    "name_cn": "云南",
+    "province": "Yunnan",
+    "best_season": "Mar–Oct (spring-like year round)",
+    "days": "5-14 days",
+    "budget_tip": "Dali/Lijiang B&Bs are cheap in off-season, prices surge in peak season",
+    "vibe": "Natural wonders + Ethnic cultures",
+    "keywords": [
+      "Dali（大理）",
+      "Lijiang（丽江）",
+      "Shangri-La（香格里拉）",
+      "Erhai Lake（洱海）",
+      "Jade Dragon Snow Mountain（玉龙雪山）",
+      "Lugu Lake（泸沽湖）"
+    ],
+    "highlights": [
+      "Dali（大理）",
+      "Lijiang（丽江）",
+      "Shangri-La（香格里拉）",
+      "Erhai Lake（洱海）"
+    ],
+    "image": "/static/img/city-yunnan.jpg"
+  },
+  "hangzhou": {
+    "name_en": "Hangzhou",
+    "name_cn": "杭州",
+    "province": "Zhejiang",
+    "best_season": "Mar–May, Sep–Nov",
+    "days": "2-4 days",
+    "budget_tip": "Accommodation near West Lake is pricey — metro-adjacent areas are more convenient",
+    "vibe": "Jiangnan water town + Poetic charm",
+    "keywords": [
+      "West Lake（西湖）",
+      "Broken Bridge（断桥）",
+      "Lingyin Temple（灵隐寺）",
+      "Longjing Tea（龙井茶）",
+      "Song Dynasty Town（宋城）"
+    ],
+    "highlights": [
+      "West Lake（西湖）",
+      "Broken Bridge（断桥）",
+      "Lingyin Temple（灵隐寺）",
+      "Longjing Tea（龙井茶）"
+    ],
+    "image": "/static/img/city-hangzhou.jpg"
+  },
+  "guangzhou": {
+    "name_en": "Guangzhou",
+    "name_cn": "广州",
+    "province": "Guangdong",
+    "best_season": "Oct–Dec, Feb–Apr",
+    "days": "2-4 days",
+    "budget_tip": "Yum cha (dim sum) ¥50–150/person, mid-range accommodation",
+    "vibe": "Food capital + Millennia-old trading port",
+    "keywords": [
+      "Yum Cha / Dim Sum（早茶）",
+      "Canton Tower（小蛮腰）",
+      "Shamian Island（沙面）",
+      "Baiyun Mountain（白云山）",
+      "Chen Clan Academy（陈家祠）"
+    ],
+    "highlights": [
+      "Yum Cha / Dim Sum（早茶）",
+      "Canton Tower（小蛮腰）",
+      "Shamian Island（沙面）",
+      "Baiyun Mountain（白云山）"
+    ],
+    "image": "/static/img/city-guangzhou.jpg"
+  },
+  "shenzhen": {
+    "name_en": "Shenzhen",
+    "name_cn": "深圳",
+    "province": "Guangdong",
+    "best_season": "Oct–Dec, Feb–Apr",
+    "days": "2-4 days",
+    "budget_tip": "Accommodation is on the pricier side, but dining options are abundant",
+    "vibe": "City of innovation + Young and dynamic",
+    "keywords": [
+      "Window of the World（世界之窗）",
+      "Happy Valley（欢乐谷）",
+      "Dameisha Beach（大梅沙）",
+      "OCT Loft（华侨城）",
+      "Huaqiangbei（华强北）"
+    ],
+    "highlights": [
+      "Window of the World（世界之窗）",
+      "Happy Valley（欢乐谷）",
+      "Dameisha Beach（大梅沙）",
+      "OCT Loft（华侨城）"
+    ],
+    "image": "/static/img/city-shenzhen.jpg"
+  },
+  "chongqing": {
+    "name_en": "Chongqing",
+    "name_cn": "重庆",
+    "province": "Chongqing",
+    "best_season": "Spring/Autumn (Mar–May, Sep–Nov)",
+    "days": "3-5 days",
+    "budget_tip": "Great value — hotpot ¥60–120/person",
+    "vibe": "8D surreal mountain city",
+    "keywords": [
+      "Hongya Cave（洪崖洞）",
+      "Hotpot（火锅）",
+      "Light Rail Through Building（轻轨穿楼）",
+      "Ciqikou（磁器口）",
+      "Yangtze River Cableway（长江索道）"
+    ],
+    "highlights": [
+      "Hongya Cave（洪崖洞）",
+      "Hotpot（火锅）",
+      "Light Rail Through Building（轻轨穿楼）",
+      "Ciqikou（磁器口）"
+    ],
+    "image": "/static/img/city-chongqing.jpg"
+  },
+  "changsha": {
+    "name_en": "Changsha",
+    "name_cn": "长沙",
+    "province": "Hunan",
+    "best_season": "Spring/Autumn (Mar–May, Sep–Nov)",
+    "days": "2-3 days",
+    "budget_tip": "Low cost of living — must try Sexy Tea（茶颜悦色）",
+    "vibe": "Entertainment capital + Food paradise",
+    "keywords": [
+      "Orange Island（橘子洲）",
+      "Yuelu Mountain（岳麓山）",
+      "Sexy Tea（茶颜悦色）",
+      "Stinky Tofu（臭豆腐）",
+      "Wenheyou（文和友）"
+    ],
+    "highlights": [
+      "Orange Island（橘子洲）",
+      "Yuelu Mountain（岳麓山）",
+      "Sexy Tea（茶颜悦色）",
+      "Stinky Tofu（臭豆腐）"
+    ],
+    "image": "/static/img/city-changsha.jpg"
+  },
+  "nanjing": {
+    "name_en": "Nanjing",
+    "name_cn": "南京",
+    "province": "Jiangsu",
+    "best_season": "Spring/Autumn (Mar–May, Sep–Nov)",
+    "days": "2-4 days",
+    "budget_tip": "Moderate accommodation prices — attractions are close together and walkable",
+    "vibe": "Ancient capital of six dynasties",
+    "keywords": [
+      "Confucius Temple（夫子庙）",
+      "Sun Yat-sen Mausoleum（中山陵）",
+      "Ming Xiaoling Tomb（明孝陵）",
+      "Xuanwu Lake（玄武湖）",
+      "Duck Blood Vermicelli Soup（鸭血粉丝汤）"
+    ],
+    "highlights": [
+      "Confucius Temple（夫子庙）",
+      "Sun Yat-sen Mausoleum（中山陵）",
+      "Ming Xiaoling Tomb（明孝陵）",
+      "Xuanwu Lake（玄武湖）"
+    ],
+    "image": "/static/img/city-nanjing.jpg"
+  },
+  "suzhou": {
+    "name_en": "Suzhou",
+    "name_cn": "苏州",
+    "province": "Jiangsu",
+    "best_season": "Mar–May, Sep–Nov",
+    "days": "2-3 days",
+    "budget_tip": "B&Bs near the gardens are charming",
+    "vibe": "Finest classical gardens under heaven",
+    "keywords": [
+      "Humble Admin Garden（拙政园）",
+      "Tiger Hill（虎丘）",
+      "Zhouzhuang Water Town（周庄）",
+      "Shantang Street（山塘街）",
+      "Sweet-and-Sour Mandarin Fish（松鼠桂鱼）"
+    ],
+    "highlights": [
+      "Humble Admin Garden（拙政园）",
+      "Tiger Hill（虎丘）",
+      "Zhouzhuang Water Town（周庄）",
+      "Shantang Street（山塘街）"
+    ],
+    "image": "/static/img/city-suzhou.jpg"
+  },
+  "harbin": {
+    "name_en": "Harbin",
+    "name_cn": "哈尔滨",
+    "province": "Heilongjiang",
+    "best_season": "Winter Dec–Feb (Ice Festival)",
+    "days": "2-4 days",
+    "budget_tip": "Prepare sufficient winter gear",
+    "vibe": "Ice & Snow city + Russian flair",
+    "keywords": [
+      "Ice and Snow World（冰雪大世界）",
+      "Central Street（中央大街）",
+      "Saint Sophia Cathedral（索菲亚教堂）",
+      "Songhua River（松花江）",
+      "Guo Bao Rou（锅包肉）"
+    ],
+    "highlights": [
+      "Ice and Snow World（冰雪大世界）",
+      "Central Street（中央大街）",
+      "Saint Sophia Cathedral（索菲亚教堂）",
+      "Songhua River（松花江）"
+    ],
+    "image": "/static/img/city-harbin.jpg"
+  },
+  "zhangjiajie": {
+    "name_en": "Zhangjiajie",
+    "name_cn": "张家界",
+    "province": "Hunan",
+    "best_season": "Apr–Jun, Sep–Oct",
+    "days": "3-5 days",
+    "budget_tip": "On-site accommodation is expensive — stay in Wulingyuan",
+    "vibe": "Inspiration for Avatar's floating mountains",
+    "keywords": [
+      "Tianmen Mountain（天门山）",
+      "Glass Skywalk（玻璃栈道）",
+      "Wulingyuan（武陵源）",
+      "Tianzi Mountain（天子山）",
+      "Bailong Elevator（百龙天梯）"
+    ],
+    "highlights": [
+      "Tianmen Mountain（天门山）",
+      "Glass Skywalk（玻璃栈道）",
+      "Wulingyuan（武陵源）",
+      "Tianzi Mountain（天子山）"
+    ],
+    "image": "/static/img/city-zhangjiajie.jpg"
+  },
+  "tibet": {
+    "name_en": "Tibet",
+    "name_cn": "西藏",
+    "province": "Tibet",
+    "best_season": "May–Oct",
+    "days": "7-14 days",
+    "budget_tip": "Prepare for altitude sickness + border permit — group tours are easier",
+    "vibe": "Snowy highlands + Land of faith",
+    "keywords": [
+      "Potala Palace（布达拉宫）",
+      "Jokhang Temple（大昭寺）",
+      "Namtso Lake（纳木错）",
+      "Everest（珠峰）",
+      "Yamdrok Lake（羊卓雍措）"
+    ],
+    "highlights": [
+      "Potala Palace（布达拉宫）",
+      "Jokhang Temple（大昭寺）",
+      "Namtso Lake（纳木错）",
+      "Everest（珠峰）"
+    ],
+    "image": "/static/img/city-tibet.jpg"
+  },
+  "sanya": {
+    "name_en": "Sanya",
+    "name_cn": "三亚",
+    "province": "Hainan",
+    "best_season": "Oct–Apr (warm winter)",
+    "days": "3-7 days",
+    "budget_tip": "Peak season (CNY) prices double",
+    "vibe": "Tropical beach resort",
+    "keywords": [
+      "Yalong Bay（亚龙湾）",
+      "End of the Earth（天涯海角）",
+      "Wuzhizhou Island（蜈支洲岛）",
+      "Coconut Dream Corridor（椰梦长廊）",
+      "Seafood（海鲜）"
+    ],
+    "highlights": [
+      "Yalong Bay（亚龙湾）",
+      "End of the Earth（天涯海角）",
+      "Wuzhizhou Island（蜈支洲岛）",
+      "Coconut Dream Corridor（椰梦长廊）"
+    ],
+    "image": "/static/img/city-sanya.jpg"
+  },
+  "dunhuang": {
+    "name_en": "Dunhuang",
+    "name_cn": "敦煌",
+    "province": "Gansu",
+    "best_season": "May–Oct",
+    "days": "2-4 days",
+    "budget_tip": "Desert sun protection is essential — Mingsha Mountain & Crescent Moon Spring is a must",
+    "vibe": "Silk Road + Desert romance",
+    "keywords": [
+      "Mogao Caves（莫高窟）",
+      "Mingsha Mountain（鸣沙山）",
+      "Crescent Moon Spring（月牙泉）",
+      "Yumen Pass（玉门关）",
+      "Yadan Landforms（雅丹）"
+    ],
+    "highlights": [
+      "Mogao Caves（莫高窟）",
+      "Mingsha Mountain（鸣沙山）",
+      "Crescent Moon Spring（月牙泉）",
+      "Yumen Pass（玉门关）"
+    ],
+    "image": "/static/img/city-dunhuang.jpg"
+  },
+  "luoyang": {
+    "name_en": "Luoyang",
+    "name_cn": "洛阳",
+    "province": "Henan",
+    "best_season": "Apr–May (Peony Festival), Sep–Oct",
+    "days": "2-3 days",
+    "budget_tip": "Longmen Grottoes is a must — cheap accommodation",
+    "vibe": "Ancient capital of 13 dynasties · City of Peonies",
+    "keywords": [
+      "Longmen Grottoes（龙门石窟）",
+      "White Horse Temple（白马寺）",
+      "Peonies（牡丹）",
+      "Luoyang Water Feast（洛阳水席）",
+      "Guan Lin（关林）"
+    ],
+    "highlights": [
+      "Longmen Grottoes（龙门石窟）",
+      "White Horse Temple（白马寺）",
+      "Peonies（牡丹）",
+      "Luoyang Water Feast（洛阳水席）"
+    ],
+    "image": "/static/img/city-luoyang.jpg"
+  },
+  "wuhan": {
+    "name_en": "Wuhan",
+    "name_cn": "武汉",
+    "province": "Hubei",
+    "best_season": "Mar–May, Sep–Oct",
+    "days": "2-3 days",
+    "budget_tip": "Rich breakfast culture — hot dry noodles just ¥5",
+    "vibe": "River city · Street food capital",
+    "keywords": [
+      "Yellow Crane Tower（黄鹤楼）",
+      "Wuhan University（武汉大学）",
+      "East Lake（东湖）",
+      "Hot Dry Noodles（热干面）",
+      "Yangtze River Bridge（长江大桥）"
+    ],
+    "highlights": [
+      "Yellow Crane Tower（黄鹤楼）",
+      "Wuhan University（武汉大学）",
+      "East Lake（东湖）",
+      "Hot Dry Noodles（热干面）"
+    ],
+    "image": "/static/img/city-wuhan.jpg"
+  },
+  "xiamen": {
+    "name_en": "Xiamen",
+    "name_cn": "厦门",
+    "province": "Fujian",
+    "best_season": "Mar–May, Oct–Dec",
+    "days": "2-4 days",
+    "budget_tip": "Gulangyu accommodation is expensive — stay near Zhongshan Road",
+    "vibe": "Coastal art town · World architecture",
+    "keywords": [
+      "Gulangyu Island（鼓浪屿）",
+      "Zengcuoan Village（曾厝垵）",
+      "Island Ring Road（环岛路）",
+      "Xiamen University（厦门大学）",
+      "Shacha Noodles（沙茶面）"
+    ],
+    "highlights": [
+      "Gulangyu Island（鼓浪屿）",
+      "Zengcuoan Village（曾厝垵）",
+      "Island Ring Road（环岛路）",
+      "Xiamen University（厦门大学）"
+    ],
+    "image": "/static/img/city-xiamen.jpg"
+  },
+  "qingdao": {
+    "name_en": "Qingdao",
+    "name_cn": "青岛",
+    "province": "Shandong",
+    "best_season": "May–Oct (Beer Festival in Aug)",
+    "days": "3-4 days",
+    "budget_tip": "Accommodation doubles during Beer Festival",
+    "vibe": "Red-tiled roofs, green trees · Blue sea, clear sky",
+    "keywords": [
+      "Zhanqiao Pier（栈桥）",
+      "Laoshan Mountain（崂山）",
+      "Badaguan（八大关）",
+      "Beer Museum（啤酒博物馆）",
+      "Golden Beach（金沙滩）"
+    ],
+    "highlights": [
+      "Zhanqiao Pier（栈桥）",
+      "Laoshan Mountain（崂山）",
+      "Badaguan（八大关）",
+      "Beer Museum（啤酒博物馆）"
+    ],
+    "image": "/static/img/city-qingdao.jpg"
+  },
+  "dali": {
+    "name_en": "Dali",
+    "name_cn": "大理",
+    "province": "Yunnan",
+    "best_season": "Mar–May, Sep–Nov",
+    "days": "3-5 days",
+    "budget_tip": "Erhai Lake cycling is a classic — must try Xizhou Baba flatbread",
+    "vibe": "Wind, flowers, snow, moon · Slow life",
+    "keywords": [
+      "Erhai Lake（洱海）",
+      "Dali Ancient Town（大理古城）",
+      "Cangshan Mountain（苍山）",
+      "Shuanglang（双廊）",
+      "Xizhou（喜洲）"
+    ],
+    "highlights": [
+      "Erhai Lake（洱海）",
+      "Dali Ancient Town（大理古城）",
+      "Cangshan Mountain（苍山）",
+      "Shuanglang（双廊）"
+    ],
+    "image": "/static/img/city-dali.jpg"
+  },
+  "lijiang": {
+    "name_en": "Lijiang",
+    "name_cn": "丽江",
+    "province": "Yunnan",
+    "best_season": "Mar–May, Sep–Nov",
+    "days": "3-5 days",
+    "budget_tip": "Old town maintenance fee ¥50 — off-season inns are cheap",
+    "vibe": "Plateau water town · Naxi culture",
+    "keywords": [
+      "Lijiang Ancient Town（丽江古城）",
+      "Jade Dragon Snow Mountain（玉龙雪山）",
+      "Shuhe Ancient Town（束河古镇）",
+      "Lugu Lake（泸沽湖）",
+      "Blue Moon Valley（蓝月谷）"
+    ],
+    "highlights": [
+      "Lijiang Ancient Town（丽江古城）",
+      "Jade Dragon Snow Mountain（玉龙雪山）",
+      "Shuhe Ancient Town（束河古镇）",
+      "Lugu Lake（泸沽湖）"
+    ],
+    "image": "/static/img/city-lijiang.jpg"
+  },
+  "huangshan": {
+    "name_en": "Huangshan",
+    "name_cn": "黄山",
+    "province": "Anhui",
+    "best_season": "Apr–Jun, Sep–Nov",
+    "days": "3-4 days",
+    "budget_tip": "Mountain-top accommodation is expensive — stay in Tangkou",
+    "vibe": "The world's most extraordinary mountain",
+    "keywords": [
+      "Yellow Mountain（黄山）",
+      "Hongcun Village（宏村）",
+      "Tunxi Old Street（屯溪老街）",
+      "Xidi Village（西递）",
+      "Anhui Cuisine（徽菜）"
+    ],
+    "highlights": [
+      "Yellow Mountain（黄山）",
+      "Hongcun Village（宏村）",
+      "Tunxi Old Street（屯溪老街）",
+      "Xidi Village（西递）"
+    ],
+    "image": "/static/img/city-huangshan.jpg"
+  },
+  "jiuzhaigou": {
+    "name_en": "Jiuzhaigou",
+    "name_cn": "九寨沟",
+    "province": "Sichuan",
+    "best_season": "Oct (most beautiful autumn colours)",
+    "days": "2-4 days",
+    "budget_tip": "¥169 entrance fee is pricey — stay at the valley entrance",
+    "vibe": "Fairytale world · Heaven on earth",
+    "keywords": [
+      "Five Flower Lake（五花海）",
+      "Nuorilang Waterfall（诺日朗瀑布）",
+      "Long Lake（长海）",
+      "Five Color Pond（五彩池）",
+      "Primeval Forest（原始森林）"
+    ],
+    "highlights": [
+      "Five Flower Lake（五花海）",
+      "Nuorilang Waterfall（诺日朗瀑布）",
+      "Long Lake（长海）",
+      "Five Color Pond（五彩池）"
+    ],
+    "image": "/static/img/city-jiuzhaigou.jpg"
+  },
+  "lanzhou": {
+    "name_en": "Lanzhou",
+    "name_cn": "兰州",
+    "province": "Gansu",
+    "best_season": "May–Oct",
+    "days": "1-2 days",
+    "budget_tip": "Lanzhou beef noodles ¥8/bowl — best value in China",
+    "vibe": "Capital by the Yellow River · Northwest hub",
+    "keywords": [
+      "Yellow River Iron Bridge（黄河铁桥）",
+      "White Pagoda Mountain（白塔山）",
+      "Lanzhou Beef Noodles（兰州牛肉面）",
+      "Zhengning Road Night Market（正宁路夜市）",
+      "Gansu Provincial Museum（甘肃省博）"
+    ],
+    "highlights": [
+      "Yellow River Iron Bridge（黄河铁桥）",
+      "White Pagoda Mountain（白塔山）",
+      "Lanzhou Beef Noodles（兰州牛肉面）",
+      "Zhengning Road Night Market（正宁路夜市）"
+    ],
+    "image": "/static/img/city-lanzhou.jpg"
+  },
+  "guiyang": {
+    "name_en": "Guiyang",
+    "name_cn": "贵阳",
+    "province": "Guizhou",
+    "best_season": "Jun–Sep (summer escape)",
+    "days": "2-3 days",
+    "budget_tip": "Summer resort — must try Sour Fish Soup（酸汤鱼）",
+    "vibe": "Summer capital · Mountain city",
+    "keywords": [
+      "Qianling Mountain（黔灵山）",
+      "Jiaxiu Tower（甲秀楼）",
+      "Qingyan Ancient Town（青岩古镇）",
+      "Sour Fish Soup（酸汤鱼）",
+      "Huaxi Beef Noodles（花溪牛肉粉）"
+    ],
+    "highlights": [
+      "Qianling Mountain（黔灵山）",
+      "Jiaxiu Tower（甲秀楼）",
+      "Qingyan Ancient Town（青岩古镇）",
+      "Sour Fish Soup（酸汤鱼）"
+    ],
+    "image": "/static/img/city-guiyang.jpg"
+  },
+  "lasa": {
+    "name_en": "Lhasa",
+    "name_cn": "拉萨",
+    "province": "Tibet",
+    "best_season": "May–Oct",
+    "days": "3-5 days",
+    "budget_tip": "Altitude sickness is the first hurdle — take it slow",
+    "vibe": "City of sunlight · Land of faith",
+    "keywords": [
+      "Potala Palace（布达拉宫）",
+      "Jokhang Temple（大昭寺）",
+      "Barkhor Street（八廓街）",
+      "Sera Monastery（色拉寺）",
+      "Namtso Lake（纳木错）"
+    ],
+    "highlights": [
+      "Potala Palace（布达拉宫）",
+      "Jokhang Temple（大昭寺）",
+      "Barkhor Street（八廓街）",
+      "Sera Monastery（色拉寺）"
+    ],
+    "image": "/static/img/city-lasa.jpg"
+  },
+  "xining": {
+    "name_en": "Xining",
+    "name_cn": "西宁",
+    "province": "Qinghai",
+    "best_season": "Jun–Aug (lake season)",
+    "days": "1-2 days",
+    "budget_tip": "Qinghai Lake loop — renting a car is convenient",
+    "vibe": "Gateway to the Qinghai-Tibet Plateau",
+    "keywords": [
+      "Qinghai Lake（青海湖）",
+      "Kumbum Monastery（塔尔寺）",
+      "Chaka Salt Lake（茶卡盐湖）",
+      "Dongguan Mosque（东关清真寺）",
+      "Hand-grabbed Lamb（手抓羊肉）"
+    ],
+    "highlights": [
+      "Qinghai Lake（青海湖）",
+      "Kumbum Monastery（塔尔寺）",
+      "Chaka Salt Lake（茶卡盐湖）",
+      "Dongguan Mosque（东关清真寺）"
+    ],
+    "image": "/static/img/city-xining.jpg"
+  },
+  "hohhot": {
+    "name_en": "Hohhot",
+    "name_cn": "呼和浩特",
+    "province": "Inner Mongolia",
+    "best_season": "Jul–Sep (grassland season)",
+    "days": "2-4 days",
+    "budget_tip": "Grassland experience prices can be opaque — ask clearly beforehand",
+    "vibe": "Grassland capital · Mongolian culture",
+    "keywords": [
+      "Xilamuren Grassland（希拉穆仁）",
+      "Dazhao Temple（大召寺）",
+      "Wudangzhao Monastery（五当召）",
+      "Roasted Whole Lamb（烤全羊）",
+      "Mongolian Yurt（蒙古包）"
+    ],
+    "highlights": [
+      "Xilamuren Grassland（希拉穆仁）",
+      "Dazhao Temple（大召寺）",
+      "Wudangzhao Monastery（五当召）",
+      "Roasted Whole Lamb（烤全羊）"
+    ],
+    "image": "/static/img/city-hohhot.jpg"
+  },
+  "nanchang": {
+    "name_en": "Nanchang",
+    "name_cn": "南昌",
+    "province": "Jiangxi",
+    "best_season": "Spring/Autumn (Mar–May, Sep–Nov)",
+    "days": "2-3 days",
+    "budget_tip": "Pavilion of Prince Teng is a must — mixed noodles + soup are incredibly cheap",
+    "vibe": "Where the flag first rose",
+    "keywords": [
+      "Pavilion of Prince Teng（滕王阁）",
+      "August 1st Uprising Museum（八一起义纪念馆）",
+      "Shengjin Tower（绳金塔）",
+      "Nanchang Mixed Noodles（南昌拌粉）",
+      "Clay Pot Soup（瓦罐汤）"
+    ],
+    "highlights": [
+      "Pavilion of Prince Teng（滕王阁）",
+      "August 1st Uprising Museum（八一起义纪念馆）",
+      "Shengjin Tower（绳金塔）",
+      "Nanchang Mixed Noodles（南昌拌粉）"
+    ],
+    "image": "/static/img/city-nanchang.jpg"
+  },
+  "fuzhou": {
+    "name_en": "Fuzhou",
+    "name_cn": "福州",
+    "province": "Fujian",
+    "best_season": "Spring/Autumn (Mar–May, Oct–Nov)",
+    "days": "2-3 days",
+    "budget_tip": "Three Lanes and Seven Alleys is free — fish balls and meat swallow noodles are must-tries",
+    "vibe": "Banyan city · Min capital culture",
+    "keywords": [
+      "Three Lanes Seven Alleys（三坊七巷）",
+      "Drum Mountain（鼓山）",
+      "West Lake Park（西湖公园）",
+      "Fish Balls（鱼丸）",
+      "Buddha Jumping Over the Wall（佛跳墙）"
+    ],
+    "highlights": [
+      "Three Lanes Seven Alleys（三坊七巷）",
+      "Drum Mountain（鼓山）",
+      "West Lake Park（西湖公园）",
+      "Fish Balls（鱼丸）"
+    ],
+    "image": "/static/img/city-fuzhou.jpg"
+  },
+  "hainan": {
+    "name_en": "Hainan (Haikou)",
+    "name_cn": "海口",
+    "province": "Hainan",
+    "best_season": "Oct–Apr",
+    "days": "2-3 days",
+    "budget_tip": "Much cheaper than Sanya — Qilou Old Street is worth exploring",
+    "vibe": "Coconut city · Slow life",
+    "keywords": [
+      "Qilou Old Street（骑楼老街）",
+      "Volcanic Crater（火山口）",
+      "Holiday Beach（假日海滩）",
+      "Wenchang Chicken（文昌鸡）",
+      "Ching Bo Leung Dessert（清补凉）"
+    ],
+    "highlights": [
+      "Qilou Old Street（骑楼老街）",
+      "Volcanic Crater（火山口）",
+      "Holiday Beach（假日海滩）",
+      "Wenchang Chicken（文昌鸡）"
+    ],
+    "image": "/static/img/city-hainan.jpg"
+  },
+  "macau": {
+    "name_en": "Macau",
+    "name_cn": "澳门",
+    "province": "Macau",
+    "best_season": "Oct–Dec, Feb–Apr",
+    "days": "1-2 days",
+    "budget_tip": "Free casino shuttle buses can save on transport costs",
+    "vibe": "Las Vegas of the East · Portuguese charm",
+    "keywords": [
+      "Ruins of St. Paul's（大三巴）",
+      "Venetian Macao（威尼斯人）",
+      "Macau Tower（澳门塔）",
+      "Portuguese Egg Tarts（葡式蛋挞）",
+      "Coloane Island（路环岛）"
+    ],
+    "highlights": [
+      "Ruins of St. Paul's（大三巴）",
+      "Venetian Macao（威尼斯人）",
+      "Macau Tower（澳门塔）",
+      "Portuguese Egg Tarts（葡式蛋挞）"
+    ],
+    "image": "/static/img/city-macau.jpg"
+  },
+  "taipei": {
+    "name_en": "Taipei",
+    "name_cn": "台北",
+    "province": "Taiwan",
+    "best_season": "Spring/Autumn (Mar–May, Oct–Dec)",
+    "days": "3-5 days",
+    "budget_tip": "Night markets ¥30–60/person — incredible value",
+    "vibe": "Heart of the treasure island · Night market paradise",
+    "keywords": [
+      "Taipei 101",
+      "National Palace Museum（故宫博物院）",
+      "Shilin Night Market（士林夜市）",
+      "Jiufen（九份）",
+      "Yangmingshan（阳明山）"
+    ],
+    "highlights": [
+      "Taipei 101",
+      "National Palace Museum（故宫博物院）",
+      "Shilin Night Market（士林夜市）",
+      "Jiufen（九份）"
+    ],
+    "image": "/static/img/city-taipei.jpg"
+  }
+}

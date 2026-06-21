@@ -1,0 +1,257 @@
+{
+  "version": "1.0",
+  "categories": [
+    {
+      "id": "visa",
+      "title": "Visa & Entry Requirements",
+      "icon": "🛂",
+      "patterns": [
+        "visa", "entry", "passport", "border", "immigration", "enter china",
+        "travel document", "visa on arrival", "visa free", "visa-free",
+        "get into china", "chinese visa", "entry permit", "customs",
+        "permit", "passport requirement", "travel authorization",
+        "visa application", "visa process", "visa fee", "visa type"
+      ],
+      "expanded_keywords": [
+        "China travel visa types L M F visa",
+        "144-hour transit without visa policy",
+        "visa-free countries list for China",
+        "Hainan visa-free entry",
+        "Guangdong 144-hour visa-free transit",
+        "visa application process and required documents",
+        "visa fees and processing times",
+        "port visa on arrival",
+        "Group visa for cruise tourists",
+        "APEC Business Travel Card"
+      ],
+      "prompt_hint": "Provide comprehensive visa information specific to the user's nationality if mentioned. Cover: visa types (L tourist, M business, S1 private visit, Q2 family reunion), 144-hour transit without visa (eligibility by nationality and entry ports), visa-free access for specific countries, application process, documents needed, fees ($30-$180 depending on type and processing speed), processing time (4-7 working days standard). If the user doesn't specify nationality, ask them and cover the most common scenarios."
+    },
+    {
+      "id": "budget",
+      "title": "Budget & Costs",
+      "icon": "💰",
+      "patterns": [
+        "budget", "cost", "price", "expensive", "cheap", "afford",
+        "money", "spend", "pay", "cheapest", "save money",
+        "how much", "costs", "pricing", "price range",
+        "economical", "economy", "low cost", "budget friendly",
+        "cheap travel", "expensive city", "living cost",
+        "daily budget", "trip cost"
+      ],
+      "expanded_keywords": [
+        "China travel costs by city tier",
+        "budget breakdown accommodation transport food attractions",
+        "budget daily mid daily luxury daily costs",
+        "flight prices domestic international",
+        "meal costs street food mid-range fine dining",
+        "attraction entrance fees",
+        "transport costs subway bus taxi high-speed train",
+        "budget tips saving money China travel",
+        "free attractions in Chinese cities",
+        "seasonal price variations peak vs off-peak"
+      ],
+      "prompt_hint": "Provide budget information using the specific pricing data from the knowledge base (ESTIMATE_DATA for the mentioned city). Break down by: accommodation (budget/mid/luxury per night), food (per meal), transport (subway/taxi/high-speed train), attractions (entrance fees). Give daily budget range estimates. Suggest money-saving tips specific to the destination. For multi-city trips, compare costs between cities."
+    },
+    {
+      "id": "itinerary",
+      "title": "Trip Planning & Itineraries",
+      "icon": "🗓️",
+      "patterns": [
+        "itinerary", "plan", "trip", "travel plan", "schedule",
+        "day", "route", "itineraries", "travel route",
+        "how many days", "how long", "recommend",
+        "trip planner", "tour plan", "visit plan",
+        "custom itinerary", "personalized trip",
+        "vacation plan", "holiday plan"
+      ],
+      "expanded_keywords": [
+        "China multi-city itinerary planning",
+        "best travel routes between Chinese cities",
+        "high-speed rail connections between cities",
+        "recommended days per destination",
+        "must-see attractions in each city",
+        "logical city sequencing for itinerary",
+        "seasonal considerations for travel routes",
+        "transport options between cities flight train bus"
+      ],
+      "prompt_hint": "Create a structured day-by-day itinerary using the exact format specified. For each day include: morning, afternoon, and evening activities with specific locations; meal recommendations with restaurant names and prices; accommodation suggestions with areas and price ranges. Consider travel time between cities if multi-city. Balance busy days with relaxed ones. Include at least one local tip per day."
+    },
+    {
+      "id": "food",
+      "title": "Food & Dining",
+      "icon": "🍜",
+      "patterns": [
+        "food", "eat", "restaurant", "cuisine", "dish", "dining",
+        "street food", "must eat", "what to eat", "foodie",
+        "local food", "traditional food", "famous food",
+        "vegetarian", "vegan", "halal", "dietary",
+        "breakfast", "lunch", "dinner", "night market",
+        "food market", "cooking class", "food tour",
+        "spicy food", "food recommendations",
+        "halal food", "allergy"
+      ],
+      "expanded_keywords": [
+        "must-try dishes by city",
+        "famous local restaurants in Chinese cities",
+        "street food markets and night markets",
+        "food prices by city",
+        "dietary accommodations vegetarian halal",
+        "regional Chinese cuisines",
+        "Michelin-recommended restaurants in China",
+        "food safety tips",
+        "food tours and cooking classes"
+      ],
+      "prompt_hint": "Use the food knowledge base data when available. List must-try dishes with both English and Chinese names. Include the best places to eat them (restaurant names, streets, districts) and price ranges. Mention dietary options if asked. For night markets, specify operating hours and the best stalls. Include tips on ordering, food etiquette, and what to avoid if relevant."
+    },
+    {
+      "id": "transport",
+      "title": "Transportation",
+      "icon": "🚄",
+      "patterns": [
+        "transport", "train", "flight", "subway", "metro",
+        "bus", "taxi", "high speed rail", "bullet train",
+        "get around", "get there", "how to go", "how do i get",
+        "getting to", "travel between", "from to", "way to",
+        "direction", "airport transfer", "transportation",
+        "diditaxi", "rickshaw", "bike", "walk",
+        "public transport", "transit", "transfer",
+        "shuttle", "ferry", "domestic flight",
+        "high-speed", "intercity", "airport"
+      ],
+      "expanded_keywords": [
+        "China high-speed rail network G D trains",
+        "domestic flights China delayed",
+        "city subway systems Beijing Shanghai Guangzhou",
+        "DiDi ride-hailing in China",
+        "public transport cards Shanghai Beijing",
+        "subway navigation for tourists",
+        "taxi tips avoiding scams",
+        "high-speed train booking China",
+        "China train ticket purchase for foreigners"
+      ],
+      "prompt_hint": "Provide practical transport advice: how to get between cities (train vs flight vs bus with rough durations and prices), how to navigate within cities (subway is best, taxi as backup). Mention DiDi (Chinese Uber) as the best alternative to street taxis. Recommend transportation cards where applicable. Include approximate travel times and costs."
+    },
+    {
+      "id": "accommodation",
+      "title": "Hotels & Accommodation",
+      "icon": "🏨",
+      "patterns": [
+        "hotel", "stay", "accommodation", "hostel", "lodging",
+        "where to stay", "place to stay", "sleep",
+        "inn", "guesthouse", "apartment", "bnb",
+        "live", "resort", "booking", "room",
+        "hotel recommendation", "hotel area",
+        "recommended area to stay"
+      ],
+      "expanded_keywords": [
+        "best areas to stay in Chinese cities",
+        "budget mid luxury hotel recommendations",
+        "hotel booking platforms China",
+        "hotel registration policy for foreigners",
+        "unique accommodations traditional courtyard",
+        "hotel price ranges by city area",
+        "nearby hotel to attractions",
+        "hostels for backpackers China"
+      ],
+      "prompt_hint": "Use the accommodation data from the knowledge base if available. Provide budget/mid/luxury options for each city with price ranges, recommended areas/neighborhoods, and description of what each tier offers. Include booking tips (Ctrip/Booking.com/Agoda). Mention that foreign guests must stay at hotels licensed for foreign visitors. Suggest which area to stay in based on the user's itinerary."
+    },
+    {
+      "id": "weather",
+      "title": "Weather & Best Time to Visit",
+      "icon": "🌤️",
+      "patterns": [
+        "weather", "season", "climate", "temperature", "rain",
+        "best time", "when to go", "cold", "hot", "warm",
+        "spring", "summer", "autumn", "fall", "winter",
+        "monsoon", "typhoon", "snow", "sunny",
+        "peak season", "off season", "shoulder season",
+        "what to wear", "pack"
+      ],
+      "expanded_keywords": [
+        "China weather by season and region",
+        "best time to visit specific Chinese cities",
+        "packing tips for China by season",
+        "northern China winter cold temperatures",
+        "typhoon season southern China",
+        "spring and autumn best travel seasons",
+        "China golden week travel dates avoid",
+        "air quality concerns large cities",
+        "temperature ranges major cities"
+      ],
+      "prompt_hint": "Use the best_season data from the knowledge base. Provide seasonal weather information: average temperatures, rainfall, what to pack. Mention the best and worst months to visit. Alert the user about Chinese public holidays (Golden Week in October, Spring Festival in January/February) when domestic travel peaks. Suggest indoor alternatives for bad weather days."
+    },
+    {
+      "id": "safety",
+      "title": "Safety & Health",
+      "icon": "🆘",
+      "patterns": [
+        "safe", "safety", "danger", "crime", "scam",
+        "emergency", "health", "hospital", "doctor",
+        "medicine", "pharmacy", "vaccine", "insurance",
+        "police", "help", "ambulance", "drink water",
+        "tap water", "food safety", "allergy",
+        "sos", "emergency contact",
+        "language barrier", "lost"
+      ],
+      "expanded_keywords": [
+        "China travel safety tips",
+        "common scams in China tourist areas",
+        "emergency numbers 110 police 119 fire 120 ambulance",
+        "travel insurance recommendation",
+        "recommended vaccines for China",
+        "food and water safety",
+        "tap water undrinkable China bottled water",
+        "hospitals with English service major cities",
+        "pharmacy and medicine access China"
+      ],
+      "prompt_hint": "Provide practical safety advice without being alarmist. Cover: emergency numbers (police 110, ambulance 120, fire 119), common tourist scams and how to avoid them, water safety (don't drink tap water), food hygiene tips, recommended vaccinations, travel insurance importance, and how to find English-speaking medical help. Keep the tone practical and reassuring."
+    },
+    {
+      "id": "culture",
+      "title": "Culture & Etiquette",
+      "icon": "🏮",
+      "patterns": [
+        "culture", "custom", "etiquette", "tradition", "temple",
+        "dos and don'ts", "taboo", "polite", "respect",
+        "cultural", "manners", "gift", "language",
+        "chinese custom", "local custom", "behavior",
+        "dining etiquette", "tipping", "bargain",
+        "festival", "holiday", "chinese new year"
+      ],
+      "expanded_keywords": [
+        "Chinese cultural dos and don'ts for tourists",
+        "temple etiquette visiting rules",
+        "dining etiquette China chopsticks rules",
+        "gift giving customs China",
+        "tipping culture in China no tipping",
+        "bargaining at markets technique",
+        "Chinese festivals and holidays schedule",
+        "social etiquette face concept",
+        "common Chinese phrases for travelers",
+        "photography etiquette temples people"
+      ],
+      "prompt_hint": "Provide cultural tips in a friendly, informative way. Cover: temple visit etiquette (no flash photography, dress modestly, don't point feet at Buddha), dining customs (don't stick chopsticks upright in rice, wait for host to start), tipping (generally not expected except for exceptional service), bargaining (expected at markets, start at 30% of asking price), and basic phrases (ni hao, xie xie). Mention major festivals if relevant to travel dates."
+    },
+    {
+      "id": "comparison",
+      "title": "City Comparisons",
+      "icon": "⚖️",
+      "patterns": [
+        "vs", "compare", "comparison", "versus", "or",
+        "which city", "which is better", "different between",
+        "better for", "similar to", "like",
+        "difference between", "recommend between",
+        "should I go to", "choose between"
+      ],
+      "expanded_keywords": [
+        "Chinese city comparison for tourists",
+        "best city for specific interests food history nature",
+        "similar cities in China comparison",
+        "city vibe differences China",
+        "top destinations by travel style",
+        "city pairing recommendations multi-city trip"
+      ],
+      "prompt_hint": "Compare cities objectively based on the user's stated preferences or assumed needs. Compare across dimensions: vibe, food scene, attractions, cost, best season, recommended stay duration, accessibility, and English-friendliness. Help the user narrow down by asking about their priorities if unclear. Suggest visiting both if feasible."
+    }
+  ]
+}

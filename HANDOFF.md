@@ -1,0 +1,266 @@
+# VisePanda (VP-Codex-Web) 项目交接文档
+
+> **最后更新：** 2026-06-20  
+> **当前版本：** `v5.0.9`  
+> **当前状态：** 可继续开发、可继续线上验证，基础稳定性已补一轮，但整体仍处于“产品验证到准商用”之间  
+> **当前 Codex 工作仓库：** `https://github.com/JTCAO515/VP-Codex-Web.git`  
+> **来源基线仓库：** `https://github.com/JTCAO515/VP-Hermes-Web.git`  
+> **线上地址：** `https://www.go2china.space`  
+> **当前部署：** `Vercel` 自动部署，现阶段继续保留
+
+---
+
+## 1. 项目是什么
+
+`VisePanda` 是一个面向国际游客的中国旅行 AI 产品网站，不是泛用聊天站点，而是围绕“中国旅行”这一垂直场景组织信息、工具和规划能力。
+
+它当前承担三件事：
+
+1. 让用户通过聊天快速生成中国行程与旅行建议
+2. 提供城市、签证、预算、短语、急救等结构化旅行信息
+3. 作为英文原生的旅游产品站继续向可商用方向演进
+
+一句话定义：
+
+> **一个面向国际游客、以 AI 对话规划为主入口、聚焦中国旅行场景的英文原生产品网站。**
+
+## 2. 当前能做什么
+
+当前已经形成的核心能力如下，接手时应优先视为“已有资产”，而不是从头再做。
+
+### 2.1 用户可见能力
+
+- AI 聊天规划，支持流式回复与多段内容输出
+- 36 城市内容浏览与部分对比能力
+- Trips 保存、读取、删除与聊天历史关联
+- Tools 详情页，覆盖 `Packing / Pricing / Visa / Phrases / Emergency`
+- Email / Password 登录、Google OAuth、用户 profile
+- Admin 用户管理、统计与聊天记录查看
+- 英文原生内容展示，并保留 `English（中文）` 专名
+- 移动端底部导航、安全区与竖屏体验优化
+
+### 2.2 工程层能力
+
+- 前后端已形成稳定主链路
+- 已有 Python 与 Node 双回归测试入口
+- 已形成版本、文档、测试、发布联动节奏
+- GitHub 提交后会自动触发 `Vercel` 部署
+
+## 3. 页面结构与内容格式
+
+项目当前是 `Vanilla JS SPA`，页面结构已比较完整：
+
+| 页面 | 作用 | 当前状态 |
+|------|------|----------|
+| `Home` | 首页、信任层、城市入口、快速规划入口 | 已完成风格化升级 |
+| `Chat` | AI 规划主入口 | 可用，支持流式聊天 |
+| `Map` | 地图与城市入口 | 可用，POI 仍不完整 |
+| `Trips` | 行程保存与浏览 | 可用 |
+| `Cities` | 城市浏览与详情 | 可用 |
+| `Tools` | 旅行工具集合 | 已支持工具详情展开 |
+| `Admin` | 后台管理 | 可用，但更偏内部使用 |
+
+当前主内容类型主要分为四类：
+
+1. 聊天气泡与规划结果
+2. 城市结构化内容
+3. Trips 行程内容
+4. Tools 工具卡片与详情面板
+
+## 4. 当前技术架构
+
+当前技术架构应理解为“轻前端 + 轻后端 + 文档化迭代”。
+
+| 层 | 技术 |
+|----|------|
+| 前端 | `HTML + CSS + Vanilla JS` |
+| 后端 | `Python WSGI` |
+| LLM | `DeepSeek V4 Flash` |
+| 地图 | `AMap` + `Leaflet fallback` |
+| 存储 | `SQLite` |
+| 部署 | `Vercel` |
+| 测试 | `python3 -m unittest` + `node --test` |
+
+当前高层运行关系：
+
+```text
+web/index.html + web/app.js + web/app.css
+              ↓
+           api/index.py
+              ↓
+api/auth.py / api/chat.py / api/cities.py / api/tools.py / api/visa.py
+              ↓
+        data/*.json + DeepSeek API
+```
+
+本文件只保留架构判断，不展开更细工程责任；详尽工程说明预留到：
+
+- [工程接手附录](docs/2026-06-20-engineering-handoff-notes.md)
+
+## 5. 已达成效果
+
+从交接视角看，当前已经明确达成这些结果：
+
+1. 项目已经从功能原型进化为完整产品网站
+2. 用户可见主内容完成了一轮英文原生化
+3. 移动端体验已做过两轮专项优化
+4. `v5.0.9` 已完成一轮生产稳定性修复
+5. 版本、测试、文档和发布节奏开始成型
+
+这意味着接手者面对的不是空壳，也不是单页 demo，而是一个可继续推进的产品基础。
+
+## 6. 计划达成效果
+
+当前阶段的合理目标，不是推倒重来，而是在现有基础上继续补齐闭环与商用品质。
+
+### 6.1 产品完成度
+
+- 继续稳定线上体验
+- 增强 `Trips / Cities / Tools / Chat` 之间的联动
+- 让工具页逐步从信息展示升级为旅行工作台
+
+### 6.2 商用方向
+
+- 当前继续保留 `Vercel`
+- 当前不立刻整站迁移
+- 后续优先考虑 `前端保留 + 后端 API 独立 + 托管数据库 + 对象存储/CDN`
+
+对应文档：
+
+- [商用升级路线](docs/2026-06-20-commercial-upgrade-plan.md)
+
+## 7. 过往关键迭代
+
+### 7.1 阶段演进
+
+- `v3.x`：完成基础产品骨架、聊天、地图、FAQ、城市知识库
+- `v4.x`：补齐 Auth、Trips、Chat History、Admin、Visa 等可用产品能力
+- `v4.1.x`：推进英文原生化与数据层英文化
+
+### 7.2 最近关键迭代
+
+- `v5.0.1 → v5.0.3`：建立测试基座，修复契约问题，规范文档与版本联动
+- `v5.0.4`：首页、Cities、Trips 完成一轮风格升级
+- `v5.0.5 → v5.0.6`：移动端专项优化
+- `v5.0.7`：用户可见主内容完成英文化
+- `v5.0.8`：Tools 升级为可展开详情的工具页
+- `v5.0.9`：完成一轮生产稳定性专项修复
+
+## 8. 当前真实问题
+
+这是接手时最需要正视的部分。
+
+### 8.1 线上质量仍需继续真实回归
+
+`v5.0.9` 只代表已经补过一轮，不代表线上质量问题已经彻底消失。接下来仍应重点验证：
+
+- `Sign in`
+- 图片加载与 fallback
+- tab 切换反馈
+- 手机端底部导航可见性
+- 多浏览器一致性
+
+### 8.2 产品闭环还不够强
+
+当前页面与模块已不少，但关键链路联动仍不够成熟，尤其是：
+
+- `Cities → Tools → Chat`
+- `Trips → Tools`
+
+### 8.3 数据覆盖还不均匀
+
+- 预算数据只覆盖部分城市
+- 地图 POI 覆盖不完整
+- 个别工具与城市内容仍有补全空间
+
+### 8.4 工程层仍有历史包袱
+
+- `web/app.js` 依然偏重，不建议在未理解入口顺序前做大重构
+- `static/*` 含历史兼容层，不能默认都属于当前主链路
+- 部署仍受 `Vercel` 边界影响，冷启动、流式接口、日志与资源治理后续仍要补
+
+## 9. 当前部署与商用判断
+
+当前部署判断已经相对明确：
+
+1. **继续使用 `Vercel`**
+2. **不立刻整站迁移**
+3. 先把线上验证、稳定性和产品闭环补强
+4. 商用升级优先迁出后端 API、数据库与资源治理能力
+
+对应路线文档：
+
+- [商用升级路线](docs/2026-06-20-commercial-upgrade-plan.md)
+
+结论不是“现在立刻迁移”，而是“现在继续保留，后续按商用需要分阶段拆出”。
+
+## 10. 接手建议
+
+### 10.1 第一天先做什么
+
+1. 如果你不知道该先看哪份文档，先读 [docs/2026-06-20-agent-transfer-index.md](docs/2026-06-20-agent-transfer-index.md)
+2. 再读 `HANDOFF.md`
+3. 再读 [docs/2026-06-20-engineering-handoff-notes.md](docs/2026-06-20-engineering-handoff-notes.md)
+4. 再读 [docs/2026-06-20-first-week-takeover-checklist.md](docs/2026-06-20-first-week-takeover-checklist.md)
+5. 再读 [docs/2026-06-20-high-risk-files-guide.md](docs/2026-06-20-high-risk-files-guide.md)
+6. 最后参考 [docs/2026-06-20-production-regression-manual.md](docs/2026-06-20-production-regression-manual.md)
+7. 再读 [docs/2026-06-20-next-2-4-weeks-priority-guide.md](docs/2026-06-20-next-2-4-weeks-priority-guide.md)
+8. 再读 [docs/2026-06-20-technical-debt-boundaries.md](docs/2026-06-20-technical-debt-boundaries.md)
+9. 再读 [docs/2026-06-20-module-ownership-guide.md](docs/2026-06-20-module-ownership-guide.md)
+10. 再看 `README.md`
+11. 再看 `CHANGELOG.md`
+12. 最后跑测试和本地服务
+
+### 10.2 建议先跑的命令
+
+```bash
+python3 -m unittest discover -s tests -v
+node --test web/tests/*.test.js
+python3 -c "
+from api.index import app
+from wsgiref.simple_server import make_server
+httpd = make_server('', 8765, app)
+print('http://127.0.0.1:8765')
+httpd.serve_forever()
+"
+```
+
+### 10.3 第一天不要先做什么
+
+- 不要一上来重构整个前端
+- 不要一上来整站迁移
+- 不要在没搞清活跃链路前大改 `static/*`
+- 不要把兼容层误认成当前主入口
+
+## 11. 关键文档索引
+
+| 文档 | 用途 |
+|------|------|
+| [README.md](README.md) | 项目总览与快速启动 |
+| [CHANGELOG.md](CHANGELOG.md) | 版本与迭代历史 |
+| [HANDOFF.md](HANDOFF.md) | 当前总交接文档 |
+| [docs/2026-06-20-agent-transfer-index.md](docs/2026-06-20-agent-transfer-index.md) | 交接文档总目录页 |
+| [docs/2026-06-20-engineering-handoff-notes.md](docs/2026-06-20-engineering-handoff-notes.md) | 详尽工程接手附录 |
+| [docs/2026-06-20-first-week-takeover-checklist.md](docs/2026-06-20-first-week-takeover-checklist.md) | 新接手开发者首周进入清单 |
+| [docs/2026-06-20-high-risk-files-guide.md](docs/2026-06-20-high-risk-files-guide.md) | 高风险文件修改指南 |
+| [docs/2026-06-20-production-regression-manual.md](docs/2026-06-20-production-regression-manual.md) | 发布前后回归手册 |
+| [docs/2026-06-20-next-2-4-weeks-priority-guide.md](docs/2026-06-20-next-2-4-weeks-priority-guide.md) | 未来 2-4 周推荐迭代顺序 |
+| [docs/2026-06-20-technical-debt-boundaries.md](docs/2026-06-20-technical-debt-boundaries.md) | 技术债边界说明 |
+| [docs/2026-06-20-module-ownership-guide.md](docs/2026-06-20-module-ownership-guide.md) | 模块责任建议表 |
+| [docs/2026-06-20-commercial-upgrade-plan.md](docs/2026-06-20-commercial-upgrade-plan.md) | 商用升级路线 |
+| [docs/superpowers/specs/2026-06-20-production-stability-pass-design.md](docs/superpowers/specs/2026-06-20-production-stability-pass-design.md) | `v5.0.9` 稳定性专项设计 |
+| [docs/superpowers/plans/2026-06-20-production-stability-pass.md](docs/superpowers/plans/2026-06-20-production-stability-pass.md) | `v5.0.9` 实施计划 |
+
+## 12. 最终结论
+
+这个项目已经完成了从“功能原型”向“可持续迭代产品网站”的过渡，但还没有到完全成熟商用状态。
+
+最准确的判断是：
+
+> **它已经具备继续开发、继续线上验证和继续增强商用品质的基础，但接手重点应放在稳定性、链路联动和分阶段商用准备，而不是从零重写。**
+
+对新接手者来说，最重要的顺序是：
+
+1. 先理解项目定义与当前能力
+2. 再判断当前真实问题与部署边界
+3. 最后基于现有主链路继续做稳定性、联动与商用准备

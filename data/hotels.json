@@ -1,0 +1,622 @@
+{
+  "beijing": {
+    "name_cn": "北京",
+    "name_en": "Beijing",
+    "budget": {
+      "range": "¥150-350/night",
+      "desc": "Hostel / Home Inn / Hanting",
+      "areas": "Qianmen（前门） / Xidan（西单） / Dongsi（东四）"
+    },
+    "mid": {
+      "range": "¥400-800/night",
+      "desc": "JI Hotel / Atour / Hilton Garden Inn",
+      "areas": "Wangfujing（王府井） / Sanlitun（三里屯） / Guomao CBD（国贸）"
+    },
+    "luxury": {
+      "range": "¥1000-3000+/night",
+      "desc": "The Peninsula / Waldorf Astoria / Four Seasons / Mandarin Oriental Wangfujing",
+      "areas": "Wangfujing（王府井） / Guomao CBD（国贸） / Financial Street"
+    },
+    "tip": "Stay inside the 2nd Ring Road for the easiest sightseeing access — Qianmen（前门）, Wangfujing（王府井）, and Dongsi（东四） are reliable picks."
+  },
+  "shanghai": {
+    "name_cn": "上海",
+    "name_en": "Shanghai",
+    "budget": {
+      "range": "¥150-350/night",
+      "desc": "Hostel / Hanting / Home Inn",
+      "areas": "People's Square（人民广场） / Nanjing East Road（南京东路）"
+    },
+    "mid": {
+      "range": "¥400-900/night",
+      "desc": "JI Hotel / Atour / Yitel",
+      "areas": "The Bund（外滩） / Jing'an Temple（静安寺） / Huaihai Road（淮海路）"
+    },
+    "luxury": {
+      "range": "¥1200-4000+/night",
+      "desc": "Peace Hotel / The Peninsula / The Ritz-Carlton Pudong / W Hotel",
+      "areas": "The Bund（外滩） / Lujiazui（陆家嘴） / Jing'an"
+    },
+    "tip": "For first-timers, People's Square（人民广场） or Nanjing East Road（南京东路） are the easiest bases; stay at The Bund（外滩） or Lujiazui（陆家嘴） for skyline views."
+  },
+  "chengdu": {
+    "name_cn": "成都",
+    "name_en": "Chengdu",
+    "budget": {
+      "range": "¥120-280/night",
+      "desc": "Hostel / Hanting / Home Inn",
+      "areas": "Chunxi Road（春熙路） / Tianfu Square（天府广场）"
+    },
+    "mid": {
+      "range": "¥300-600/night",
+      "desc": "JI Hotel / Atour / Jinjiang Hotel",
+      "areas": "Chunxi Road（春熙路） / Kuanzhai Alley（宽窄巷子） / Wuhou Shrine（武侯祠）"
+    },
+    "luxury": {
+      "range": "¥800-2500+/night",
+      "desc": "The Temple House / Grand Hyatt Chengdu / St. Regis / Waldorf Astoria",
+      "areas": "Taikoo Li（太古里） / Chunxi Road（春熙路）"
+    },
+    "tip": "Chunxi Road（春熙路） is the most convenient base for sightseeing, and The Temple House is the city's standout boutique stay."
+  },
+  "xian": {
+    "name_cn": "西安",
+    "name_en": "Xi'an",
+    "budget": {
+      "range": "¥100-250/night",
+      "desc": "Hostel / Hanting / Home Inn",
+      "areas": "Bell Tower（钟楼） / South Gate（南门）"
+    },
+    "mid": {
+      "range": "¥250-600/night",
+      "desc": "JI Hotel / Atour / Mercure",
+      "areas": "Bell Tower（钟楼） / Big Wild Goose Pagoda（大雁塔） / South Gate（南门）"
+    },
+    "luxury": {
+      "range": "¥700-2000+/night",
+      "desc": "Sofitel Legend / Westin / Marriott Executive Apartments",
+      "areas": "Bell Tower（钟楼） / Big Wild Goose Pagoda（大雁塔）"
+    },
+    "tip": "Stay around Bell Tower（钟楼） or inside the South Gate（南门） city wall for easy walks to the Muslim Quarter and the walls; Big Wild Goose Pagoda（大雁塔） is best if you want the fountain show nearby."
+  },
+  "guangzhou": {
+    "name_cn": "广州",
+    "name_en": "Guangzhou",
+    "budget": {
+      "range": "¥120-280/night",
+      "desc": "Hanting / Home Inn / 7 Days Inn",
+      "areas": "Tianhe / Beijing Road（北京路）"
+    },
+    "mid": {
+      "range": "¥300-700/night",
+      "desc": "JI Hotel / Atour / Hyatt Place",
+      "areas": "Tianhe / Zhujiang New Town（珠江新城）"
+    },
+    "luxury": {
+      "range": "¥900-3500+/night",
+      "desc": "Four Seasons / Ritz-Carlton / Mandarin Oriental / Rosewood",
+      "areas": "Zhujiang New Town（珠江新城） / Tianhe"
+    },
+    "tip": "Zhujiang New Town（珠江新城） is the easiest all-round base, and the Canton Tower night view is excellent."
+  },
+  "hangzhou": {
+    "name_cn": "杭州",
+    "name_en": "Hangzhou",
+    "budget": {
+      "range": "¥150-300/night",
+      "desc": "Hanting / Home Inn / Pod Inn",
+      "areas": "West Lake District / Wulin Square（武林广场）"
+    },
+    "mid": {
+      "range": "¥350-800/night",
+      "desc": "JI Hotel / Atour / Hidden Place",
+      "areas": "around West Lake（西湖） / Lingyin（灵隐）"
+    },
+    "luxury": {
+      "range": "¥1000-4000+/night",
+      "desc": "Four Seasons Hangzhou at West Lake / Amanfayun / Banyan Tree / Relais & Châteaux",
+      "areas": "West Lake Scenic Area（西湖景区） / Lingyin（灵隐）"
+    },
+    "tip": "Boutique stays around West Lake feel more atmospheric than standard hotels; if the budget allows, Amanfayun is a signature experience."
+  },
+  "guilin": {
+    "name_cn": "桂林",
+    "name_en": "Guilin",
+    "budget": {
+      "range": "¥80-200/night",
+      "desc": "Hostel / Hanting / 7 Days Inn",
+      "areas": "City Center / Two Rivers & Four Lakes（两江四湖）"
+    },
+    "mid": {
+      "range": "¥200-500/night",
+      "desc": "Atour / Vienna Hotel / Boutique stay",
+      "areas": "City Center / along the Li River（漓江）"
+    },
+    "luxury": {
+      "range": "¥600-1500+/night",
+      "desc": "Shangri-La Guilin / Li River Boyin（漓江泊隐） / Banyan Tree Yangshuo",
+      "areas": "East Bank of the Li River（漓江） / Yangshuo（阳朔）"
+    },
+    "tip": "Yangshuo is usually a better overnight base than Guilin city proper, and guesthouses along the Yulong River offer the best atmosphere."
+  },
+  "shenzhen": {
+    "name_cn": "深圳",
+    "name_en": "Shenzhen",
+    "budget": {
+      "range": "¥120-280/night",
+      "desc": "Hanting / Home Inn / 7 Days Inn",
+      "areas": "Luohu（罗湖） / Futian（福田）"
+    },
+    "mid": {
+      "range": "¥300-700/night",
+      "desc": "JI Hotel / Atour / Courtyard",
+      "areas": "Futian CBD / Nanshan（南山）"
+    },
+    "luxury": {
+      "range": "¥900-3000+/night",
+      "desc": "Park Hyatt / St. Regis / Raffles / Grand Hyatt",
+      "areas": "Futian（福田） / Nanshan（南山） / Luohu（罗湖）"
+    },
+    "tip": "Futian CBD is the most central choice, while Nanshan works well if you want to stay near the tech parks and OCT."
+  },
+  "chongqing": {
+    "name_cn": "重庆",
+    "name_en": "Chongqing",
+    "budget": {
+      "range": "¥100-250/night",
+      "desc": "Hanting / Home Inn / 7 Days Inn",
+      "areas": "Jiefangbei（解放碑） / Guanyinqiao（观音桥）"
+    },
+    "mid": {
+      "range": "¥250-550/night",
+      "desc": "JI Hotel / Atour / Vienna Hotel",
+      "areas": "Jiefangbei（解放碑） / Jiangbeizui（江北嘴）"
+    },
+    "luxury": {
+      "range": "¥700-2500+/night",
+      "desc": "Westin / InterContinental Raffles City / Niccolo / Novotel",
+      "areas": "Jiefangbei（解放碑） / Jiangbeizui（江北嘴） / Nanbin Road（南滨路）"
+    },
+    "tip": "Jiefangbei（解放碑） is the most central base; choose Nanbin Road（南滨路） or Jiangbeizui（江北嘴） for the best night views."
+  },
+  "lijiang": {
+    "name_cn": "丽江",
+    "name_en": "Lijiang",
+    "budget": {
+      "range": "¥80-200/night",
+      "desc": "Old Town guesthouse / Hostel",
+      "areas": "inside the Old Town / Shuhe Ancient Town（束河古镇）"
+    },
+    "mid": {
+      "range": "¥200-600/night",
+      "desc": "Boutique guesthouse / Old Town guesthouse",
+      "areas": "inside the Old Town / Shuhe（束河）"
+    },
+    "luxury": {
+      "range": "¥800-2500+/night",
+      "desc": "Banyan Tree / Aman / Old Town boutique hotel",
+      "areas": "Shuhe（束河） / beside the Old Town"
+    },
+    "tip": "Shuhe is quieter than Dayan Old Town, and the cobblestone lanes inside the old town are rough with luggage, so arrange a pickup with your host if possible."
+  },
+  "zhangjiajie": {
+    "name_cn": "张家界",
+    "name_en": "Zhangjiajie",
+    "budget": {
+      "range": "¥80-200/night",
+      "desc": "Guesthouse / Hanting / 7 Days Inn",
+      "areas": "Wulingyuan（武陵源） / Urban Area"
+    },
+    "mid": {
+      "range": "¥200-500/night",
+      "desc": "Atour / Boutique stay / Vienna Hotel",
+      "areas": "Wulingyuan Main Gate（武陵源标志门）"
+    },
+    "luxury": {
+      "range": "¥600-1500+/night",
+      "desc": "Harmona Resort Zhangjiajie / Nabalie（纳百利） / Holiday Inn",
+      "areas": "Wulingyuan（武陵源）"
+    },
+    "tip": "Staying near the Wulingyuan Main Gate gives you the easiest walk-in access to the park."
+  },
+  "suzhou": {
+    "name_cn": "苏州",
+    "name_en": "Suzhou",
+    "budget": {
+      "range": "¥120-250/night",
+      "desc": "Hanting / Home Inn / 7 Days Inn",
+      "areas": "Guanqian Street（观前街） / Railway Station"
+    },
+    "mid": {
+      "range": "¥250-600/night",
+      "desc": "Atour / JI Hotel / Blossom Hill",
+      "areas": "Guanqian Street（观前街） / Pingjiang Road（平江路）"
+    },
+    "luxury": {
+      "range": "¥700-2000+/night",
+      "desc": "Kempinski Hotel Suzhou Jinji Lake / Park Hyatt / Crowne Plaza Zhongyin",
+      "areas": "Jinji Lake（金鸡湖） / Pingjiang Road（平江路）"
+    },
+    "tip": "Guesthouses around Pingjiang Road or Shantang Street feel the most classic Jiangnan, while Jinji Lake suits business stays better."
+  },
+  "nanjing": {
+    "name_cn": "南京",
+    "name_en": "Nanjing",
+    "budget": {
+      "range": "¥120-250/night",
+      "desc": "Hanting / Home Inn / 7 Days Inn",
+      "areas": "Xinjiekou（新街口） / Confucius Temple（夫子庙）"
+    },
+    "mid": {
+      "range": "¥250-600/night",
+      "desc": "Atour / JI Hotel / Golden Eagle Hotel",
+      "areas": "Xinjiekou（新街口） / Xuanwu Lake（玄武湖）"
+    },
+    "luxury": {
+      "range": "¥800-2500+/night",
+      "desc": "The Ritz-Carlton Nanjing / Yihe Mansion / Westin",
+      "areas": "Xinjiekou（新街口） / Yihe Road（颐和路）"
+    },
+    "tip": "Xinjiekou is the most central base, while the Yihe Road villa district offers elegant Republican-era style stays."
+  },
+  "harbin": {
+    "name_cn": "哈尔滨",
+    "name_en": "Harbin",
+    "budget": {
+      "range": "¥100-250/night",
+      "desc": "Hanting / Home Inn / 7 Days Inn",
+      "areas": "Central Street（中央大街）"
+    },
+    "mid": {
+      "range": "¥250-600/night",
+      "desc": "Atour / JI Hotel / Wanda Realm",
+      "areas": "Central Street（中央大街） / Songbei（松北）"
+    },
+    "luxury": {
+      "range": "¥600-1500+/night",
+      "desc": "Wanda Vista Harbin / Shangri-La / Sunac Songbei",
+      "areas": "Central Street（中央大街） / Songbei（松北）"
+    },
+    "tip": "Stay near Central Street for the easiest logistics; Saint Sophia Cathedral is walkable and there are convenient shuttle links to Ice and Snow World."
+  },
+  "wuhan": {
+    "name_cn": "武汉",
+    "name_en": "Wuhan",
+    "budget": {
+      "range": "¥120-250/night",
+      "desc": "Hanting / Home Inn / 7 Days Inn",
+      "areas": "Jianghan Road（江汉路） / Hubu Alley（户部巷）"
+    },
+    "mid": {
+      "range": "¥250-600/night",
+      "desc": "Atour / JI Hotel / Wanda Realm",
+      "areas": "Jianghan Road（江汉路） / Chu River Han Street（楚河汉街）"
+    },
+    "luxury": {
+      "range": "¥700-2000+/night",
+      "desc": "Wanda Reign Wuhan / Fairmont / Sheraton（泛海喜来登）",
+      "areas": "Hankou Riverfront（汉口江滩） / Wuchang（武昌）"
+    },
+    "tip": "Jianghan Road is the most central base, while Optics Valley in Wuchang works well for student-friendly budgets."
+  },
+  "qingdao": {
+    "name_cn": "青岛",
+    "name_en": "Qingdao",
+    "budget": {
+      "range": "¥100-250/night",
+      "desc": "Hanting / Home Inn / 7 Days Inn",
+      "areas": "Railway Station / Taidong（台东）"
+    },
+    "mid": {
+      "range": "¥250-600/night",
+      "desc": "Atour / JI Hotel / Westin (entry room types)",
+      "areas": "May Fourth Square（五四广场） / Badaguan（八大关）"
+    },
+    "luxury": {
+      "range": "¥800-2500+/night",
+      "desc": "The Lalu Qingdao / InterContinental Qingdao / Sea View Garden",
+      "areas": "Badaguan（八大关） / Laoshan（崂山）"
+    },
+    "tip": "German-style guesthouses around Badaguan feel the most distinctive, but rates can double in peak summer."
+  },
+  "xiamen": {
+    "name_cn": "厦门",
+    "name_en": "Xiamen",
+    "budget": {
+      "range": "¥100-250/night",
+      "desc": "Guesthouse / Hanting / Hostel",
+      "areas": "Zhongshan Road（中山路） / Zengcuoan（曾厝垵）"
+    },
+    "mid": {
+      "range": "¥250-600/night",
+      "desc": "Atour / Boutique stay / JI Hotel",
+      "areas": "Gulangyu（鼓浪屿） / Island Ring Road（环岛路）"
+    },
+    "luxury": {
+      "range": "¥700-2000+/night",
+      "desc": "Conrad Xiamen / Lohkah Hotel & Spa（七尚） / Seaview Resort",
+      "areas": "Gulangyu（鼓浪屿） / Island Ring Road（环岛路）"
+    },
+    "tip": "Zengcuoan guesthouses offer strong value; spending one night on Gulangyu is atmospheric, but moving luggage there is a hassle."
+  },
+  "sanya": {
+    "name_cn": "三亚",
+    "name_en": "Sanya",
+    "budget": {
+      "range": "¥150-350/night",
+      "desc": "Boutique stay / Hanting / 7 Days Inn",
+      "areas": "Dadonghai（大东海） / Urban Area"
+    },
+    "mid": {
+      "range": "¥350-800/night",
+      "desc": "Atour / Hilton Garden Inn / Wyndham",
+      "areas": "Sanya Bay（三亚湾） / Yalong Bay（亚龙湾）"
+    },
+    "luxury": {
+      "range": "¥1000-4000+/night",
+      "desc": "The EDITION Sanya / Capella / Park Hyatt / Banyan Tree",
+      "areas": "Haitang Bay（海棠湾） / Yalong Bay（亚龙湾）"
+    },
+    "tip": "Yalong Bay has the best sand, Haitang Bay has the newest luxury resorts, and Sanya Bay is best for sunsets; winter rates can easily double."
+  },
+  "changsha": {
+    "name_cn": "长沙",
+    "name_en": "Changsha",
+    "budget": {
+      "range": "¥100-250/night",
+      "desc": "Hanting / Home Inn / 7 Days Inn",
+      "areas": "Wuyi Square（五一广场） / Taiping Street（太平街）"
+    },
+    "mid": {
+      "range": "¥250-550/night",
+      "desc": "Atour / JI Hotel / Vienna Hotel",
+      "areas": "Wuyi Square（五一广场） / IFS"
+    },
+    "luxury": {
+      "range": "¥700-2000+/night",
+      "desc": "Niccolo Changsha / St. Regis / Grand Hyatt / W Hotel",
+      "areas": "Wuyi Square（五一广场） / along the Xiang River（湘江）"
+    },
+    "tip": "Stay around Wuyi Square for the most central location, with Pozi Street and Taiping Street within walking distance."
+  },
+  "lasa": {
+    "name_cn": "拉萨",
+    "name_en": "Lhasa",
+    "budget": {
+      "range": "¥100-250/night",
+      "desc": "Guesthouse / Hostel / Hanting",
+      "areas": "Barkhor Street（八廓街） / Beijing Road（北京路）"
+    },
+    "mid": {
+      "range": "¥250-600/night",
+      "desc": "Atour / Guesthouse / St. Regis (entry room types)",
+      "areas": "Barkhor Street（八廓街） / Potala Palace（布达拉宫）"
+    },
+    "luxury": {
+      "range": "¥800-2000+/night",
+      "desc": "The St. Regis Lhasa Resort / InterContinental Lhasa Paradise / Shangri-La",
+      "areas": "Barkhor Street（八廓街） / Potala Palace（布达拉宫）"
+    },
+    "tip": "Do not shower on your first night in Lhasa if you're adjusting to the altitude; staying near Barkhor Street keeps both the kora route and Potala Palace close by."
+  },
+  "fuzhou": {
+    "name_cn": "福州",
+    "name_en": "Fuzhou",
+    "budget": {
+      "range": "¥120-250/night",
+      "desc": "Hanting / Home Inn / 7 Days Inn",
+      "areas": "Drum Tower District（鼓楼） / Dongjiekou（东街口）"
+    },
+    "mid": {
+      "range": "¥250-550/night",
+      "desc": "Atour / JI Hotel / Hyatt Place",
+      "areas": "Drum Tower District（鼓楼） / Three Lanes and Seven Alleys（三坊七巷）"
+    },
+    "luxury": {
+      "range": "¥700-1800+/night",
+      "desc": "Hilton Fuzhou / Westin / Kempinski",
+      "areas": "Drum Tower District（鼓楼） / north bank of the Min River（闽江）"
+    },
+    "tip": "Guesthouses around Three Lanes and Seven Alleys feel the most like old Fuzhou."
+  },
+  "dunhuang": {
+    "name_cn": "敦煌",
+    "name_en": "Dunhuang",
+    "budget": {
+      "range": "¥80-200/night",
+      "desc": "Guesthouse / Hostel / Hanting",
+      "areas": "Urban Area / Mingsha Mountain（鸣沙山）"
+    },
+    "mid": {
+      "range": "¥200-500/night",
+      "desc": "Boutique stay / Guesthouse / Silk Road Yiyuan（丝路怡苑）",
+      "areas": "Urban Area"
+    },
+    "luxury": {
+      "range": "¥600-1500+/night",
+      "desc": "Dunhuang Hotel（敦煌山庄） / Tianhe Hotel（天河酒店） / International Hotel",
+      "areas": "Mingsha Mountain（鸣沙山） / Urban Area"
+    },
+    "tip": "Desert camping near Mingsha Mountain is worth trying if you want a more memorable stay."
+  },
+  "lanzhou": {
+    "name_cn": "兰州",
+    "name_en": "Lanzhou",
+    "budget": {
+      "range": "¥100-200/night",
+      "desc": "Hanting / Home Inn / 7 Days Inn",
+      "areas": "Xiguan（西关） / Zhangye Road（张掖路）"
+    },
+    "mid": {
+      "range": "¥200-500/night",
+      "desc": "Atour / JI Hotel / Holiday Inn (entry room types)",
+      "areas": "Xiguan（西关） / along the Yellow River（黄河）"
+    },
+    "luxury": {
+      "range": "¥600-1500+/night",
+      "desc": "Crowne Plaza Lanzhou / Great Wall Jianguo Hotel",
+      "areas": "Yellow River Scenic Line（黄河风情线）"
+    },
+    "tip": "Xiguan Crossroads is the most convenient base, with Zhengning Road Night Market within walking distance."
+  },
+  "luoyang": {
+    "name_cn": "洛阳",
+    "name_en": "Luoyang",
+    "budget": {
+      "range": "¥80-200/night",
+      "desc": "Hanting / Home Inn / Hostel",
+      "areas": "Old Town / Xigong（西工）"
+    },
+    "mid": {
+      "range": "¥200-500/night",
+      "desc": "Atour / JI Hotel / Peony City Hotel（牡丹城）",
+      "areas": "Old Town / Luolong（洛龙）"
+    },
+    "luxury": {
+      "range": "¥600-1500+/night",
+      "desc": "Huayang Plaza Luoyang / Mudu Lihao（钼都利豪） / Marriott",
+      "areas": "Luolong（洛龙） / New District"
+    },
+    "tip": "Stay in Luolong if Longmen Grottoes is your priority; the Old Town is more convenient for Luoyang Water Banquet restaurants."
+  },
+  "huangshan": {
+    "name_cn": "黄山",
+    "name_en": "Huangshan",
+    "budget": {
+      "range": "¥100-250/night",
+      "desc": "Guesthouse / Hostel / Hanting",
+      "areas": "Tangkou Town（汤口镇） / Tunxi（屯溪）"
+    },
+    "mid": {
+      "range": "¥250-600/night",
+      "desc": "Boutique stay / Atour / Guesthouse",
+      "areas": "Tangkou Town（汤口镇） / Hongcun（宏村）"
+    },
+    "luxury": {
+      "range": "¥700-2000+/night",
+      "desc": "Banyan Tree Huangshan / Hanyuelou（涵月楼） / Crowne Plaza Yucheng（昱城皇冠）",
+      "areas": "Hongcun（宏村） / Tunxi（屯溪）"
+    },
+    "tip": "Stay in Tangkou Town for hiking Yellow Mountain; choose a Hongcun guesthouse if you want classic Anhui architecture."
+  },
+  "guiyang": {
+    "name_cn": "贵阳",
+    "name_en": "Guiyang",
+    "budget": {
+      "range": "¥100-200/night",
+      "desc": "Hanting / Home Inn / 7 Days Inn",
+      "areas": "Yunyan（云岩） / Penshuichi（喷水池）"
+    },
+    "mid": {
+      "range": "¥200-500/night",
+      "desc": "Atour / JI Hotel / Vienna Hotel",
+      "areas": "Yunyan（云岩） / Jiaxiu Tower（甲秀楼）"
+    },
+    "luxury": {
+      "range": "¥600-1500+/night",
+      "desc": "Hyatt Regency Guiyang Zhongtian / Sofitel / Renaissance",
+      "areas": "Guanshanhu（观山湖） / Yunyan（云岩）"
+    },
+    "tip": "Stay in Yunyan District or near Jiaxiu Tower for the easiest access to the city core and Erqi Road snack street."
+  },
+  "nanchang": {
+    "name_cn": "南昌",
+    "name_en": "Nanchang",
+    "budget": {
+      "range": "¥80-200/night",
+      "desc": "Hanting / Home Inn / 7 Days Inn",
+      "areas": "Honggutan（红谷滩） / Bayi Square（八一广场）"
+    },
+    "mid": {
+      "range": "¥200-500/night",
+      "desc": "Atour / JI Hotel / Grand Skylight",
+      "areas": "Honggutan（红谷滩） / Pavilion of Prince Teng（滕王阁）"
+    },
+    "luxury": {
+      "range": "¥600-1500+/night",
+      "desc": "Ligao Crowne Plaza（力高皇冠） / Qianhu Hotel / Sheraton",
+      "areas": "Honggutan（红谷滩）"
+    },
+    "tip": "Hotels in Honggutan are newer, while the Old Town is better if you want easy access to mixed noodles and clay-pot soup spots."
+  },
+  "xining": {
+    "name_cn": "西宁",
+    "name_en": "Xining",
+    "budget": {
+      "range": "¥80-200/night",
+      "desc": "Hanting / Home Inn / Hostel",
+      "areas": "Chengzhong District（城中区） / Mojia Street（莫家街）"
+    },
+    "mid": {
+      "range": "¥200-500/night",
+      "desc": "Atour / JI Hotel / Qinghai Hotel",
+      "areas": "Chengzhong District（城中区） / Haihu（海湖）"
+    },
+    "luxury": {
+      "range": "¥600-1800+/night",
+      "desc": "Sofitel Xining / Wanda Realm / Hilton",
+      "areas": "Haihu New District"
+    },
+    "tip": "Stay in Chengzhong District for easy access to Mojia Street, and overnight in Xining before an early Qinghai Lake departure."
+  },
+  "hohhot": {
+    "name_cn": "呼和浩特",
+    "name_en": "Hohhot",
+    "budget": {
+      "range": "¥80-200/night",
+      "desc": "Hanting / Home Inn / 7 Days Inn",
+      "areas": "Drum Tower District（鼓楼） / Zhongshan West Road（中山西路）"
+    },
+    "mid": {
+      "range": "¥200-500/night",
+      "desc": "Atour / JI Hotel / Shangri-La (entry room types)",
+      "areas": "Drum Tower District（鼓楼） / Ruyi（如意）"
+    },
+    "luxury": {
+      "range": "¥600-1500+/night",
+      "desc": "Shangri-La Hohhot / Sheraton / Marriott",
+      "areas": "Ruyi（如意） / New City District"
+    },
+    "tip": "Stay near Gulou for the easiest access to Mongolian restaurants; most grassland trips start from Hohhot."
+  },
+  "dali": {
+    "name_cn": "大理",
+    "name_en": "Dali",
+    "budget": {
+      "range": "¥80-200/night",
+      "desc": "Old Town guesthouse / Hostel",
+      "areas": "inside the Old Town / Caicun（才村）"
+    },
+    "mid": {
+      "range": "¥200-500/night",
+      "desc": "Boutique guesthouse / sea-view guesthouse",
+      "areas": "Dali Ancient Town（古城） / by Erhai Lake（洱海）"
+    },
+    "luxury": {
+      "range": "¥600-2000+/night",
+      "desc": "Yihe Yunxi（颐和耘熹） / Mingyue Songjian（明月松间） / Hainer（海纳尔）",
+      "areas": "Erhai Lake（洱海） / Dali Ancient Town（古城）"
+    },
+    "tip": "Stay inside Dali Ancient Town for energy and nightlife, or by Erhai Lake for a quieter sunrise stay."
+  },
+  "jiuzhaigou": {
+    "name_cn": "九寨沟",
+    "name_en": "Jiuzhaigou",
+    "budget": {
+      "range": "¥80-200/night",
+      "desc": "Guesthouse / Hostel / Tibetan family guesthouse",
+      "areas": "park entrance（沟口） / Zhangzha Town（漳扎镇）"
+    },
+    "mid": {
+      "range": "¥200-500/night",
+      "desc": "Boutique stay / Atour / Guesthouse",
+      "areas": "park entrance（沟口）"
+    },
+    "luxury": {
+      "range": "¥600-1500+/night",
+      "desc": "Banyan Tree Jiuzhaigou / Howard Johnson Tianyuan / Hilton",
+      "areas": "park entrance（沟口）"
+    },
+    "tip": "Staying at the park entrance is the most convenient for walking into Jiuzhaigou, but autumn room rates can double."
+  }
+}
