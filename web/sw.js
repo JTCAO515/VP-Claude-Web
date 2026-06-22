@@ -1,4 +1,4 @@
-const CACHE_NAME = "visepanda-shell-v608-mobile-ui3";
+const CACHE_NAME = "visepanda-shell-v610-ai-first3";
 const APP_SHELL = [
   "/",
   "/web/index.html",

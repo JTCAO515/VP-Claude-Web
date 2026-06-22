@@ -1,5 +1,32 @@
 # Changelog
 
+## v6.1.0 - 2026-06-23
+
+### Changed
+
+- Shifted the default app entry from Plan to Ask so users land directly in the AI travel agent.
+- Reworked the mobile primary navigation to four core tabs: Ask, Cities, Tools, and Trips.
+- Moved Overview into the top bar as a secondary planning surface.
+- Added an AI-first chat welcome state with six high-value quick prompts and first-screen input access.
+- Made chat controls progressive: mode, provider, depth, and detailed presets appear after the user starts a conversation.
+- Updated the visual direction with a deep travel-agent chat stage, Great Wall texture, sky-blue surfaces, and orange send action.
+
+### Fixed
+
+- Added request timeouts for shared API calls and chat requests.
+- Hardened SSE parsing so malformed `data:` lines no longer crash the chat session.
+- Preserved chat Authorization headers for future authenticated chat flows.
+- Fixed quick planner duration handling.
+- Added city image fallback handling.
+- Added clearer session/config failure feedback.
+- Wrapped trip saving errors with visible toast feedback.
+
+### Regression
+
+- Updated backend version tests to `6.1.0`.
+- Updated frontend structure tests for AI-first navigation, progressive chat controls, cache busting, and streaming resilience.
+- Browser-verified desktop and mobile portrait rendering with the in-app browser.
+
 ## v6.0.8 - 2026-06-22
 
 ### Changed

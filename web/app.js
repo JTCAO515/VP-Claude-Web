@@ -8,6 +8,8 @@ const state = {
     provider: "auto",
     depth: "standard",
     optionsLoaded: false,
+    hasStarted: false,
+    isStreaming: false,
   },
   authMode: "login",
   pendingEmail: "",
@@ -26,7 +28,7 @@ function showToast(message, tone = "info") {
   toast.dataset.tone = tone;
   toast.classList.add("is-visible");
   clearTimeout(showToast.timer);
-  showToast.timer = setTimeout(() => toast.classList.remove("is-visible"), 3200);
+  showToast.timer = setTimeout(() => toast.classList.remove("is-visible"), tone === "error" ? 5600 : 3600);
 }
 
 function setStatus(selector, message, tone = "neutral") {
@@ -67,7 +69,7 @@ async function withButtonBusy(button, label, task) {
   const oldHtml = button.innerHTML;
   button.disabled = true;
   button.setAttribute("aria-busy", "true");
-  if (label) button.textContent = label;
+  if (label) setButtonLabel(button, label);
   try {
     return await task();
   } finally {
@@ -77,13 +79,39 @@ async function withButtonBusy(button, label, task) {
   }
 }
 
+function setButtonLabel(button, label) {
+  const walker = document.createTreeWalker(button, NodeFilter.SHOW_TEXT);
+  let node = walker.nextNode();
+  while (node && !node.nodeValue.trim()) node = walker.nextNode();
+  if (node) {
+    node.nodeValue = ` ${label}`;
+  } else {
+    button.appendChild(document.createTextNode(label));
+  }
+}
+
+async function fetchWithTimeout(path, options = {}, timeout = 15000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+  try {
+    return await fetch(path, { ...options, signal: controller.signal });
+  } catch (error) {
+    if (error.name === "AbortError") {
+      throw new Error("The request took too long. Please try again.");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function api(path, options = {}) {
   const headers = {
     "Content-Type": "application/json",
     ...(options.headers || {}),
   };
   if (state.token) headers.Authorization = `Bearer ${state.token}`;
-  const response = await fetch(path, { ...options, headers });
+  const response = await fetchWithTimeout(path, { ...options, headers }, options.timeout || 15000);
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     const message = data.error?.message || "Request failed";
@@ -99,6 +127,9 @@ function setView(view) {
     button.classList.toggle("is-active", active);
     button.setAttribute("aria-selected", active ? "true" : "false");
     button.tabIndex = active ? 0 : -1;
+  });
+  $$("[data-view='dashboard']:not(.nav__item)").forEach((button) => {
+    button.setAttribute("aria-current", view === "dashboard" ? "page" : "false");
   });
   $$("[data-view-panel]").forEach((panel) => {
     const hidden = panel.dataset.viewPanel !== view;
@@ -156,7 +187,7 @@ async function loadChatOptions() {
     populateSelect("#chatProvider", data.providers, state.chat.provider);
     populateSelect("#chatDepth", data.depths, state.chat.depth);
     state.chat.optionsLoaded = true;
-    setStatus("#chatStatus", "Auto route ready. Choose a mode or start with a preset.");
+    if (!state.chat.hasStarted) setStatus("#chatStatus", "Ready. Start with a question or a quick prompt.");
   } catch (error) {
     setStatus("#chatStatus", "Chat options are using local defaults.", "error");
   }
@@ -165,8 +196,9 @@ async function loadChatOptions() {
 async function loadAuthConfig() {
   try {
     state.authConfig = await api("/api/auth/config");
-  } catch {
+  } catch (error) {
     state.authConfig = { google: false, emailVerification: true };
+    showToast("Account providers are using local defaults.", "error");
   }
   updateAuthUi();
 }
@@ -175,8 +207,12 @@ function cityCard(city) {
   const article = document.createElement("article");
   article.className = "city-card";
   const image = document.createElement("img");
-  image.src = city.image;
+  image.loading = "lazy";
+  image.src = city.image || "/static/img/great-wall.jpg";
   image.alt = `${city.name} travel view`;
+  image.addEventListener("error", () => {
+    image.src = "/static/img/great-wall.jpg";
+  }, { once: true });
   article.appendChild(image);
   const body = document.createElement("div");
   body.className = "city-card__body";
@@ -190,10 +226,12 @@ function cityCard(city) {
 
 async function loadCities() {
   const grid = $("#cityGrid");
+  const featured = $("#featuredCities");
   try {
     if (!state.cities.length) {
       setStatus("#cityStatus", "Loading city intelligence...");
       grid.replaceChildren(...loadingCards(6));
+      if (featured && !featured.children.length) featured.replaceChildren(...loadingCards(4));
       const data = await api("/api/cities");
       state.cities = data.cities || [];
     }
@@ -214,8 +252,9 @@ async function loadCities() {
       loadCities();
     }),
   ]));
-  const featured = $("#featuredCities");
   if (featured && !featured.children.length) {
+    featured.replaceChildren(...state.cities.slice(0, 4).map(cityCard));
+  } else if (featured && featured.querySelector(".skeleton-card")) {
     featured.replaceChildren(...state.cities.slice(0, 4).map(cityCard));
   }
 }
@@ -293,11 +332,11 @@ async function loadTools() {
 function addMessage(author, text, kind = "") {
   const node = $("#messageTemplate").content.firstElementChild.cloneNode(true);
   node.classList.toggle("is-user", kind === "user");
-  $("span", node).textContent = author;
-  $("p", node).textContent = text;
+  $(".message__author", node).textContent = author;
+  $(".message__body", node).textContent = text;
   $("#chatLog").appendChild(node);
   $("#chatLog").scrollTop = $("#chatLog").scrollHeight;
-  return $("p", node);
+  return $(".message__body", node);
 }
 
 function currentChatSettings(overrides = {}) {
@@ -311,16 +350,22 @@ function currentChatSettings(overrides = {}) {
 async function sendChat(message, overrides = {}) {
   const settings = currentChatSettings(overrides);
   state.chat = { ...state.chat, ...settings };
+  startChatExperience();
   setStatus("#chatStatus", "Thinking through the route...");
   addMessage("You", message, "user");
   const target = addMessage("VisePanda", "");
   const targetMessage = target.closest(".message");
+  const input = $("#chatInput");
   try {
-    const response = await fetch("/api/chat", {
+    state.chat.isStreaming = true;
+    if (input) input.disabled = true;
+    const headers = { "Content-Type": "application/json" };
+    if (state.token) headers.Authorization = `Bearer ${state.token}`;
+    const response = await fetchWithTimeout("/api/chat", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify({ message, ...settings }),
-    });
+    }, 22000);
     if (!response.ok || !response.body) {
       throw new Error("I could not reach the guide service. Please try again.");
     }
@@ -335,9 +380,14 @@ async function sendChat(message, overrides = {}) {
       buffer = lines.pop() || "";
       lines.forEach((line) => {
         if (!line.startsWith("data:")) return;
-        const payload = JSON.parse(line.slice(5).trim());
+        let payload;
+        try {
+          payload = JSON.parse(line.slice(5).trim());
+        } catch {
+          return;
+        }
         if (payload.meta) {
-          $("span", targetMessage).textContent = `VisePanda - ${payload.meta.modeLabel} - ${payload.meta.providerLabel}`;
+          $(".message__author", targetMessage).textContent = `VisePanda - ${payload.meta.modeLabel} - ${payload.meta.providerLabel}`;
           setStatus("#chatStatus", `${payload.meta.modeLabel} via ${payload.meta.providerLabel}`);
         }
         if (payload.token) target.textContent += payload.token;
@@ -347,7 +397,24 @@ async function sendChat(message, overrides = {}) {
   } catch (error) {
     target.textContent = "I could not reach the guide service. Please try again.";
     showToast(error.message, "error");
+  } finally {
+    state.chat.isStreaming = false;
+    if (input) input.disabled = false;
+    input?.focus();
   }
+}
+
+function startChatExperience() {
+  if (state.chat.hasStarted) return;
+  state.chat.hasStarted = true;
+  $("#panel-chat")?.classList.add("has-started");
+  $("#chatWelcome")?.classList.add("is-hidden");
+  [".chat-toolbar", ".chat-prompts"].forEach((selector) => {
+    const node = $(selector);
+    if (!node) return;
+    node.classList.remove("is-hidden");
+    node.classList.add("fade-in");
+  });
 }
 
 async function loadTrips() {
@@ -386,12 +453,17 @@ function tripCard(trip) {
 
 async function saveTrip(form) {
   const body = Object.fromEntries(new FormData(form).entries());
-  if (state.token) {
-    await api("/api/trips", { method: "POST", body: JSON.stringify(body) });
-  } else {
-    const trips = JSON.parse(localStorage.getItem("vp_guest_trips") || "[]");
-    trips.unshift({ ...body, id: Date.now() });
-    localStorage.setItem("vp_guest_trips", JSON.stringify(trips.slice(0, 12)));
+  try {
+    if (state.token) {
+      await api("/api/trips", { method: "POST", body: JSON.stringify(body) });
+    } else {
+      const trips = JSON.parse(localStorage.getItem("vp_guest_trips") || "[]");
+      trips.unshift({ ...body, id: Date.now() });
+      localStorage.setItem("vp_guest_trips", JSON.stringify(trips.slice(0, 12)));
+    }
+  } catch (error) {
+    showToast(error.message, "error");
+    throw error;
   }
   form.reset();
   await loadTrips();
@@ -431,6 +503,7 @@ async function restoreSession() {
   } catch {
     state.token = "";
     sessionStorage.removeItem("vp_token");
+    showToast("Your session expired. Please sign in again.", "error");
   }
   updateAuthUi();
 }
@@ -447,6 +520,7 @@ function handleAuthReturn() {
 
 function bindEvents() {
   $$(".nav__item").forEach((button) => button.addEventListener("click", () => setView(button.dataset.view)));
+  $$("[data-view='dashboard']:not(.nav__item)").forEach((button) => button.addEventListener("click", () => setView("dashboard")));
   $("#mobileAskButton").addEventListener("click", () => {
     setView("chat");
     setTimeout(() => $("#chatInput")?.focus(), 180);
@@ -480,7 +554,8 @@ function bindEvents() {
     const values = Object.fromEntries(new FormData(event.currentTarget).entries());
     const button = event.currentTarget.querySelector("button");
     setView("chat");
-    await withButtonBusy(button, "Asking", () => sendChat(`Plan a ${values.length} China trip for ${values.destination || "a first-time visitor"}.`));
+    const length = values.length || values.duration || "7 days";
+    await withButtonBusy(button, "Asking", () => sendChat(`Plan a ${length} China trip for ${values.destination || "a first-time visitor"}.`));
   });
   $("#tripForm").addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -605,9 +680,8 @@ function bindEvents() {
 async function boot() {
   handleAuthReturn();
   bindEvents();
-  document.body.dataset.view = "dashboard";
-  addMessage("VisePanda", "Tell me your nationality, travel month, total days, budget band, and what you care about most. I can answer as an itinerary strategist, entry analyst, budget planner, transit planner, food guide, safety checker, or city fit comparator.");
-  await Promise.all([loadCities(), restoreSession(), loadChatOptions(), loadAuthConfig()]);
+  setView("chat");
+  Promise.all([loadCities(), restoreSession(), loadChatOptions(), loadAuthConfig()]).catch(() => {});
 }
 
 document.addEventListener("DOMContentLoaded", boot);

@@ -13,5 +13,11 @@ test("chat reads server-sent event tokens from a streaming response", () => {
 
 test("chat inserts traveler text with textContent", () => {
   assert.match(app, /target\.textContent \+= payload\.token/);
-  assert.match(app, /\$\("p", node\)\.textContent = text/);
+  assert.match(app, /\.message__body", node\)\.textContent = text/);
+});
+
+test("chat protects streaming JSON parsing and sends auth header when available", () => {
+  assert.match(app, /try\s*{\s*payload = JSON\.parse/s);
+  assert.match(app, /headers\.Authorization = `Bearer \$\{state\.token\}`/);
+  assert.match(app, /fetchWithTimeout\("\/api\/chat"/);
 });

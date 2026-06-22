@@ -1,8 +1,8 @@
 # VisePanda / VP-Codex-Web Handoff
 
-Last updated: 2026-06-22
-Current version: v6.0.8
-Latest commit: 4a58629 Polish mobile layout and app tabs
+Last updated: 2026-06-23
+Current version: v6.1.0
+Latest commit: pending local commit for AI-first redesign
 Repository: https://github.com/JTCAO515/VP-Codex-Web
 Production domain: https://go2china.space
 Deployment target: Vercel, routed through `api/index.py`
@@ -13,11 +13,12 @@ VisePanda is an English-language China travel workspace for international visito
 
 The product is not a generic chatbot. The intended user journey is:
 
-1. Start from a China travel planning workspace.
-2. Ask the AI guide for itinerary, visa, budget, transit, safety, city-fit, or food guidance.
-3. Browse cities and practical tools.
-4. Save trip drafts locally as a guest or sync them after signing in.
-5. Use account login, email verification, and optional Google OAuth for persisted user state.
+1. Start directly in the Ask / AI Guide surface.
+2. Use quick prompts or type a planning question.
+3. Reveal advanced chat settings only after the conversation starts.
+4. Browse cities and practical tools as supporting context.
+5. Save trip drafts locally as a guest or sync them after signing in.
+6. Use account login, email verification, and optional Google OAuth for persisted user state.
 
 The current product is a working MVP-plus foundation. It is suitable for continued iteration, production validation, and gradual commercial hardening. It is not yet a fully mature commercial platform.
 
@@ -171,6 +172,24 @@ optional external model/email/OAuth providers
 
 ## 5. Current Version State
 
+### v6.1.0
+
+Latest commit: pending local commit for AI-first redesign
+
+This release shifts the product from a planning dashboard toward an AI-first travel agent:
+
+- Ask is the default first screen.
+- Primary navigation is now Ask, Cities, Tools, and Trips.
+- Overview remains available from the top bar as a secondary planning surface.
+- Chat opens with a focused AI agent welcome state, six quick prompts, and first-screen input.
+- Mode, provider, depth, and detailed presets reveal after the first user message.
+- SSE parsing is protected against malformed `data:` lines.
+- Shared API calls and chat calls now use request timeouts.
+- Chat sends Authorization headers when a session token exists.
+- City cards use image fallback handling.
+- Cache busting is updated to `20260623-v610-ai-first3`.
+- App version is updated to `6.1.0`.
+
 ### v6.0.8
 
 Latest commit: `4a58629 Polish mobile layout and app tabs`
@@ -259,7 +278,7 @@ curl.exe http://127.0.0.1:8765/api/health
 Expected current health version:
 
 ```json
-{"ok":true,"service":"VisePanda","version":"6.0.8"}
+{"ok":true,"service":"VisePanda","version":"6.1.0"}
 ```
 
 ## 7. Test Commands
@@ -289,10 +308,10 @@ Run whitespace diff check before committing:
 git diff --check
 ```
 
-Latest known passing state from v6.0.8:
+Latest known passing state from v6.1.0:
 
 - Python tests: 18/18 passing
-- Frontend tests: 16/16 passing
+- Frontend tests: 17/17 passing
 - `node --check web/app.js`: passing
 - `python -m py_compile api/config.py api/index.py`: passing
 - `git diff --check`: passing
@@ -475,38 +494,36 @@ The current product direction is to make chat more professional and specialized,
 
 ## 13. Mobile UI Notes
 
-v6.0.8 specifically targeted mobile portrait use.
+v6.1.0 specifically targets an AI-first mobile portrait flow.
 
 Verified in browser QA at 390x844:
 
 - No horizontal overflow
-- Five tabs exist: Plan, Ask, Cities, Tools, Trips
+- Four primary tabs exist: Ask, Cities, Tools, Trips
+- Ask is selected by default
 - Active tab updates `aria-selected`
-- Mobile Ask button enters Chat
-- Chat panel becomes visible
-- Ask floating button hides in Chat
-- `chatInput` receives focus
+- Chat panel is the first visible product surface
+- Welcome state, quick prompts, input, and send button fit in the first mobile viewport
+- Advanced chat controls reveal after the first message
 - Browser console had no relevant errors
 
 Known caveat:
 
-- The in-app Browser DOM/interaction QA worked.
-- The in-app Browser screenshot API timed out during this iteration.
-- External Chrome headless screenshots were unstable and sometimes reflected headless viewport quirks.
-- Trust the in-app Browser DOM metrics for the 390x844 check unless rerunning visual QA in a normal browser.
+- Browser QA used the in-app browser at desktop width and 390x844 mobile width.
+- Local service worker/cache can retain old CSS during development; bump cache strings when changing frontend assets.
 
 ## 14. Service Worker and Cache
 
 Current service worker cache name:
 
 ```js
-visepanda-shell-v608-mobile-ui3
+visepanda-shell-v610-ai-first3
 ```
 
 Current frontend cache busting query:
 
 ```text
-20260622-v608-mobile-ui3
+20260623-v610-ai-first3
 ```
 
 When changing frontend CSS or JS, update:

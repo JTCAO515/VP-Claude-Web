@@ -6,7 +6,7 @@ Active repository: `https://github.com/JTCAO515/VP-Codex-Web`
 
 ## Current Version
 
-`v6.0.8` refines the mobile portrait experience with a planning-first home surface, clearer app-style tabs, a thumb-friendly Ask AI shortcut, and brighter travel-product UI polish.
+`v6.1.0` shifts the product to an AI-first flow: Ask is now the default first screen, the mobile nav focuses on Ask/Cities/Tools/Trips, chat settings reveal progressively, and critical frontend resilience bugs are fixed.
 
 ## Documentation
 
@@ -20,8 +20,8 @@ Active repository: `https://github.com/JTCAO515/VP-Codex-Web`
 
 ## Product Surface
 
-- Plan: first-screen travel workspace with destination input, featured cities, and readiness checklist.
-- Ask: streaming AI travel guide with consultation modes, professional presets, model routing, and a deterministic local fallback.
+- Ask: default first-screen AI travel guide with quick prompts, consultation modes, progressive settings, model routing, and a deterministic local fallback.
+- Overview: secondary planning workspace with destination input, featured cities, and readiness checklist.
 - Cities: searchable China destination cards built from the curated city dataset.
 - Tools: packing, pricing, phrase, emergency, and visa helper views.
 - Trips: authenticated saved trips with a guest local draft mode.
