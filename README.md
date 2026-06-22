@@ -8,6 +8,16 @@ Active repository: `https://github.com/JTCAO515/VP-Codex-Web`
 
 `v6.0.8` refines the mobile portrait experience with a planning-first home surface, clearer app-style tabs, a thumb-friendly Ask AI shortcut, and brighter travel-product UI polish.
 
+## Documentation
+
+- `HANDOFF.md`: full current handoff and next-agent guide.
+- `CONTEXT.md`: product context, active architecture, and constraints.
+- `PLAN.md`: active five-round iteration plan.
+- `DESIGN.md`: current UI system and mobile interaction rules.
+- `docs/ROADMAP.md`: phased product roadmap.
+- `docs/PRD_USER_SYSTEM.md`: user-system product requirements.
+- `docs/TECH_USER_SYSTEM.md`: user-system technical notes.
+
 ## Product Surface
 
 - Plan: first-screen travel workspace with destination input, featured cities, and readiness checklist.
