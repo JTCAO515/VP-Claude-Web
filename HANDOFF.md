@@ -1,8 +1,8 @@
 # VisePanda / VP-Codex-Web Handoff
 
 Last updated: 2026-06-23
-Current version: v6.1.0
-Latest commit: pending local commit for AI-first redesign
+Current version: v6.1.1
+Latest commit: pending local commit for verified responsive QA fixes
 Repository: https://github.com/JTCAO515/VP-Codex-Web
 Production domain: https://go2china.space
 Deployment target: Vercel, routed through `api/index.py`
@@ -24,13 +24,22 @@ The current product is a working MVP-plus foundation. It is suitable for continu
 
 ## 2. Current Product Surface
 
-### Plan
+### Ask
 
-The first screen is the planning workspace. It includes:
+The first screen is the AI travel guide. It includes:
+
+- A progressive chat welcome state
+- First-screen prompt input
+- High-value quick prompts
+- Mode, provider, and depth controls after the conversation starts
+- A viewport-bounded mobile chat shell with internal message scrolling
+
+### Overview
+
+The planning workspace remains available from the top bar. It includes:
 
 - Destination input
 - Trip length selector
-- Quick prompt buttons
 - Entry / Route / Local snapshot cards
 - Featured city strip
 - Readiness checklist
@@ -172,9 +181,22 @@ optional external model/email/OAuth providers
 
 ## 5. Current Version State
 
-### v6.1.0
+### v6.1.1
 
-Latest commit: pending local commit for AI-first redesign
+Latest commit: pending local commit for verified responsive QA fixes
+
+This release verifies the v2 optimization report against the live app before applying fixes:
+
+- Fixed the guest Trips empty state so its action opens Ask instead of the removed dashboard nav target.
+- Expanded the desktop chat shell on wide screens to reduce empty space on 27 inch displays.
+- Tightened mobile chat after the first message: compact settings, bounded shell height, internal message scrolling, and no automatic post-send input focus on narrow screens.
+- Added a mobile composing state that hides the bottom tab bar while the chat input is focused.
+- Replaced the root `100vh` minimum with `100dvh`.
+- Confirmed the auth dialog is already centered on desktop and the bottom nav is already four tabs.
+- Cache busting is updated to `20260623-v611-responsive-qa2`.
+- App version is updated to `6.1.1`.
+
+### v6.1.0
 
 This release shifts the product from a planning dashboard toward an AI-first travel agent:
 
@@ -278,7 +300,7 @@ curl.exe http://127.0.0.1:8765/api/health
 Expected current health version:
 
 ```json
-{"ok":true,"service":"VisePanda","version":"6.1.0"}
+{"ok":true,"service":"VisePanda","version":"6.1.1"}
 ```
 
 ## 7. Test Commands
@@ -308,10 +330,10 @@ Run whitespace diff check before committing:
 git diff --check
 ```
 
-Latest known passing state from v6.1.0:
+Latest known passing state from v6.1.1:
 
 - Python tests: 18/18 passing
-- Frontend tests: 17/17 passing
+- Frontend tests: 18/18 passing
 - `node --check web/app.js`: passing
 - `python -m py_compile api/config.py api/index.py`: passing
 - `git diff --check`: passing
@@ -494,7 +516,7 @@ The current product direction is to make chat more professional and specialized,
 
 ## 13. Mobile UI Notes
 
-v6.1.0 specifically targets an AI-first mobile portrait flow.
+v6.1.1 specifically targets an AI-first mobile portrait flow.
 
 Verified in browser QA at 390x844:
 
@@ -504,7 +526,9 @@ Verified in browser QA at 390x844:
 - Active tab updates `aria-selected`
 - Chat panel is the first visible product surface
 - Welcome state, quick prompts, input, and send button fit in the first mobile viewport
-- Advanced chat controls reveal after the first message
+- Advanced chat controls reveal after the first message in a compact two-column mobile layout
+- The chat shell stays bounded to the mobile viewport after the conversation starts
+- The bottom tab bar hides while the chat input is focused
 - Browser console had no relevant errors
 
 Known caveat:
@@ -517,13 +541,13 @@ Known caveat:
 Current service worker cache name:
 
 ```js
-visepanda-shell-v610-ai-first3
+visepanda-shell-v611-responsive-qa2
 ```
 
 Current frontend cache busting query:
 
 ```text
-20260623-v610-ai-first3
+20260623-v611-responsive-qa2
 ```
 
 When changing frontend CSS or JS, update:

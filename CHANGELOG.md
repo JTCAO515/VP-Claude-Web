@@ -1,5 +1,20 @@
 # Changelog
 
+## v6.1.1 - 2026-06-23
+
+### Fixed
+
+- Fixed the guest Trips empty-state action so it returns to Ask instead of the removed dashboard nav target.
+- Expanded the AI chat shell on wide desktop screens and raised the usable message width.
+- Reworked mobile chat layout so the shell stays inside the viewport, the message log scrolls internally, and the tab bar hides while composing.
+- Compressed mobile chat settings into a two-column layout after the conversation starts.
+- Replaced the root `100vh` minimum height with `100dvh` for mobile browser chrome stability.
+
+### Verified
+
+- Rechecked the v2 optimization report against code and browser measurements before changing behavior.
+- Confirmed the desktop auth dialog was already centered and the bottom nav already had four tabs.
+
 ## v6.1.0 - 2026-06-23
 
 ### Changed

@@ -6,7 +6,7 @@ Active repository: `https://github.com/JTCAO515/VP-Codex-Web`
 
 ## Current Version
 
-`v6.1.0` shifts the product to an AI-first flow: Ask is now the default first screen, the mobile nav focuses on Ask/Cities/Tools/Trips, chat settings reveal progressively, and critical frontend resilience bugs are fixed.
+`v6.1.1` keeps the AI-first flow and tightens verified responsive issues: Trips empty states return to Ask, wide desktop chat uses more of the screen, and mobile chat keeps the composer and tab bar from fighting the keyboard.
 
 ## Documentation
 

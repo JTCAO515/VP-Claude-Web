@@ -122,6 +122,7 @@ async function api(path, options = {}) {
 
 function setView(view) {
   document.body.dataset.view = view;
+  if (view !== "chat") document.body.classList.remove("is-chat-composing");
   $$(".nav__item").forEach((button) => {
     const active = button.dataset.view === view;
     button.classList.toggle("is-active", active);
@@ -400,7 +401,12 @@ async function sendChat(message, overrides = {}) {
   } finally {
     state.chat.isStreaming = false;
     if (input) input.disabled = false;
-    input?.focus();
+    if (window.matchMedia("(max-width: 560px)").matches) {
+      document.body.classList.remove("is-chat-composing");
+      requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
+    } else {
+      input?.focus({ preventScroll: true });
+    }
   }
 }
 
@@ -424,7 +430,7 @@ async function loadTrips() {
       const localTrips = JSON.parse(localStorage.getItem("vp_guest_trips") || "[]");
       setStatus("#tripStatus", localTrips.length ? "Guest trips are saved on this device." : "Guest mode: save a quick trip on this device.");
       list.replaceChildren(...(localTrips.length ? localTrips.map(tripCard) : [
-        emptyState("No trips yet", "Save a draft here, or sign in later to sync across devices.", "Use planner", () => setView("dashboard")),
+        emptyState("No trips yet", "Save a draft here, or sign in later to sync across devices.", "Ask AI", () => setView("chat")),
       ]));
       return;
     }
@@ -549,6 +555,8 @@ function bindEvents() {
     input.value = "";
     await withButtonBusy(button, "Sending", () => sendChat(message));
   });
+  $("#chatInput").addEventListener("focus", () => document.body.classList.add("is-chat-composing"));
+  $("#chatInput").addEventListener("blur", () => document.body.classList.remove("is-chat-composing"));
   $("#quickPlanner").addEventListener("submit", async (event) => {
     event.preventDefault();
     const values = Object.fromEntries(new FormData(event.currentTarget).entries());
