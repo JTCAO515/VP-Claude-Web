@@ -1,16 +1,14 @@
 {
-  "name": "VisePanda",
+  "name": "VisePanda — China Travel Butler",
   "short_name": "VisePanda",
-  "description": "A China travel workspace for city planning, visa readiness, saved trips, and AI guidance.",
+  "description": "An English-native China travel butler: ask, plan, and translate.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f7faf9",
-  "theme_color": "#1f9ac7",
-  "orientation": "any",
-  "categories": ["travel", "utilities"],
+  "background_color": "#faf7f1",
+  "theme_color": "#1c2b3a",
   "icons": [
-    {"src": "/web/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
-    {"src": "/web/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
-    {"src": "/web/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+    { "src": "/web/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/web/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/web/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

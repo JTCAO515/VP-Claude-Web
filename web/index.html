@@ -1,310 +1,212 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>VisePanda | China Travel Butler</title>
-    <meta name="description" content="Your all-in-one China travel butler for planning, translation, rides, meals, routes, and local travel help.">
-    <meta name="theme-color" content="#0f2633">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
-    <link rel="manifest" href="/web/manifest.json">
-    <link rel="stylesheet" href="/web/app.css?v=20260623-v621-travel-butler-translate">
-  </head>
-  <body>
-    <header class="topbar">
-      <a class="brand" href="/" aria-label="VisePanda home">
-        <img src="/static/img/logo-panda.jpg" alt="">
-        <span>VisePanda</span>
-      </a>
-      <div class="topbar__actions">
-        <button class="icon-button" id="authButton" title="Account" aria-label="Account">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.7-4 4.4-6 8-6s6.3 2 8 6"></path></svg>
-        </button>
-      </div>
-    </header>
-    <nav class="nav" aria-label="Primary" role="tablist">
-      <button class="nav__item is-active" id="tab-chatbot" data-view="chat" role="tab" aria-selected="true" aria-controls="panel-chat" title="Chatbot" aria-label="Chatbot">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"></path></svg>
-        <span>Chatbot</span>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>VisePanda — China Travel Butler</title>
+  <meta name="description" content="An English-native China travel butler: ask questions, plan your route, and translate on the spot.">
+  <meta name="theme-color" content="#1c2b3a">
+  <link rel="manifest" href="/web/manifest.json">
+  <link rel="icon" href="/static/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/web/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=Inter:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="/web/css/app.css?v=7.0.0">
+</head>
+<body data-view="chat">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="rail" aria-label="Primary">
+    <div class="rail__mark" aria-hidden="true">
+      <svg viewBox="0 0 48 48" class="mark-glyph"><circle cx="24" cy="24" r="22" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M14 28c2-9 8-14 10-14s8 5 10 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </div>
+    <nav class="rail__tabs" role="tablist" aria-label="App sections">
+      <button class="rail__tab is-active" id="tab-chat" role="tab" aria-selected="true" aria-controls="panel-chat" data-view="chat" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <span>Ask</span>
       </button>
-      <button class="nav__item" id="tab-dashboard" data-view="dashboard" role="tab" aria-selected="false" aria-controls="panel-dashboard" title="Dashboard" aria-label="Dashboard">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h7V4H4Z"></path><path d="M13 20h7V4h-7Z"></path><path d="M4 20h7v-5H4Z"></path></svg>
+      <button class="rail__tab" id="tab-dashboard" role="tab" aria-selected="false" aria-controls="panel-dashboard" data-view="dashboard" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
         <span>Dashboard</span>
       </button>
-      <button class="nav__item" id="tab-translate" data-view="translate" role="tab" aria-selected="false" aria-controls="panel-translate">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h8"></path><path d="M9 3v2"></path><path d="M4 11c3.4 0 6-2.2 6-6"></path><path d="M12 11c-1.4-.6-2.6-1.6-3.5-3"></path><path d="M13 21l4-10 4 10"></path><path d="M15 17h4"></path></svg>
-        <span>Translation</span>
+      <button class="rail__tab" id="tab-translate" role="tab" aria-selected="false" aria-controls="panel-translate" data-view="translate" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h7M8.5 6v2.4C8.5 12 6 14 4 14.6M9 9.2c1 1.6 2.6 2.8 4 3.4M14 19l3.5-9 3.5 9M14.9 16.4h5.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Translate</span>
       </button>
     </nav>
+  </header>
 
-    <main>
-      <section class="dashboard section dashboard-drive is-hidden" id="panel-dashboard" data-view-panel="dashboard" role="tabpanel" aria-labelledby="tab-dashboard" hidden>
-        <div class="dashboard-main">
-          <div class="section__head">
-            <p class="eyebrow">Superdrive</p>
-            <h2>China trip command center</h2>
-          </div>
-          <div class="weather-strip">
-            <span>Shanghai · 28°C · Cloudy</span>
-            <span id="dashboardLocation">Location-aware travel cards are ready.</span>
-          </div>
-          <form class="planner" id="quickPlanner">
-            <label>
-              Destination idea
-              <input name="destination" type="text" placeholder="Beijing, Chengdu, first-time China...">
-            </label>
-            <label>
-              Travel length
-              <select name="length">
-                <option value="3 days">3 days</option>
-                <option value="7 days" selected>7 days</option>
-                <option value="14 days">14 days</option>
-              </select>
-            </label>
-            <button class="primary" type="submit">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg>
-              Ask AI
-            </button>
-          </form>
-          <div class="dashboard-actions" aria-label="Quick actions">
-            <button class="dashboard-action" id="dashboardHotelsButton" type="button">
-              <strong>Hotels</strong>
-              <span>Foreigner-ready stays</span>
-            </button>
-            <button class="dashboard-action" id="dashboardMapButton" type="button">
-              <strong>Map</strong>
-              <span>Nearby POI and routes</span>
-            </button>
-            <button class="dashboard-action" id="dashboardDealsButton" type="button">
-              <strong>Deals</strong>
-              <span>Food and local vouchers</span>
-            </button>
-          </div>
-          <div class="dashboard-grid" aria-label="Planning drive">
-            <article>
-              <strong>Questions</strong>
-              <span id="questionSummary">No questions yet. Ask VisePanda to start building context.</span>
-            </article>
-            <article>
-              <strong>Saved trips</strong>
-              <span id="dashboardTrips">No saved trips on this device yet.</span>
-            </article>
-            <article>
-              <strong>Next action</strong>
-              <span id="dashboardNext">Start with dates, route style, or entry requirements.</span>
-            </article>
-          </div>
-          <div class="dashboard-list" id="recentQuestions" aria-label="Recent questions"></div>
-          <section class="dashboard-module">
-            <div class="module-head">
-              <h3>Hotels</h3>
-              <span>Accepts foreign guests · English service · card support</span>
-            </div>
-            <div class="mini-card-grid" id="dashboardHotels"></div>
-          </section>
-          <section class="dashboard-module">
-            <div class="module-head">
-              <h3>Map and nearby POI</h3>
-              <span>Backed by a server-side map proxy interface</span>
-            </div>
-            <div class="dashboard-map" id="dashboardMap"></div>
-          </section>
-          <section class="dashboard-module">
-            <div class="module-head">
-              <h3>Deals</h3>
-              <span>Meituan and Dianping style guidance for visitors</span>
-            </div>
-            <div class="mini-card-grid" id="dashboardDeals"></div>
-          </section>
-          <section class="dashboard-module">
-            <div class="module-head">
-              <h3>Recommended cities</h3>
-              <span>High-signal destinations for first-time and repeat visitors</span>
-            </div>
-            <div class="city-strip" id="featuredCities"></div>
-            <div class="mini-card-grid" id="dashboardCities"></div>
-          </section>
-          <section class="dashboard-module">
-            <div class="module-head">
-              <h3>Travel tools</h3>
-              <span>Visa · payment · connectivity · packing</span>
-            </div>
-            <div class="mini-card-grid" id="dashboardTools"></div>
-          </section>
-          <section class="dashboard-module">
-            <div class="module-head">
-              <div>
-                <h3>My trips</h3>
-                <span>Drafts saved on this device or synced after sign-in</span>
-              </div>
-              <button class="secondary" id="refreshTrips" type="button">Refresh</button>
-            </div>
-            <form class="trip-form" id="tripForm">
-              <input name="title" type="text" placeholder="Trip title" required>
-              <input name="destination" type="text" placeholder="Destination">
-              <input name="startDate" type="date">
-              <input name="endDate" type="date">
-              <button class="primary" type="submit">Save trip</button>
-            </form>
-            <div class="mini-card-grid" id="dashboardTripsList"></div>
-          </section>
+  <main id="main">
+    <!-- ===== Ask / Chat ===== -->
+    <section class="panel chat-panel" id="panel-chat" role="tabpanel" aria-labelledby="tab-chat">
+      <div class="chat-welcome" id="chatWelcome">
+        <div class="panda" aria-hidden="true">
+          <svg viewBox="0 0 120 120" class="panda__svg">
+            <circle cx="30" cy="30" r="15" fill="var(--ink)"/>
+            <circle cx="90" cy="30" r="15" fill="var(--ink)"/>
+            <circle cx="60" cy="64" r="40" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+            <circle cx="30" cy="74" r="8" fill="var(--vermillion)" opacity="0.16"/>
+            <circle cx="90" cy="74" r="8" fill="var(--vermillion)" opacity="0.16"/>
+            <g class="panda__eye">
+              <ellipse cx="42" cy="58" rx="11" ry="14" fill="var(--ink)"/>
+              <circle cx="45" cy="61" r="3.6" fill="var(--paper)"/>
+            </g>
+            <g class="panda__eye">
+              <ellipse cx="78" cy="58" rx="11" ry="14" fill="var(--ink)"/>
+              <circle cx="81" cy="61" r="3.6" fill="var(--paper)"/>
+            </g>
+            <ellipse cx="60" cy="76" rx="5.5" ry="3.6" fill="var(--ink)"/>
+            <path d="M48 84q12 9 24 0" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
+          </svg>
         </div>
-        <aside class="readiness">
-          <h2>Readiness</h2>
-          <ul>
-            <li><span></span>Passport valid for six months</li>
-            <li><span></span>Visa or transit rule checked</li>
-            <li><span></span>Payment apps linked to card</li>
-            <li><span></span>Offline maps and translator ready</li>
-          </ul>
-        </aside>
-      </section>
-
-      <section class="workspace section chat-hero" id="panel-chat" data-view-panel="chat" role="tabpanel" aria-labelledby="tab-chatbot">
-        <div class="chat-shell">
-          <div class="chat-welcome" id="chatWelcome">
-            <svg class="panda-mascot" viewBox="0 0 100 100" aria-hidden="true">
-              <circle cx="26" cy="24" r="13" fill="#1f2530"></circle>
-              <circle cx="74" cy="24" r="13" fill="#1f2530"></circle>
-              <circle cx="50" cy="56" r="34" fill="#fbfdff" stroke="#1f2530" stroke-width="2"></circle>
-              <circle cx="22" cy="62" r="7" fill="#d9363e" opacity="0.18"></circle>
-              <circle cx="78" cy="62" r="7" fill="#d9363e" opacity="0.18"></circle>
-              <g class="panda-eye">
-                <ellipse cx="35" cy="52" rx="10" ry="13" fill="#1f2530"></ellipse>
-                <circle cx="37" cy="55" r="3.4" fill="#fbfdff"></circle>
-              </g>
-              <g class="panda-eye">
-                <ellipse cx="65" cy="52" rx="10" ry="13" fill="#1f2530"></ellipse>
-                <circle cx="67" cy="55" r="3.4" fill="#fbfdff"></circle>
-              </g>
-              <ellipse cx="50" cy="68" rx="5" ry="3.4" fill="#1f2530"></ellipse>
-              <path d="M40 75q10 8 20 0" fill="none" stroke="#1f2530" stroke-width="2.5" stroke-linecap="round"></path>
-            </svg>
-            <div class="agent-mark">
-              <strong>VisePanda</strong>
-              <span>China travel AI</span>
-            </div>
-            <div class="welcome-copy">
-              <h1><span class="accent-dot" aria-hidden="true"></span>Ni hao. Where in China next?</h1>
-            </div>
-            <div class="quick-chips" aria-label="Quick planning prompts">
-              <button type="button" data-mode="itinerary" data-depth="expert" data-prompt="Plan a first-time 7 day China route with simple rail transfers. Ask me only the missing questions first, then give a professional draft.">Plan 7 days</button>
-              <button type="button" data-mode="entry" data-depth="expert" data-prompt="Create a visa, payment, app, and document readiness checklist for a US traveler visiting China.">Visa check</button>
-              <button type="button" data-mode="city-fit" data-depth="standard" data-prompt="Compare Beijing, Shanghai, Chengdu, Xi'an, Guilin, and Zhangjiajie for a first-time traveler. Rank them by food, culture, logistics, and trip difficulty.">Cities</button>
-              <button type="button" data-mode="budget" data-depth="expert" data-prompt="Build a realistic China travel budget model for a 7 day first-time trip, with low, mid, and comfortable bands.">Budget</button>
-            </div>
-          </div>
-          <p class="llm-status" id="llmStatus" role="status" aria-live="polite">Checking DeepSeek connection...</p>
-          <p class="view-status chat-status" id="chatStatus" role="status" aria-live="polite">Ready. Start with a question or a quick prompt.</p>
-          <div class="chat-log" id="chatLog" aria-live="polite"></div>
-          <div class="followup-suggestions is-hidden" id="followupSuggestions" aria-label="Follow-up suggestions"></div>
-          <form class="chat-form" id="chatForm">
-            <textarea id="chatInput" rows="3" placeholder="Ask anything about traveling in China..."></textarea>
-            <button class="primary" type="submit">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 2 11 13"></path><path d="m22 2-7 20-4-9-9-4Z"></path></svg>
-              <span class="send-label">Send</span>
-            </button>
-          </form>
+        <p class="brand-mark">VisePanda</p>
+        <h1 class="welcome-title">Ni hao. Where shall we go in China?</h1>
+        <p class="welcome-sub">Ask about routes, cities, visas, food, or how to get around — in plain English.</p>
+        <div class="quick-chips" aria-label="Example questions">
+          <button type="button" class="chip" data-prompt="Plan a first-time 7 day China route for Beijing, Xi'an, and Shanghai.">7-day first trip</button>
+          <button type="button" class="chip" data-prompt="What visa do I need as a US passport holder?">Visa for US passport</button>
+          <button type="button" class="chip" data-prompt="Best street food cities in China for someone who loves spicy food?">Spicy food cities</button>
+          <button type="button" class="chip" data-prompt="How do I pay for things in China without a Chinese bank account?">Paying without a local bank</button>
         </div>
-      </section>
+      </div>
 
-      <section class="workspace section is-hidden" id="panel-translate" data-view-panel="translate" role="tabpanel" aria-labelledby="tab-translate" hidden>
-        <div class="section__head row">
-          <div>
-            <p class="eyebrow">On-trip butler</p>
-            <h2>Translate</h2>
-          </div>
-          <button class="secondary" id="burnTranslationHistory" type="button">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M6 6l1 14h10l1-14"></path></svg>
-            Clear history
-          </button>
-        </div>
-        <p class="view-status" id="translateStatus" role="status" aria-live="polite"></p>
-        <div class="translate-shell">
-          <article class="voice-card">
-            <div>
-              <h3>Voice translator</h3>
-              <p class="meta">Press to use browser speech tools when available. Best for taxi, hotel, restaurant, and direction moments.</p>
-            </div>
-            <button class="primary" id="voiceTranslateButton" type="button">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><path d="M12 19v3"></path></svg>
-              Hold to speak
-            </button>
-          </article>
-          <form class="translation-card" id="translationForm">
-            <label>
-              Text translator
-              <textarea id="translationInput" rows="5" placeholder="Paste Chinese or English text..."></textarea>
-            </label>
-            <div class="translation-actions">
-              <button class="primary" type="submit">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 14 0"></path><path d="m13 6 6 6-6 6"></path></svg>
-                Translate
-              </button>
-              <button class="secondary" id="swapTranslationDirection" type="button">Swap direction</button>
-            </div>
-            <output class="translation-output" id="translationOutput">Translation will appear here.</output>
-          </form>
-          <div class="phrase-library" id="phraseLibrary" aria-label="Travel phrase library"></div>
-          <div class="translation-history" id="translationHistory" aria-label="Recent translations"></div>
-        </div>
-      </section>
+      <div class="chat-log" id="chatLog" aria-live="polite"></div>
 
-    </main>
+      <div class="followups" id="followups" hidden></div>
 
-    <button class="mobile-ask-fab" id="mobileAskButton" type="button">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"></path></svg>
-      Ask AI
-    </button>
-
-    <dialog class="auth-dialog" id="authDialog">
-      <div class="sheet-handle" aria-hidden="true"></div>
-      <form method="dialog" class="dialog-close">
-        <button class="icon-button" title="Close" aria-label="Close">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+      <form class="chat-form" id="chatForm">
+        <textarea id="chatInput" name="message" rows="1" placeholder="Ask anything about traveling in China..." aria-label="Message"></textarea>
+        <button class="send-btn" type="submit" aria-label="Send">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l16-8-6 16-2.5-6.5z" fill="currentColor"/></svg>
         </button>
       </form>
-      <div class="auth-layout">
-        <div>
-          <p class="eyebrow">Account</p>
-          <h2 id="authTitle">Sign in</h2>
-          <p class="muted" id="authStatus">Save trips across devices and manage your profile.</p>
-        </div>
-        <form class="auth-form" id="authForm">
-          <input name="email" type="email" placeholder="Email" aria-label="Email" required>
-          <input name="password" type="password" placeholder="Password" aria-label="Password" minlength="8" required>
-          <button class="primary" type="submit">Continue</button>
-          <button class="link-button" type="button" id="toggleAuthMode">Create an account</button>
-          <a class="secondary google-login" id="googleLogin" href="/api/auth/google/start">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 12h7"></path><path d="M18 15.5A7 7 0 1 1 16.8 7"></path></svg>
-            Continue with Google
-          </a>
-        </form>
-        <form class="auth-form is-hidden" id="verifyForm">
-          <input name="email" type="email" placeholder="Email" aria-label="Email" required>
-          <input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" aria-label="Verification code" required>
-          <button class="primary" type="submit">Verify email</button>
-          <button class="secondary" type="button" id="resendVerification">Resend code</button>
-          <button class="link-button" type="button" id="backToSignIn">Back to sign in</button>
-        </form>
-        <form class="profile-form is-hidden" id="profileForm">
-          <input name="name" placeholder="Display name" aria-label="Display name">
-          <input name="currentPassword" type="password" placeholder="Current password" aria-label="Current password">
-          <input name="newPassword" type="password" placeholder="New password" aria-label="New password">
-          <button class="primary" type="submit">Update profile</button>
-          <button class="secondary" type="button" id="logoutButton">Sign out</button>
-        </form>
+      <p class="chat-status" id="chatStatus" aria-live="polite"></p>
+    </section>
+
+    <!-- ===== Dashboard ===== -->
+    <section class="panel" id="panel-dashboard" role="tabpanel" aria-labelledby="tab-dashboard" hidden>
+      <div class="page-head">
+        <p class="eyebrow">Trip command center</p>
+        <h1>Dashboard</h1>
       </div>
-    </dialog>
 
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      <section class="module" id="climateModule">
+        <h2>Climate snapshot</h2>
+        <div class="module-body" id="climateBody"><p class="placeholder">Pick a city below to see its best season.</p></div>
+      </section>
 
-    <template id="messageTemplate">
-      <article class="message"><span class="message__author"></span><p class="message__body"></p></article>
-    </template>
+      <section class="module">
+        <div class="module-head">
+          <h2>My trips</h2>
+        </div>
+        <form class="trip-form" id="tripForm">
+          <input name="title" type="text" placeholder="Trip name" required>
+          <input name="destination" type="text" placeholder="Destination">
+          <button class="btn-primary" type="submit">Save</button>
+        </form>
+        <div class="card-grid" id="tripsList"><p class="placeholder">No saved trips yet. Drafts stay on this device.</p></div>
+      </section>
 
-    <script src="/web/app.js?v=20260623-v621-travel-butler-translate" defer></script>
-  </body>
+      <section class="module">
+        <h2>Featured cities</h2>
+        <div class="card-row" id="citiesRow"><p class="placeholder">Loading cities…</p></div>
+      </section>
+
+      <section class="module">
+        <h2>Foreigner-friendly hotels</h2>
+        <div class="card-grid" id="hotelsGrid"><p class="placeholder">Loading hotels…</p></div>
+      </section>
+
+      <section class="module">
+        <h2>Local deals</h2>
+        <div class="card-grid" id="dealsGrid"><p class="placeholder">Loading deals…</p></div>
+      </section>
+
+      <section class="module">
+        <h2>Map &amp; routes</h2>
+        <form class="map-form" id="mapForm">
+          <input name="q" type="text" placeholder="Search a place, e.g. Forbidden City">
+          <button class="btn-secondary" type="submit">Search</button>
+        </form>
+        <div class="card-grid" id="mapResults"></div>
+      </section>
+
+      <section class="module">
+        <h2>Travel tools</h2>
+        <div class="card-grid" id="toolsGrid"><p class="placeholder">Loading tools…</p></div>
+      </section>
+    </section>
+
+    <!-- ===== Translate ===== -->
+    <section class="panel" id="panel-translate" role="tabpanel" aria-labelledby="tab-translate" hidden>
+      <div class="page-head">
+        <p class="eyebrow">During-trip butler</p>
+        <h1>Translate</h1>
+      </div>
+
+      <section class="module voice-card">
+        <h2>Voice translation</h2>
+        <p class="muted" id="voiceStatus">Checking your browser's speech support…</p>
+        <button class="btn-primary" id="voiceButton" type="button">Hold to speak</button>
+      </section>
+
+      <section class="module">
+        <h2>Text translator</h2>
+        <form class="translate-form" id="translateForm">
+          <input id="translateInput" type="text" placeholder="Type a word or phrase, e.g. taxi, spicy, passport" autocomplete="off">
+          <button class="btn-primary" type="submit">Find</button>
+        </form>
+        <div class="card-grid" id="translateResults"></div>
+      </section>
+
+      <section class="module">
+        <div class="module-head">
+          <h2>Phrase library</h2>
+          <div class="category-tabs" id="phraseCategories" role="tablist" aria-label="Phrase categories">
+            <button type="button" class="category-tab is-active" data-category="phrases">Common</button>
+            <button type="button" class="category-tab" data-category="dining">Dining</button>
+            <button type="button" class="category-tab" data-category="attractions">Attractions</button>
+            <button type="button" class="category-tab" data-category="culture">Culture</button>
+          </div>
+        </div>
+        <div class="card-grid" id="phraseLibrary"><p class="placeholder">Loading phrases…</p></div>
+      </section>
+
+      <section class="module">
+        <div class="module-head">
+          <h2>History</h2>
+          <button class="btn-text" id="clearHistory" type="button">Clear</button>
+        </div>
+        <div class="card-grid" id="historyList"><p class="placeholder">Your recent lookups will appear here.</p></div>
+      </section>
+    </section>
+  </main>
+
+  <nav class="tabbar" role="tablist" aria-label="App sections (mobile)">
+    <button class="tabbar__item is-active" role="tab" aria-selected="true" data-view="chat" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      <span>Ask</span>
+    </button>
+    <button class="tabbar__item" role="tab" aria-selected="false" data-view="dashboard" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+      <span>Dashboard</span>
+    </button>
+    <button class="tabbar__item" role="tab" aria-selected="false" data-view="translate" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h7M8.5 6v2.4C8.5 12 6 14 4 14.6M9 9.2c1 1.6 2.6 2.8 4 3.4M14 19l3.5-9 3.5 9M14.9 16.4h5.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Translate</span>
+    </button>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <template id="messageTemplate">
+    <article class="message">
+      <p class="message__author"></p>
+      <p class="message__body"></p>
+    </article>
+  </template>
+
+  <script type="module" src="/web/js/main.js"></script>
+</body>
 </html>
