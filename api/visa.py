@@ -74,7 +74,10 @@ def dispatch(method, path_parts, environ, start_response):
             body = read_json(environ)
         except ValueError as exc:
             return error_response(start_response, HTTPStatus.BAD_REQUEST, "bad_json", str(exc), environ)
-        duration = int(body.get("durationDays") or body.get("duration") or 7)
+        try:
+            duration = int(body.get("durationDays") or body.get("duration") or 7)
+        except (TypeError, ValueError):
+            return error_response(start_response, HTTPStatus.BAD_REQUEST, "invalid_duration", "durationDays must be a number.", environ)
         policy = find_policy(body.get("nationality"))
         return json_response(
             start_response,

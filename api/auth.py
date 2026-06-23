@@ -24,7 +24,6 @@ from api.common import (
 
 
 MIN_PASSWORD_LENGTH = 8
-_ATTEMPTS = {}
 
 
 class ClosingConnection(sqlite3.Connection):
@@ -109,6 +108,11 @@ def init_db(conn):
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS rate_limit_attempts (
+            key TEXT NOT NULL,
+            ts REAL NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_rate_limit_key ON rate_limit_attempts (key);
         """
     )
     ensure_auth_columns(conn)
@@ -211,12 +215,12 @@ def public_user(row):
 
 def check_rate(key, limit=6, window=300):
     now = time.time()
-    attempts = [item for item in _ATTEMPTS.get(key, []) if now - item < window]
-    if len(attempts) >= limit:
-        _ATTEMPTS[key] = attempts
-        return False
-    attempts.append(now)
-    _ATTEMPTS[key] = attempts
+    with db() as conn:
+        conn.execute("DELETE FROM rate_limit_attempts WHERE key = ? AND ts < ?", (key, now - window))
+        count = conn.execute("SELECT COUNT(*) FROM rate_limit_attempts WHERE key = ?", (key,)).fetchone()[0]
+        if count >= limit:
+            return False
+        conn.execute("INSERT INTO rate_limit_attempts (key, ts) VALUES (?, ?)", (key, now))
     return True
 
 

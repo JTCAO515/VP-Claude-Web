@@ -135,9 +135,19 @@
           </section>
           <section class="dashboard-module">
             <div class="module-head">
-              <h3>My trips</h3>
-              <span>Drafts saved on this device or synced after sign-in</span>
+              <div>
+                <h3>My trips</h3>
+                <span>Drafts saved on this device or synced after sign-in</span>
+              </div>
+              <button class="secondary" id="refreshTrips" type="button">Refresh</button>
             </div>
+            <form class="trip-form" id="tripForm">
+              <input name="title" type="text" placeholder="Trip title" required>
+              <input name="destination" type="text" placeholder="Destination">
+              <input name="startDate" type="date">
+              <input name="endDate" type="date">
+              <button class="primary" type="submit">Save trip</button>
+            </form>
             <div class="mini-card-grid" id="dashboardTripsList"></div>
           </section>
         </div>

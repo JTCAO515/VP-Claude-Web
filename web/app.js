@@ -127,7 +127,7 @@ async function api(path, options = {}) {
 
 function setView(view) {
   document.body.dataset.view = view;
-  if (view !== "chat") document.body.classList.remove("is-chat-composing");
+  document.body.classList.remove("is-composing");
   $$(".nav__item").forEach((button) => {
     const active = button.dataset.view === view;
     button.classList.toggle("is-active", active);
@@ -245,41 +245,6 @@ function cityCard(city) {
   renderTags(body, city.highlights || []);
   article.appendChild(body);
   return article;
-}
-
-async function loadCities() {
-  const grid = $("#cityGrid");
-  const featured = $("#featuredCities");
-  try {
-    if (!state.cities.length) {
-      setStatus("#cityStatus", "Loading city intelligence...");
-      grid.replaceChildren(...loadingCards(6));
-      if (featured && !featured.children.length) featured.replaceChildren(...loadingCards(4));
-      const data = await api("/api/cities");
-      state.cities = data.cities || [];
-    }
-  } catch (error) {
-    setStatus("#cityStatus", error.message, "error");
-    grid.replaceChildren(emptyState("Cities did not load", "Check the connection and try again.", "Retry", loadCities));
-    return;
-  }
-  const query = ($("#citySearch")?.value || "").toLowerCase();
-  const filtered = state.cities.filter((city) => {
-    const haystack = [city.name, city.province, city.vibe, ...(city.highlights || [])].join(" ").toLowerCase();
-    return haystack.includes(query);
-  });
-  setStatus("#cityStatus", `${filtered.length} destination${filtered.length === 1 ? "" : "s"} ready`);
-  grid.replaceChildren(...(filtered.length ? filtered.map(cityCard) : [
-    emptyState("No city match", "Try a city, province, season, or highlight such as hotpot or Great Wall.", "Clear search", () => {
-      $("#citySearch").value = "";
-      loadCities();
-    }),
-  ]));
-  if (featured && !featured.children.length) {
-    featured.replaceChildren(...state.cities.slice(0, 4).map(cityCard));
-  } else if (featured && featured.querySelector(".skeleton-card")) {
-    featured.replaceChildren(...state.cities.slice(0, 4).map(cityCard));
-  }
 }
 
 function getRecentQuestions() {
@@ -466,49 +431,6 @@ function loadDashboardTrips() {
   ]));
 }
 
-function renderMapBoard(payload = {}) {
-  const board = $("#mapBoard");
-  if (!board) return;
-  const cities = (payload.cities || state.cities || []).slice(0, 6);
-  const routes = payload.routes || [
-    { name: "Beijing to Xi'an", type: "High-speed rail", duration: "4.5-6h" },
-    { name: "Xi'an to Shanghai", type: "High-speed rail or flight", duration: "6-7h rail" },
-    { name: "Shanghai to Chengdu", type: "Flight favored", duration: "3.5h flight" },
-  ];
-  const routeCards = routes.slice(0, 4).map((route) => {
-    const card = document.createElement("article");
-    card.className = "map-card";
-    card.appendChild(createText("h3", "", route.name || route.label || "China route"));
-    card.appendChild(createText("p", "meta", [route.type, route.duration].filter(Boolean).join(" - ") || route.summary || "Compare rail, flight, and transfer friction."));
-    return card;
-  });
-  const cityPins = cities.map((city) => {
-    const pin = document.createElement("span");
-    pin.className = "map-pin";
-    pin.textContent = city.name || city;
-    return pin;
-  });
-  const canvas = document.createElement("div");
-  canvas.className = "map-canvas";
-  canvas.append(...cityPins);
-  board.replaceChildren(canvas, ...routeCards);
-}
-
-async function loadMap() {
-  try {
-    setStatus("#mapStatus", "Loading route intelligence...");
-    if (!state.map) {
-      const data = await api("/api/map");
-      state.map = data;
-    }
-    renderMapBoard(state.map);
-    setStatus("#mapStatus", "Map intelligence is ready.");
-  } catch (error) {
-    setStatus("#mapStatus", "Using starter route intelligence.", "error");
-    renderMapBoard();
-  }
-}
-
 function translationHistory() {
   try {
     return JSON.parse(localStorage.getItem("vp_translation_history") || "[]");
@@ -619,76 +541,6 @@ async function loadTranslations() {
   }
 }
 
-function renderToolDetail(tool) {
-  const detail = $("#toolDetail");
-  detail.replaceChildren();
-  detail.appendChild(createText("h3", "", tool.name));
-  if (tool.items) {
-    const list = document.createElement("ul");
-    tool.items.forEach((item) => {
-      const li = document.createElement("li");
-      li.textContent = item.label ? `${item.label}${item.required ? " - essential" : ""}` : `${item.context}: ${item.english}`;
-      list.appendChild(li);
-    });
-    detail.appendChild(list);
-  } else if (tool.numbers) {
-    const list = document.createElement("ul");
-    Object.entries(tool.numbers).forEach(([label, number]) => {
-      const li = document.createElement("li");
-      li.textContent = `${label}: ${number}`;
-      list.appendChild(li);
-    });
-    detail.appendChild(list);
-  } else {
-    detail.appendChild(createText("p", "meta", tool.summary || tool.description || ""));
-  }
-}
-
-async function loadTools() {
-  try {
-    if (!state.tools.length) {
-      setStatus("#toolStatus", "Loading travel tools...");
-      $("#toolGrid").replaceChildren(...loadingCards(4));
-      const data = await api("/api/tools");
-      state.tools = data.tools || [];
-    }
-  } catch (error) {
-    setStatus("#toolStatus", error.message, "error");
-    $("#toolGrid").replaceChildren(emptyState("Tools did not load", "The toolkit is temporarily unavailable.", "Retry", loadTools));
-    $("#toolDetail").replaceChildren();
-    return;
-  }
-  setStatus("#toolStatus", `${state.tools.length} tools available`);
-  const cards = state.tools.map((tool) => {
-    const card = document.createElement("article");
-    card.className = "tool-card";
-    card.appendChild(createText("h3", "", tool.name));
-    card.appendChild(createText("p", "meta", tool.description));
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "secondary";
-    button.textContent = "Open";
-    button.addEventListener("click", async () => {
-      await withButtonBusy(button, "Opening", async () => {
-        try {
-          const data = await api(`/api/tools/${tool.id}`);
-          renderToolDetail(data.tool);
-          showToast(`${tool.name} opened`);
-        } catch (error) {
-          showToast(error.message, "error");
-        }
-      });
-    });
-    card.appendChild(button);
-    return card;
-  });
-  $("#toolGrid").replaceChildren(...cards);
-  if (!$("#toolDetail").children.length && state.tools[0]) {
-    const data = await api(`/api/tools/${state.tools[0].id}`);
-    renderToolDetail(data.tool);
-  }
-}
-
 function addMessage(author, text, kind = "") {
   const node = $("#messageTemplate").content.firstElementChild.cloneNode(true);
   node.classList.toggle("is-user", kind === "user");
@@ -791,7 +643,11 @@ async function sendChat(message, overrides = {}) {
     }
     completed = true;
   } catch (error) {
-    target.textContent = "I could not reach the guide service. Please try again.";
+    if (!target.textContent.trim()) {
+      target.textContent = "I could not reach the guide service. Please try again.";
+    } else {
+      target.textContent += "\n\n[Connection lost. The answer above may be incomplete.]";
+    }
     showToast(error.message, "error");
   } finally {
     state.chat.isStreaming = false;
@@ -799,7 +655,7 @@ async function sendChat(message, overrides = {}) {
     setStatus("#chatStatus", "");
     if (completed && target.textContent.trim()) renderFollowups(buildFollowups(message, target.textContent));
     if (window.matchMedia("(max-width: 560px)").matches) {
-      document.body.classList.remove("is-chat-composing");
+      document.body.classList.remove("is-composing");
       requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
     } else {
       input?.focus({ preventScroll: true });
@@ -812,40 +668,6 @@ function startChatExperience() {
   state.chat.hasStarted = true;
   $("#panel-chat")?.classList.add("has-started");
   $("#chatWelcome")?.classList.add("is-hidden");
-}
-
-async function loadTrips() {
-  const list = $("#tripList");
-  try {
-    if (!state.token) {
-      const localTrips = getGuestTrips();
-      setStatus("#tripStatus", localTrips.length ? "Guest trips are saved on this device." : "Guest mode: save a quick trip on this device.");
-      list.replaceChildren(...(localTrips.length ? localTrips.map(tripCard) : [
-        emptyState("No trips yet", "Save a draft here, or sign in later to sync across devices.", "Ask AI", () => setView("chat")),
-      ]));
-      return;
-    }
-    setStatus("#tripStatus", "Loading saved trips...");
-    list.replaceChildren(...loadingCards(2));
-    const data = await api("/api/trips");
-    const trips = data.trips || [];
-    setStatus("#tripStatus", trips.length ? "Synced trips loaded." : "Signed in, but no saved trips yet.");
-    list.replaceChildren(...(trips.length ? trips.map(tripCard) : [
-      emptyState("No saved trips", "Create your first China trip and it will sync to this account.", "Ask AI", () => setView("chat")),
-    ]));
-  } catch (error) {
-    setStatus("#tripStatus", error.message, "error");
-    list.replaceChildren(emptyState("Trips did not load", "Try refreshing this view.", "Retry", loadTrips));
-  }
-}
-
-function tripCard(trip) {
-  const card = document.createElement("article");
-  card.className = "trip-card";
-  card.appendChild(createText("h3", "", trip.title));
-  const dates = [trip.startDate, trip.endDate].filter(Boolean).join(" to ");
-  renderFacts(card, "trip-card__facts", [trip.destination || "China", dates]);
-  return card;
 }
 
 async function saveTrip(form) {
@@ -863,8 +685,7 @@ async function saveTrip(form) {
     throw error;
   }
   form.reset();
-  loadDashboard();
-  await loadTrips();
+  loadDashboardTrips();
   showToast("Trip saved");
 }
 
@@ -960,7 +781,6 @@ function bindEvents() {
     }
     setStatus("#translateStatus", "Voice tools are available in this browser. Full push-to-talk flow is planned for the next build.");
   });
-  $("#citySearch")?.addEventListener("input", loadCities);
   $("#chatForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     const input = $("#chatInput");
@@ -970,8 +790,10 @@ function bindEvents() {
     input.value = "";
     await withButtonBusy(button, "Sending", () => sendChat(message));
   });
-  $("#chatInput").addEventListener("focus", () => document.body.classList.add("is-chat-composing"));
-  $("#chatInput").addEventListener("blur", () => document.body.classList.remove("is-chat-composing"));
+  $$("#chatInput, #translationInput").forEach((field) => {
+    field.addEventListener("focus", () => document.body.classList.add("is-composing"));
+    field.addEventListener("blur", () => document.body.classList.remove("is-composing"));
+  });
   $("#quickPlanner").addEventListener("submit", async (event) => {
     event.preventDefault();
     const values = Object.fromEntries(new FormData(event.currentTarget).entries());
@@ -986,7 +808,7 @@ function bindEvents() {
     const button = form.querySelector("button");
     await withButtonBusy(button, "Saving", () => saveTrip(form));
   });
-  $("#refreshTrips")?.addEventListener("click", (event) => withButtonBusy(event.currentTarget, "Refreshing", loadTrips));
+  $("#refreshTrips")?.addEventListener("click", () => loadDashboardTrips());
   $("#authButton").addEventListener("click", () => {
     updateAuthUi();
     $("#authDialog").showModal();

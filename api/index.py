@@ -6,6 +6,19 @@ from api.config import public_config
 
 
 def application(environ, start_response):
+    try:
+        return _route(environ, start_response)
+    except Exception:
+        return error_response(
+            start_response,
+            HTTPStatus.INTERNAL_SERVER_ERROR,
+            "internal_error",
+            "Something went wrong. Please try again.",
+            environ,
+        )
+
+
+def _route(environ, start_response):
     method = environ.get("REQUEST_METHOD", "GET").upper()
     path = environ.get("PATH_INFO") or "/"
     path_parts = [part for part in path.strip("/").split("/") if part]

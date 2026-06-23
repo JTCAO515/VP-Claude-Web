@@ -2,6 +2,7 @@ import json
 import mimetypes
 import os
 import re
+import time
 from http import HTTPStatus
 from pathlib import Path
 from urllib.parse import parse_qs
@@ -83,9 +84,20 @@ def query_params(environ):
     return {key: values[-1] for key, values in parse_qs(environ.get("QUERY_STRING", "")).items()}
 
 
+_JSON_CACHE = {}
+_JSON_CACHE_TTL_SECONDS = 60
+
+
 def load_json(filename):
-    with (DATA_DIR / filename).open("r", encoding="utf-8") as handle:
-        return json.load(handle)
+    path = DATA_DIR / filename
+    now = time.time()
+    cached = _JSON_CACHE.get(filename)
+    if cached and now - cached[0] < _JSON_CACHE_TTL_SECONDS:
+        return cached[1]
+    with path.open("r", encoding="utf-8") as handle:
+        data = json.load(handle)
+    _JSON_CACHE[filename] = (now, data)
+    return data
 
 
 def clean_text(value):

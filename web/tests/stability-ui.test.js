@@ -107,10 +107,10 @@ test("v6.2.1 strengthens the AI-first dashboard and mobile planning surface", ()
 test("v6.2.1 fixes verified AI-first responsive regressions", () => {
   assert.doesNotMatch(appJs(), /Use planner", \(\) => setView\("dashboard"\)/);
   assert.match(appJs(), /Ask AI", \(\) => setView\("chat"\)/);
-  assert.match(appJs(), /is-chat-composing/);
+  assert.match(appJs(), /is-composing/);
   assert.match(css, /@media \(min-width: 1440px\)/);
   assert.match(css, /width: min\(1120px, calc\(100vw - 180px\)\)/);
-  assert.match(css, /body\[data-view="chat"\]\.is-chat-composing \.nav/);
+  assert.match(css, /body\.is-composing \.nav/);
   assert.doesNotMatch(css, /\.chat-toolbar/);
   assert.doesNotMatch(css, /\.preset-group/);
   assert.match(appJs(), /window\.scrollTo\(\{ top: 0, behavior: "auto" \}\)/);
