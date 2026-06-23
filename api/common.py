@@ -1,9 +1,11 @@
-"""Shared utilities: response helpers, JWT, password hashing, JSON IO, HTTP fetch."""
+"""Shared HTTP / WSGI / crypto / IO helpers — Python stdlib only."""
 from __future__ import annotations
 
 import base64
+import binascii
 import hashlib
 import hmac
+import io
 import json
 import mimetypes
 import secrets
@@ -11,24 +13,30 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from email.parser import BytesParser
+from email.policy import default as email_default_policy
 from pathlib import Path
-from typing import Any, Callable, Iterable
+from typing import Any, Iterable
 
-from .config import JWT_SECRET, JWT_TTL_DAYS, ROOT_DIR
+from .config import (
+    JWT_SECRET,
+    JWT_TTL_DAYS,
+    ROOT_DIR,
+    SESSION_COOKIE,
+    is_production,
+)
 
 
 # ---------- WSGI response helpers ----------
 
-JSON_HEADERS = [
+JSON_HEADERS: list[tuple[str, str]] = [
     ("Content-Type", "application/json; charset=utf-8"),
     ("Cache-Control", "no-store"),
-    ("Access-Control-Allow-Origin", "*"),
-    ("Access-Control-Allow-Headers", "Content-Type, Authorization"),
-    ("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"),
 ]
 
 
-def json_response(start_response, payload: Any, status: str = "200 OK", extra_headers: Iterable[tuple] | None = None):
+def json_response(start_response, payload: Any, status: str = "200 OK",
+                  extra_headers: Iterable[tuple] | None = None):
     body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     headers = list(JSON_HEADERS) + [("Content-Length", str(len(body)))]
     if extra_headers:
@@ -37,26 +45,55 @@ def json_response(start_response, payload: Any, status: str = "200 OK", extra_he
     return [body]
 
 
-def error_response(start_response, message: str, status: str = "400 Bad Request", code: str | None = None):
-    return json_response(start_response, {"ok": False, "error": message, "code": code}, status=status)
-
-
-def ok_response(start_response, data: dict | None = None):
+def ok_response(start_response, data: dict | None = None,
+                extra_headers: Iterable[tuple] | None = None):
     payload = {"ok": True}
     if data:
         payload.update(data)
-    return json_response(start_response, payload)
+    return json_response(start_response, payload, extra_headers=extra_headers)
+
+
+def error_response(start_response, message: str, status: str = "400 Bad Request",
+                   code: str | None = None):
+    return json_response(start_response, {"ok": False, "error": message, "code": code},
+                         status=status)
+
+
+def no_content(start_response, extra_headers: Iterable[tuple] | None = None):
+    headers = [("Content-Length", "0")] + list(extra_headers or [])
+    start_response("204 No Content", headers)
+    return [b""]
+
+
+def redirect(start_response, location: str, extra_headers: Iterable[tuple] | None = None):
+    headers = [("Location", location), ("Content-Length", "0")] + list(extra_headers or [])
+    start_response("302 Found", headers)
+    return [b""]
+
+
+def binary_response(start_response, body: bytes, content_type: str,
+                    status: str = "200 OK", extra_headers: Iterable[tuple] | None = None):
+    headers = [
+        ("Content-Type", content_type),
+        ("Content-Length", str(len(body))),
+        ("Cache-Control", "no-store"),
+    ]
+    if extra_headers:
+        headers.extend(extra_headers)
+    start_response(status, headers)
+    return [body]
 
 
 # ---------- Request parsing ----------
 
-def read_body(environ) -> bytes:
+def read_body(environ, max_bytes: int = 25 * 1024 * 1024) -> bytes:
     try:
         length = int(environ.get("CONTENT_LENGTH") or 0)
     except (TypeError, ValueError):
         length = 0
     if length <= 0:
         return b""
+    length = min(length, max_bytes)
     return environ["wsgi.input"].read(length)
 
 
@@ -73,12 +110,81 @@ def parse_json_body(environ) -> dict:
 
 def parse_query(environ) -> dict:
     qs = environ.get("QUERY_STRING", "")
-    return {k: v[0] if v else "" for k, v in urllib.parse.parse_qs(qs, keep_blank_values=True).items()}
+    return {k: v[0] if v else "" for k, v in
+            urllib.parse.parse_qs(qs, keep_blank_values=True).items()}
 
 
 def get_header(environ, name: str) -> str:
     key = "HTTP_" + name.upper().replace("-", "_")
     return environ.get(key, "")
+
+
+def parse_cookies(environ) -> dict:
+    raw = environ.get("HTTP_COOKIE", "") or ""
+    out: dict[str, str] = {}
+    for part in raw.split(";"):
+        part = part.strip()
+        if not part or "=" not in part:
+            continue
+        k, v = part.split("=", 1)
+        out[k.strip()] = urllib.parse.unquote(v.strip())
+    return out
+
+
+def parse_multipart(environ) -> dict[str, dict]:
+    """Tiny multipart/form-data parser using stdlib email module.
+    Returns { field_name: { 'filename': str|None, 'content_type': str, 'data': bytes } }.
+    """
+    ctype = environ.get("CONTENT_TYPE", "")
+    if "multipart/form-data" not in ctype:
+        return {}
+    raw = read_body(environ)
+    if not raw:
+        return {}
+    # Build a header + body for the email parser.
+    pseudo = f"Content-Type: {ctype}\r\n\r\n".encode() + raw
+    msg = BytesParser(policy=email_default_policy).parsebytes(pseudo)
+    fields: dict[str, dict] = {}
+    if not msg.is_multipart():
+        return fields
+    for part in msg.iter_parts():
+        cd = part.get("Content-Disposition", "")
+        if not cd:
+            continue
+        # Parse: form-data; name="field"; filename="f.webm"
+        params = {}
+        for token in cd.split(";"):
+            token = token.strip()
+            if "=" in token:
+                k, v = token.split("=", 1)
+                params[k.strip().lower()] = v.strip().strip('"')
+        name = params.get("name")
+        if not name:
+            continue
+        fields[name] = {
+            "filename": params.get("filename"),
+            "content_type": part.get_content_type(),
+            "data": part.get_payload(decode=True) or b"",
+        }
+    return fields
+
+
+# ---------- Cookie writing ----------
+
+def build_cookie(name: str, value: str, *, max_age: int = 7 * 86400,
+                 path: str = "/", http_only: bool = True,
+                 same_site: str = "Lax") -> str:
+    parts = [f"{name}={urllib.parse.quote(value)}", f"Max-Age={max_age}", f"Path={path}"]
+    if http_only:
+        parts.append("HttpOnly")
+    if is_production():
+        parts.append("Secure")
+    parts.append(f"SameSite={same_site}")
+    return "; ".join(parts)
+
+
+def clear_cookie(name: str, path: str = "/") -> str:
+    return f"{name}=; Max-Age=0; Path={path}; HttpOnly; SameSite=Lax"
 
 
 # ---------- Static file serving ----------
@@ -91,6 +197,7 @@ EXTRA_MIME = {
     ".svg": "image/svg+xml",
     ".json": "application/json; charset=utf-8",
     ".webmanifest": "application/manifest+json",
+    ".woff2": "font/woff2",
 }
 
 
@@ -98,7 +205,9 @@ def serve_file(start_response, path: Path, cache: str = "public, max-age=300"):
     if not path.exists() or not path.is_file():
         start_response("404 Not Found", [("Content-Type", "text/plain")])
         return [b"not found"]
-    mime = EXTRA_MIME.get(path.suffix.lower()) or mimetypes.guess_type(str(path))[0] or "application/octet-stream"
+    mime = (EXTRA_MIME.get(path.suffix.lower())
+            or mimetypes.guess_type(str(path))[0]
+            or "application/octet-stream")
     body = path.read_bytes()
     headers = [
         ("Content-Type", mime),
@@ -110,7 +219,6 @@ def serve_file(start_response, path: Path, cache: str = "public, max-age=300"):
 
 
 def safe_join(root: Path, *parts: str) -> Path | None:
-    """Reject traversal."""
     candidate = (root.joinpath(*parts)).resolve()
     try:
         candidate.relative_to(root.resolve())
@@ -163,22 +271,31 @@ def jwt_verify(token: str) -> dict | None:
     return payload
 
 
-def bearer_token(environ) -> str | None:
+def session_token(environ) -> str | None:
+    cookies = parse_cookies(environ)
+    tok = cookies.get(SESSION_COOKIE)
+    if tok:
+        return tok
     auth = get_header(environ, "Authorization")
     if auth.lower().startswith("bearer "):
         return auth[7:].strip() or None
     return None
 
 
-# ---------- Password hashing (PBKDF2) ----------
+# ---------- Password hashing (PBKDF2-SHA256) ----------
 
-def hash_password(password: str, *, salt: bytes | None = None, iterations: int = 240_000) -> str:
+def hash_password(password: str, *, salt: bytes | None = None,
+                  iterations: int = 240_000) -> str:
     salt = salt or secrets.token_bytes(16)
     derived = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
-    return f"pbkdf2_sha256${iterations}${base64.b64encode(salt).decode()}${base64.b64encode(derived).decode()}"
+    return (f"pbkdf2_sha256${iterations}$"
+            f"{base64.b64encode(salt).decode()}$"
+            f"{base64.b64encode(derived).decode()}")
 
 
 def verify_password(password: str, stored: str) -> bool:
+    if not stored:
+        return False
     try:
         algo, iter_s, salt_b64, hash_b64 = stored.split("$")
     except ValueError:
@@ -189,16 +306,29 @@ def verify_password(password: str, stored: str) -> bool:
         iterations = int(iter_s)
         salt = base64.b64decode(salt_b64)
         expected = base64.b64decode(hash_b64)
-    except (ValueError, base64.binascii.Error):
+    except (ValueError, binascii.Error):
         return False
     derived = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
     return hmac.compare_digest(derived, expected)
 
 
+def sha256_hex(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def random_id() -> str:
+    return secrets.token_hex(16)
+
+
+def random_code(digits: int = 6) -> str:
+    return "".join(secrets.choice("0123456789") for _ in range(digits))
+
+
 # ---------- HTTP fetch (no third-party deps) ----------
 
 def http_request(url: str, *, method: str = "GET", headers: dict | None = None,
-                 data: bytes | dict | None = None, timeout: float = 15.0) -> tuple[int, bytes, dict]:
+                 data: bytes | dict | None = None,
+                 timeout: float = 15.0) -> tuple[int, bytes, dict]:
     hdrs = {"User-Agent": "VisePanda/7.0"}
     if headers:
         hdrs.update(headers)
@@ -213,7 +343,11 @@ def http_request(url: str, *, method: str = "GET", headers: dict | None = None,
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             return resp.status, resp.read(), dict(resp.headers)
     except urllib.error.HTTPError as e:
-        return e.code, e.read(), dict(e.headers or {})
+        try:
+            payload = e.read()
+        except Exception:  # noqa: BLE001
+            payload = b""
+        return e.code, payload, dict(e.headers or {})
     except urllib.error.URLError as e:
         return 0, f"{e.reason}".encode(), {}
     except Exception as e:  # noqa: BLE001
@@ -230,4 +364,18 @@ def load_json(path: Path, default):
 
 
 def load_translation(name: str) -> Any:
-    return load_json(ROOT_DIR / "data" / "translations" / f"{name}.json", default=[])
+    path = ROOT_DIR / "data" / "translations" / f"{name}.json"
+    return load_json(path, default={"phrases": []})
+
+
+def write_json_atomic(path: Path, payload) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    import os as _os
+    _os.replace(tmp, path)
+
+
+# Backwards-compat name used by some modules.
+def bearer_token(environ) -> str | None:
+    return session_token(environ)

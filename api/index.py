@@ -1,4 +1,4 @@
-"""VisePanda v7 WSGI entrypoint. Routes everything: APIs + static frontend.
+"""VisePanda v7.0 WSGI entrypoint. Routes APIs + static frontend.
 
 Compatible with Vercel @vercel/python (exposes `app`) and the stdlib WSGI server.
 """
@@ -8,18 +8,12 @@ import sys
 import traceback
 from pathlib import Path
 
-# Make the project root importable when Vercel invokes from /api.
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from api import auth as auth_routes  # noqa: E402
-from api import chat as chat_routes  # noqa: E402
-from api import dashboard as dashboard_routes  # noqa: E402
-from api import health as health_routes  # noqa: E402
-from api import translations as translations_routes  # noqa: E402
 from api.common import error_response, json_response, safe_join, serve_file  # noqa: E402
-from api.config import ROOT_DIR, WEB_DIR, feature_flags  # noqa: E402
+from api.config import ROOT_DIR, WEB_DIR, public_features  # noqa: E402
 
 
 def _cors_preflight(start_response):
@@ -34,18 +28,43 @@ def _cors_preflight(start_response):
 
 
 def _route_api(environ, start_response, path: str):
+    # Lazy imports keep cold-start light.
     if path == "/api/health":
-        return health_routes.handle(environ, start_response, path)
-    if path == "/api/config":
-        return json_response(start_response, {"ok": True, **feature_flags()})
-    if path.startswith("/api/auth") or path.startswith("/api/trips"):
-        return auth_routes.handle(environ, start_response, path)
+        from api import health
+        return health.handle(environ, start_response, path)
+    if path in ("/api/config", "/api/config/public"):
+        return json_response(start_response, {"ok": True, **public_features()})
+    if path.startswith("/api/auth"):
+        from api import auth
+        return auth.handle(environ, start_response, path)
     if path == "/api/chat":
-        return chat_routes.handle(environ, start_response, path)
-    if path == "/api/translations":
-        return translations_routes.handle(environ, start_response, path)
-    if path in {"/api/cities", "/api/hotels", "/api/deals", "/api/tools", "/api/maps", "/api/weather"}:
-        return dashboard_routes.handle(environ, start_response, path)
+        from api import chat
+        return chat.handle(environ, start_response, path)
+    if path == "/api/translate":
+        from api import translate
+        return translate.handle(environ, start_response, path)
+    if path == "/api/tts":
+        from api import tts
+        return tts.handle(environ, start_response, path)
+    if path == "/api/stt":
+        from api import stt
+        return stt.handle(environ, start_response, path)
+    if path.startswith("/api/translations"):
+        from api import translations
+        return translations.handle(environ, start_response, path)
+    if path in {"/api/cities", "/api/hotels", "/api/deals", "/api/tools",
+                "/api/maps", "/api/weather"}:
+        from api import dashboard
+        return dashboard.handle(environ, start_response, path)
+    if path.startswith("/api/itinerary"):
+        from api import itinerary
+        return itinerary.handle(environ, start_response, path)
+    if path.startswith("/api/favorites"):
+        from api import favorites
+        return favorites.handle(environ, start_response, path)
+    if path.startswith("/api/chat-history"):
+        from api import chat_history
+        return chat_history.handle(environ, start_response, path)
     return error_response(start_response, "Endpoint not found", "404 Not Found")
 
 
@@ -53,20 +72,21 @@ def _serve_static(environ, start_response, path: str):
     if path in ("", "/"):
         return serve_file(start_response, WEB_DIR / "index.html", cache="no-cache")
     if path == "/manifest.json":
-        return serve_file(start_response, WEB_DIR / "manifest.json")
+        return serve_file(start_response, WEB_DIR / "manifest.json", cache="no-cache")
     if path == "/sw.js":
         return serve_file(start_response, WEB_DIR / "sw.js", cache="no-cache")
-    if path == "/favicon.ico" or path == "/favicon.svg":
+    if path in ("/favicon.ico", "/favicon.svg"):
         return serve_file(start_response, WEB_DIR / "favicon.svg")
     if path.startswith("/web/"):
         target = safe_join(WEB_DIR, path[len("/web/"):])
         if target:
             return serve_file(start_response, target)
     if path.startswith("/data/translations/"):
-        target = safe_join(ROOT_DIR / "data" / "translations", path[len("/data/translations/"):])
+        target = safe_join(ROOT_DIR / "data" / "translations",
+                           path[len("/data/translations/"):])
         if target:
             return serve_file(start_response, target)
-    # SPA fallback — any unknown route returns index.html so the client router can resolve.
+    # SPA fallback: any unknown route returns index.html so the client router can resolve.
     return serve_file(start_response, WEB_DIR / "index.html", cache="no-cache")
 
 
@@ -80,11 +100,12 @@ def app(environ, start_response):
             return _route_api(environ, start_response, path)
         return _serve_static(environ, start_response, path)
     except Exception:  # noqa: BLE001
-        tb = traceback.format_exc(limit=4)
-        return error_response(start_response, f"Internal error: {tb.splitlines()[-1]}", "500 Internal Server Error")
+        tb = traceback.format_exc(limit=6)
+        last = tb.strip().splitlines()[-1] if tb.strip() else "Unknown error"
+        return error_response(start_response, f"Internal error: {last}",
+                              "500 Internal Server Error")
 
 
-# Vercel detects `app`. The dev `python -m api.index` block runs locally.
 if __name__ == "__main__":
     from wsgiref.simple_server import make_server
     port = 8765
