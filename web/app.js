@@ -544,6 +544,7 @@ async function loadTranslations() {
 function addMessage(author, text, kind = "") {
   const node = $("#messageTemplate").content.firstElementChild.cloneNode(true);
   node.classList.toggle("is-user", kind === "user");
+  node.classList.add("fade-in");
   $(".message__author", node).textContent = author;
   $(".message__body", node).textContent = text;
   $("#chatLog").appendChild(node);

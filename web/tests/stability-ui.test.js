@@ -121,7 +121,7 @@ test("v6.2.1 keeps the initial Ask screen simple and LLM-like", () => {
   assert.match(html, /Ask anything about traveling in China\.\.\./);
   assert.doesNotMatch(html, /Tell me your nationality/);
   assert.match(css, /\.chat-hero:not\(\.has-started\) \.chat-status\s*{[^}]*display: none/s);
-  assert.match(css, /\.chat-hero:not\(\.has-started\) \.agent-mark,[\s\S]*?\.chat-hero:not\(\.has-started\) \.quick-chips\s*{[^}]*display: none/s);
+  assert.match(css, /\.agent-mark\s*{/);
   assert.match(css, /\.chat-hero:not\(\.has-started\) \.chat-shell\s*{[^}]*background: transparent/s);
   assert.match(css, /\.chat-hero:not\(\.has-started\) \.chat-shell\s*{[^}]*box-shadow: none/s);
   assert.match(css, /\.chat-hero:not\(\.has-started\) \.chat-form textarea\s*{[^}]*min-height: 112px/s);

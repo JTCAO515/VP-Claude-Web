@@ -165,15 +165,29 @@
       <section class="workspace section chat-hero" id="panel-chat" data-view-panel="chat" role="tabpanel" aria-labelledby="tab-chatbot">
         <div class="chat-shell">
           <div class="chat-welcome" id="chatWelcome">
+            <svg class="panda-mascot" viewBox="0 0 100 100" aria-hidden="true">
+              <circle cx="26" cy="24" r="13" fill="#1f2530"></circle>
+              <circle cx="74" cy="24" r="13" fill="#1f2530"></circle>
+              <circle cx="50" cy="56" r="34" fill="#fbfdff" stroke="#1f2530" stroke-width="2"></circle>
+              <circle cx="22" cy="62" r="7" fill="#d9363e" opacity="0.18"></circle>
+              <circle cx="78" cy="62" r="7" fill="#d9363e" opacity="0.18"></circle>
+              <g class="panda-eye">
+                <ellipse cx="35" cy="52" rx="10" ry="13" fill="#1f2530"></ellipse>
+                <circle cx="37" cy="55" r="3.4" fill="#fbfdff"></circle>
+              </g>
+              <g class="panda-eye">
+                <ellipse cx="65" cy="52" rx="10" ry="13" fill="#1f2530"></ellipse>
+                <circle cx="67" cy="55" r="3.4" fill="#fbfdff"></circle>
+              </g>
+              <ellipse cx="50" cy="68" rx="5" ry="3.4" fill="#1f2530"></ellipse>
+              <path d="M40 75q10 8 20 0" fill="none" stroke="#1f2530" stroke-width="2.5" stroke-linecap="round"></path>
+            </svg>
             <div class="agent-mark">
-              <img src="/static/img/logo-panda.jpg" alt="">
-              <div>
-                <strong>VisePanda</strong>
-                <span>China travel AI</span>
-              </div>
+              <strong>VisePanda</strong>
+              <span>China travel AI</span>
             </div>
             <div class="welcome-copy">
-              <h1>Ni hao. Where in China next?</h1>
+              <h1><span class="accent-dot" aria-hidden="true"></span>Ni hao. Where in China next?</h1>
             </div>
             <div class="quick-chips" aria-label="Quick planning prompts">
               <button type="button" data-mode="itinerary" data-depth="expert" data-prompt="Plan a first-time 7 day China route with simple rail transfers. Ask me only the missing questions first, then give a professional draft.">Plan 7 days</button>
