@@ -1,26 +1,25 @@
-from api.common import json_response, load_json
+"""Serve curated translation datasets."""
+from __future__ import annotations
+
+from .common import json_response, load_translation, parse_query
+
+CATEGORIES = ["phrases", "dining", "attractions", "culture"]
 
 
-FILES = {
-    "phrases": "translations/phrases.json",
-    "dining": "translations/dining.json",
-    "attractions": "translations/attractions.json",
-    "culture": "translations/culture.json",
-}
-
-
-def api_translation_payload():
-    payload = {}
-    for key, filename in FILES.items():
-        payload[key] = load_json(filename)
-    return payload
-
-
-def dispatch(method, environ, start_response):
-    if method != "GET":
-        from http import HTTPStatus
-
-        from api.common import error_response
-
-        return error_response(start_response, HTTPStatus.METHOD_NOT_ALLOWED, "method_not_allowed", "Method not allowed.", environ)
-    return json_response(start_response, api_translation_payload(), environ=environ)
+def handle(environ, start_response, path: str):
+    params = parse_query(environ)
+    category = (params.get("category") or "").strip().lower()
+    if category and category in CATEGORIES:
+        return json_response(start_response, {
+            "ok": True,
+            "category": category,
+            "items": load_translation(category),
+        })
+    data = {c: load_translation(c) for c in CATEGORIES}
+    counts = {c: len(v) if isinstance(v, list) else 0 for c, v in data.items()}
+    return json_response(start_response, {
+        "ok": True,
+        "categories": CATEGORIES,
+        "counts": counts,
+        "data": data,
+    })

@@ -1,15 +1,16 @@
 {
+  "version": 2,
   "builds": [
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "10mb",
-        "runtime": "python3.11"
-      }
-    }
+    { "src": "api/index.py", "use": "@vercel/python", "config": { "runtime": "python3.11" } }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "api/index.py" }
+    { "src": "/api/(.*)", "dest": "api/index.py" },
+    { "src": "/web/(.*)", "dest": "/web/$1" },
+    { "src": "/data/translations/(.*)", "dest": "/data/translations/$1" },
+    { "src": "/manifest.json", "dest": "/web/manifest.json" },
+    { "src": "/sw.js", "dest": "/web/sw.js" },
+    { "src": "/favicon.ico", "dest": "/web/favicon.svg" },
+    { "src": "/", "dest": "/web/index.html" },
+    { "src": "/(.*)", "dest": "/web/$1" }
   ]
 }

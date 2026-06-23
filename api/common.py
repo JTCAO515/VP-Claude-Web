@@ -1,182 +1,233 @@
+"""Shared utilities: response helpers, JWT, password hashing, JSON IO, HTTP fetch."""
+from __future__ import annotations
+
+import base64
+import hashlib
+import hmac
 import json
 import mimetypes
-import os
-import re
-from http import HTTPStatus
+import secrets
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
 from pathlib import Path
-from urllib.parse import parse_qs
+from typing import Any, Callable, Iterable
+
+from .config import JWT_SECRET, JWT_TTL_DAYS, ROOT_DIR
 
 
-ROOT = Path(__file__).resolve().parents[1]
-DATA_DIR = ROOT / "data"
-WEB_DIR = ROOT / "web"
-STATIC_DIR = ROOT / "static"
+# ---------- WSGI response helpers ----------
 
-ALLOWED_ORIGINS = {
-    "https://go2china.space",
-    "https://www.go2china.space",
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:5173",
-}
+JSON_HEADERS = [
+    ("Content-Type", "application/json; charset=utf-8"),
+    ("Cache-Control", "no-store"),
+    ("Access-Control-Allow-Origin", "*"),
+    ("Access-Control-Allow-Headers", "Content-Type, Authorization"),
+    ("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"),
+]
 
 
-def cors_headers(environ):
-    origin = environ.get("HTTP_ORIGIN", "")
-    allow_origin = origin if origin in ALLOWED_ORIGINS else "https://go2china.space"
-    return [
-        ("Access-Control-Allow-Origin", allow_origin),
-        ("Access-Control-Allow-Credentials", "true"),
-        ("Access-Control-Allow-Headers", "Content-Type, Authorization"),
-        ("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS"),
-        ("Vary", "Origin"),
-    ]
-
-
-def send(start_response, status, body, headers=None, environ=None):
-    if isinstance(status, HTTPStatus):
-        status_line = f"{status.value} {status.phrase}"
-    elif isinstance(status, int):
-        phrase = HTTPStatus(status).phrase if status in HTTPStatus._value2member_map_ else "OK"
-        status_line = f"{status} {phrase}"
-    else:
-        status_line = status
-    final_headers = list(headers or [])
-    if environ is not None:
-        final_headers.extend(cors_headers(environ))
-    start_response(status_line, final_headers)
-    if isinstance(body, str):
-        body = body.encode("utf-8")
+def json_response(start_response, payload: Any, status: str = "200 OK", extra_headers: Iterable[tuple] | None = None):
+    body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+    headers = list(JSON_HEADERS) + [("Content-Length", str(len(body)))]
+    if extra_headers:
+        headers.extend(extra_headers)
+    start_response(status, headers)
     return [body]
 
 
-def json_response(start_response, payload, status=HTTPStatus.OK, environ=None, headers=None):
-    base_headers = [("Content-Type", "application/json; charset=utf-8")]
-    base_headers.extend(headers or [])
-    return send(start_response, status, json.dumps(payload, ensure_ascii=False), base_headers, environ)
+def error_response(start_response, message: str, status: str = "400 Bad Request", code: str | None = None):
+    return json_response(start_response, {"ok": False, "error": message, "code": code}, status=status)
 
 
-def text_response(start_response, text, status=HTTPStatus.OK, content_type="text/plain; charset=utf-8", environ=None):
-    return send(start_response, status, text, [("Content-Type", content_type)], environ)
+def ok_response(start_response, data: dict | None = None):
+    payload = {"ok": True}
+    if data:
+        payload.update(data)
+    return json_response(start_response, payload)
 
 
-def error_response(start_response, status, code, message, environ=None):
-    return json_response(start_response, {"error": {"code": code, "message": message}}, status, environ)
+# ---------- Request parsing ----------
 
-
-def read_json(environ):
+def read_body(environ) -> bytes:
     try:
-        length = int(environ.get("CONTENT_LENGTH") or "0")
-    except ValueError:
+        length = int(environ.get("CONTENT_LENGTH") or 0)
+    except (TypeError, ValueError):
         length = 0
-    raw = environ["wsgi.input"].read(length) if length else b"{}"
+    if length <= 0:
+        return b""
+    return environ["wsgi.input"].read(length)
+
+
+def parse_json_body(environ) -> dict:
+    raw = read_body(environ)
     if not raw:
         return {}
     try:
-        return json.loads(raw.decode("utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError):
-        raise ValueError("Request body must be valid JSON.")
+        data = json.loads(raw.decode("utf-8"))
+        return data if isinstance(data, dict) else {}
+    except (ValueError, UnicodeDecodeError):
+        return {}
 
 
-def query_params(environ):
-    return {key: values[-1] for key, values in parse_qs(environ.get("QUERY_STRING", "")).items()}
+def parse_query(environ) -> dict:
+    qs = environ.get("QUERY_STRING", "")
+    return {k: v[0] if v else "" for k, v in urllib.parse.parse_qs(qs, keep_blank_values=True).items()}
 
 
-def load_json(filename):
-    with (DATA_DIR / filename).open("r", encoding="utf-8") as handle:
-        return json.load(handle)
+def get_header(environ, name: str) -> str:
+    key = "HTTP_" + name.upper().replace("-", "_")
+    return environ.get(key, "")
 
 
-def clean_text(value):
-    if value is None:
-        return ""
-    text = str(value)
-    replacements = {
-        "\u9225?": "-",
-        "\u9225\u63d7": "-M",
-        "\u9225\u63d8": "-N",
-        "\u9225\u63d9": "-O",
-        "\u9225\u63c7": "-D",
-        "\u9225\u63c2": "-A",
-        "\u9225\u63ca": "-F",
-        "\u9225\u63dd": "-S",
-        "\u9225\u63d3": "-J",
-        "\u8def": "-",
-        "\u697c": "RMB ",
-        "\u62e2": "GBP ",
-        "\u9227?": "EUR 0",
-    }
-    for bad, good in replacements.items():
-        text = text.replace(bad, good)
-    text = re.split(r"\u951b|\uff08|\(", text, maxsplit=1)[0]
-    text = re.sub(r"\s+", " ", text).strip(" -")
-    return text
+# ---------- Static file serving ----------
+
+EXTRA_MIME = {
+    ".js": "application/javascript; charset=utf-8",
+    ".mjs": "application/javascript; charset=utf-8",
+    ".css": "text/css; charset=utf-8",
+    ".html": "text/html; charset=utf-8",
+    ".svg": "image/svg+xml",
+    ".json": "application/json; charset=utf-8",
+    ".webmanifest": "application/manifest+json",
+}
 
 
-def clean_list(values, limit=None):
-    output = []
-    for item in values or []:
-        cleaned = clean_text(item)
-        if cleaned and cleaned not in output:
-            output.append(cleaned)
-        if limit and len(output) >= limit:
-            break
-    return output
+def serve_file(start_response, path: Path, cache: str = "public, max-age=300"):
+    if not path.exists() or not path.is_file():
+        start_response("404 Not Found", [("Content-Type", "text/plain")])
+        return [b"not found"]
+    mime = EXTRA_MIME.get(path.suffix.lower()) or mimetypes.guess_type(str(path))[0] or "application/octet-stream"
+    body = path.read_bytes()
+    headers = [
+        ("Content-Type", mime),
+        ("Content-Length", str(len(body))),
+        ("Cache-Control", cache),
+    ]
+    start_response("200 OK", headers)
+    return [body]
 
 
-def bearer_token(environ):
-    header = environ.get("HTTP_AUTHORIZATION", "")
-    if header.lower().startswith("bearer "):
-        return header[7:].strip()
-    return ""
-
-
-def client_ip(environ):
-    forwarded = environ.get("HTTP_X_FORWARDED_FOR", "")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    return environ.get("REMOTE_ADDR", "unknown")
-
-
-def static_response(start_response, request_path, environ):
-    if request_path in {"", "/"}:
-        target = WEB_DIR / "index.html"
-    elif request_path.startswith("/static/"):
-        target = STATIC_DIR / request_path.removeprefix("/static/")
-    elif request_path.startswith("/web/"):
-        target = WEB_DIR / request_path.removeprefix("/web/")
-    else:
-        safe_name = request_path.lstrip("/") or "index.html"
-        target = WEB_DIR / safe_name
-
+def safe_join(root: Path, *parts: str) -> Path | None:
+    """Reject traversal."""
+    candidate = (root.joinpath(*parts)).resolve()
     try:
-        resolved = target.resolve()
-        allowed = {WEB_DIR.resolve(), STATIC_DIR.resolve()}
-        if not any(str(resolved).startswith(str(base)) for base in allowed):
-            raise FileNotFoundError
-        if not resolved.is_file():
-            target = WEB_DIR / "index.html"
-            resolved = target.resolve()
-        body = resolved.read_bytes()
-    except FileNotFoundError:
-        return error_response(start_response, HTTPStatus.NOT_FOUND, "not_found", "Resource not found.", environ)
-
-    content_type = mimetypes.guess_type(str(resolved))[0] or "application/octet-stream"
-    cache = "public, max-age=86400" if resolved.suffix.lower() in {".png", ".jpg", ".jpeg", ".svg", ".css", ".js"} else "no-store"
-    return send(
-        start_response,
-        HTTPStatus.OK,
-        body,
-        [("Content-Type", content_type), ("Cache-Control", cache)],
-        environ,
-    )
+        candidate.relative_to(root.resolve())
+    except ValueError:
+        return None
+    return candidate
 
 
-def runtime_database_path():
-    configured = os.environ.get("AUTH_DB_PATH")
-    if configured:
-        return Path(configured)
-    if os.environ.get("VERCEL"):
-        return Path("/tmp/vp-codex.db")
-    return DATA_DIR / "vp-codex.db"
+# ---------- JWT (HS256) ----------
+
+def _b64url(data: bytes) -> str:
+    return base64.urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
+
+
+def _b64url_decode(text: str) -> bytes:
+    pad = "=" * (-len(text) % 4)
+    return base64.urlsafe_b64decode(text + pad)
+
+
+def jwt_sign(payload: dict, ttl_seconds: int | None = None) -> str:
+    header = {"alg": "HS256", "typ": "JWT"}
+    body = dict(payload)
+    now = int(time.time())
+    body.setdefault("iat", now)
+    if ttl_seconds is None:
+        ttl_seconds = JWT_TTL_DAYS * 24 * 3600
+    body.setdefault("exp", now + ttl_seconds)
+    h = _b64url(json.dumps(header, separators=(",", ":")).encode())
+    p = _b64url(json.dumps(body, separators=(",", ":"), ensure_ascii=False).encode())
+    signing_input = f"{h}.{p}".encode()
+    sig = hmac.new(JWT_SECRET.encode(), signing_input, hashlib.sha256).digest()
+    return f"{h}.{p}.{_b64url(sig)}"
+
+
+def jwt_verify(token: str) -> dict | None:
+    try:
+        h, p, s = token.split(".")
+    except ValueError:
+        return None
+    signing_input = f"{h}.{p}".encode()
+    expected = _b64url(hmac.new(JWT_SECRET.encode(), signing_input, hashlib.sha256).digest())
+    if not hmac.compare_digest(expected, s):
+        return None
+    try:
+        payload = json.loads(_b64url_decode(p).decode("utf-8"))
+    except (ValueError, UnicodeDecodeError):
+        return None
+    if payload.get("exp", 0) < int(time.time()):
+        return None
+    return payload
+
+
+def bearer_token(environ) -> str | None:
+    auth = get_header(environ, "Authorization")
+    if auth.lower().startswith("bearer "):
+        return auth[7:].strip() or None
+    return None
+
+
+# ---------- Password hashing (PBKDF2) ----------
+
+def hash_password(password: str, *, salt: bytes | None = None, iterations: int = 240_000) -> str:
+    salt = salt or secrets.token_bytes(16)
+    derived = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
+    return f"pbkdf2_sha256${iterations}${base64.b64encode(salt).decode()}${base64.b64encode(derived).decode()}"
+
+
+def verify_password(password: str, stored: str) -> bool:
+    try:
+        algo, iter_s, salt_b64, hash_b64 = stored.split("$")
+    except ValueError:
+        return False
+    if algo != "pbkdf2_sha256":
+        return False
+    try:
+        iterations = int(iter_s)
+        salt = base64.b64decode(salt_b64)
+        expected = base64.b64decode(hash_b64)
+    except (ValueError, base64.binascii.Error):
+        return False
+    derived = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
+    return hmac.compare_digest(derived, expected)
+
+
+# ---------- HTTP fetch (no third-party deps) ----------
+
+def http_request(url: str, *, method: str = "GET", headers: dict | None = None,
+                 data: bytes | dict | None = None, timeout: float = 15.0) -> tuple[int, bytes, dict]:
+    hdrs = {"User-Agent": "VisePanda/7.0"}
+    if headers:
+        hdrs.update(headers)
+    body = None
+    if isinstance(data, dict):
+        body = json.dumps(data).encode("utf-8")
+        hdrs.setdefault("Content-Type", "application/json")
+    elif isinstance(data, bytes):
+        body = data
+    req = urllib.request.Request(url, data=body, headers=hdrs, method=method)
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return resp.status, resp.read(), dict(resp.headers)
+    except urllib.error.HTTPError as e:
+        return e.code, e.read(), dict(e.headers or {})
+    except urllib.error.URLError as e:
+        return 0, f"{e.reason}".encode(), {}
+    except Exception as e:  # noqa: BLE001
+        return 0, f"{e}".encode(), {}
+
+
+# ---------- JSON file IO ----------
+
+def load_json(path: Path, default):
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, ValueError):
+        return default
+
+
+def load_translation(name: str) -> Any:
+    return load_json(ROOT_DIR / "data" / "translations" / f"{name}.json", default=[])
