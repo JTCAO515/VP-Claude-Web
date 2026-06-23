@@ -1,78 +1,67 @@
 # VisePanda Active Plan
 
 Last updated: 2026-06-23
-Current version: v6.2.1
+Current version: v7.0.0
 
 ## Current Objective
 
-Upgrade VisePanda from a China trip planning workspace into an all-in-one China travel butler for foreign visitors.
+v7.0.0 just completed a full from-scratch rewrite of the frontend and backend (see `CHANGELOG.md`, `OPTIMIZATION_REPORT.md`). The current objective is to bring the rewritten codebase up to the same operational maturity the old codebase had — automated tests, real-credential verification, and consistent docs — before adding new product surface.
 
-The active product loop is now:
+The active product loop is unchanged from before the rewrite:
 
 ```text
-Chatbot before trip -> organize in Dashboard -> use Translation and Dashboard services during trip -> refine Chatbot with real context
+Chat before/during trip -> Dashboard for hotels/deals/tools -> Translate during trip
 ```
 
-## Current Baseline
+## Current Baseline (v7.0.0)
 
-Already shipped or actively implemented:
+Already shipped:
 
-- English-native static frontend.
-- Mobile-first app shell.
-- Three core tabs: Chatbot, Dashboard, Translation.
-- Dashboard command center with hotels, maps, deals, trips, cities, and tools aggregated.
-- Clean Chatbot conversation with DeepSeek health status and follow-up suggestions.
-- Native Translate tab foundation.
-- Translation JSON datasets under `data/translations/`.
-- `/api/translations` endpoint.
-- City, map, hotel, deals, tools, trips, auth, and admin foundations.
-- `/api/maps/*`, `/api/hotels/*`, and `/api/deals/*` API contracts.
-- Email verification, optional Resend, optional Google OAuth.
-- Local fallback behavior for AI and translation dictionary use.
+- English-native static frontend, native ES modules, no bundler.
+- Mobile-first shell: bottom tab bar under 860px, fixed icon rail at/above 860px.
+- Three tabs: Chat, Dashboard, Translate, sharing one `<main>` via `hidden` toggling.
+- Chat: streaming/non-streaming DeepSeek client with a deterministic local fallback.
+- Dashboard: featured cities, hotels, deals, tools/visa lookup, recent questions, saved trips (all client-local, no account).
+- Translate: category-filtered phrase/dining/attractions/culture lookup with local history.
+- `api/lib/` (data, http, deepseek, amap, static) + `api/routes/` (one module per resource) backend structure.
+- `localStorage` persistence under `vp_*_v7` keys.
+- New ink-and-porcelain visual identity with light/dark via `prefers-color-scheme`.
+
+Explicitly **not** in the baseline (removed during the rewrite, not yet rebuilt):
+
+- Auth / accounts.
+- Admin console.
+- Any automated test suite (`tests/`, `web/tests/` were deleted, not replaced).
 
 ## Phase Plan
 
 ### Phase 1: Pre-Trip Planning
 
-Status: foundation complete, still needs depth.
+Status: implemented via Chat + Dashboard tools/visa card.
 
-- Improve trip-intake quality.
-- Convert strong Ask outputs into saved trip drafts.
-- Add hotel-area and foreigner-friendly accommodation guidance.
-- Add high-speed rail and 12306 foreign passport guidance.
-- Keep visa/payment/SIM/VPN readiness practical and conservative.
+- Improve `local_answer()` coverage (more cities, more question patterns) so the offline fallback stays useful without an API key.
+- Add hotel-area and foreigner-friendly accommodation guidance to Dashboard hotel cards.
 
 ### Phase 1.5: During-Trip Butler
 
-Status: current core direction.
+Status: current core direction; Translate and Dashboard hotels/deals are implemented, voice is not.
 
-- Translate text and phrase-library content natively.
-- Keep maps, hotels, deals, cities, trips, and tools inside Dashboard rather than separate mobile tabs.
-- Add browser speech recognition and TTS flow when available.
-- Expand dining translation: dishes, spice, allergens, vegetarian, halal, foreign-card signals.
-- Expand attractions translation: names, aliases, signs, opening notes, ticket reminders.
-- Add taxi snippets with Chinese driver-facing address templates.
-- Add local route tools for one-day city routing.
-- Add Meituan/Dianping group-buying guidance inside Tools, without pretending to purchase directly.
+- Implement push-to-talk voice translation using browser STT/TTS where available (`web/js/translate.js` currently only shows a voice-readiness affordance).
+- Expand dining/attractions translation depth in `data/translations/`.
+- Add city-context handoff between Chat and Translate (e.g. "open Translate for this city").
 
 ### Phase 2: After-Trip Community
 
-Status: documented only, out of current scope.
+Status: documented only, out of current scope. Do not build in this cycle.
 
-- Community.
-- Travel journals.
-- Companion matching.
-- Ratings and feedback.
-- Shared itinerary stories.
+## Next Iterations
 
-## Next Five Iterations
+### Round 1: Stabilize the Rewrite
 
-### Round 1: Translation MVP Hardening
-
-- Improve phrase search and category filters.
-- Add phrase copy and speaker playback.
-- Add more emergency, hotel, taxi, and restaurant phrases.
-- Add tests for `/api/translations` shape and frontend Translate structure.
+- Rebuild a contract test suite covering `api/lib/http.py` routing and every `api/routes/*` module (currently zero coverage post-rewrite).
+- Add frontend structure checks for `web/js/*.js` modules (at minimum `node --check`, ideally behavior tests for view switching and lazy loading).
+- Verify `/api/chat` streaming and `/api/maps/*` against real `DEEPSEEK_API_KEY` / `AMAP_KEY` credentials in a non-production environment; v7.0.0 was only exercised against local fallback paths.
+- Update `CONTEXT.md`, `DESIGN.md`, and `README.md` to match the v7.0.0 architecture and API surface (`HANDOFF.md` and this file are already current; those three are not).
 
 ### Round 2: Voice Translation
 
@@ -81,33 +70,22 @@ Status: documented only, out of current scope.
 - Add TTS playback for translated output.
 - Keep text fallback visible when voice permission fails.
 
-### Round 3: Dining Butler
+### Round 3: Translation Content Depth
 
-- Expand dish database.
-- Add spice/allergen filters.
-- Add restaurant-friendly labels: English menu, foreign cards, halal, vegetarian.
-- Add point-and-show ordering cards.
+- Expand `data/translations/dining.json` and `attractions.json` coverage.
+- Add spice/allergen/halal/vegetarian tags to dining entries and surface them in Translate filters.
 
-### Round 4: Route/Ride Butler
+### Round 4: Trip Context Loop
 
-- Add taxi driver cards.
-- Add route handoff from Map to Translate.
-- Add city one-day route templates.
-- Add Gaode/Didi guidance without deep integration claims.
-
-### Round 5: Trip Context Loop
-
-- Connect saved trips to Translate suggestions.
-- Surface city-specific phrases based on active trip city.
-- Add "use in Ask" from Translate cards.
-- Add trip-day context to Dashboard.
+- Connect Dashboard's locally-saved trips to Translate suggestions (surface city-specific phrases when a trip city is set).
+- Add "use in Chat" from Translate/Dashboard cards.
 
 ## Near-Term Rules
 
-- UI must remain English-native.
-- Mobile portrait comes first.
-- Do not build Phase 2 community in this cycle.
-- Keep the stack vanilla JS + Python WSGI.
-- Add tests when changing navigation, APIs, chat, auth, trips, or translation data.
-- Update cache busting when CSS/JS changes.
+- UI stays English-native.
+- Mobile portrait comes first; verify both <860px (tab bar) and >=860px (icon rail) layouts when touching layout CSS.
+- Keep the stack vanilla JS (native ES modules) + Python WSGI stdlib-only — no bundler, no external Python dependencies, per `requirements.txt` and `vercel.json`.
+- Do not reintroduce auth/admin or start Phase 2 community work in this cycle.
+- Add tests for any change to routing, chat, translations data shape, or view switching — there is no existing suite to lean on, so new code should bring its own coverage.
+- Bump the PWA cache name (`web/sw.js`, `web/manifest.json`) and `localStorage` key suffixes together if making a breaking client-state change.
 - Do not commit secrets.
