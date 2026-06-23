@@ -1,165 +1,118 @@
-# VisePanda / VP-Codex-Web Handoff
+# VisePanda Handoff
 
 Last updated: 2026-06-23
-Current version: v6.2.1
-Latest commit: pending local commit for v6.2.1 travel-butler IA and service API iteration
-Repository: https://github.com/JTCAO515/VP-Codex-Web
-Production domain: https://go2china.space
+Current version: v7.0.0
+Latest commit: `e3e5764` (Rewrite VisePanda from scratch as v7.0.0)
+Branch: `claude/friendly-dirac-sn2iet`
+Repository: https://github.com/JTCAO515/VP-Claude-Web
 Deployment target: Vercel, routed through `api/index.py`
 
 ## 1. Project Summary
 
-VisePanda is an English-native China travel butler for foreign visitors.
+VisePanda is an English-native China travel butler for foreign visitors: pre-trip planning, an AI travel guide, and native translation in one small app.
 
-The product has moved beyond "travel planning tool." The current direction is a full journey assistant:
+v7.0.0 is a full from-scratch rewrite of both frontend and backend. No code from `web/` or `api/` in v6.2.1 or earlier was reused; only the curated JSON knowledge base under `data/` was kept. Auth, the admin panel, and all v6.2.1-era automated tests were removed as part of the rewrite and are **not** part of current scope. See `CHANGELOG.md` and `OPTIMIZATION_REPORT.md` for the full rationale.
 
-```text
-Pre-trip planning -> During-trip butler -> Post-trip community later
-```
-
-Phase 1 pre-trip planning exists as a working foundation. Phase 1.5 is now the main direction: translation, restaurants, local routes, taxi help, and practical in-China service guidance. Phase 2 community, journals, companion matching, and social feedback are documented only and are not part of this release.
+Treat everything below as the current source of truth. `CONTEXT.md`, `DESIGN.md`, and `README.md` still describe the pre-v7.0.0 product (three tabs with similar names but a different stack, plus auth/admin) and have not been updated yet — do not trust their architecture or API sections.
 
 ## 2. Current Product Surface
 
+Three tabs, one shared `<main>` with `role="tabpanel"` sections toggled by `hidden`:
+
+### Chat (default view)
+
+- Streaming or non-streaming AI travel guide via DeepSeek (`deepseek-chat` by default).
+- Deterministic local fallback (`api/lib/deepseek.py:local_answer`) grounded in `data/` when `DEEPSEEK_API_KEY` is unset or the remote call fails — the assistant always answers, never errors out to the user.
+- No auth required; conversation state lives in the page only (not persisted across reloads).
+
 ### Dashboard
 
-Command center for:
+Lazy-loaded on first activation (`web/js/main.js`):
 
-- destination and trip-length input;
-- lightweight weather/location strip;
-- hotels that mark foreign guest acceptance, English service, foreign-card support, and metro distance;
-- map and nearby POI cards served through the `/api/maps/*` proxy interface;
-- Meituan/Dianping-style deals guidance with foreigner usability labels;
-- recent Ask question summary;
-- saved trip summary;
-- next-action prompt;
-- featured cities;
-- travel tools;
-- readiness checklist.
-
-### Chatbot
-
-Default first screen. It behaves like a mainstream LLM chat after conversation starts:
-
-- startup DeepSeek health status is shown after the user enters the chat surface;
-- no visible mode/model/depth controls;
-- no preset panel after first message;
-- AI answers end with generated follow-up question buttons;
-- recent user questions are stored locally for Dashboard context.
+- recent questions (from `localStorage`);
+- saved trips (from `localStorage`);
+- featured cities (`/api/cities?featured=1`);
+- hotels (`/api/hotels/search`);
+- deals (`/api/deals/search`);
+- travel tool cards and visa lookup (`/api/tools`, `/api/tools/visa`).
 
 ### Translate
 
-New Phase 1.5 surface.
+Lazy-loaded on first activation:
 
-Current v6.2.1 scope:
+- text translation/lookup against `data/translations/{phrases,dining,attractions,culture}.json` via `/api/translations`;
+- local translation history with clear-history control;
+- voice-readiness affordance only (no STT/TTS wiring yet).
 
-- voice-translation readiness card;
-- text translator using local travel dictionary lookup;
-- phrase cards;
-- local translation history;
-- clear-history control;
-- data loaded from `/api/translations`.
+### Removed in v7.0.0
 
-Translation data lives in:
+- Admin panel (`web/admin.html`).
+- Auth (`api/auth.py` and all `/api/auth/*`, `/api/trips`, `/api/admin/*` routes).
+- All v6.2.1-era contract tests (`tests/`, `web/tests/`).
 
-- `data/translations/phrases.json`
-- `data/translations/dining.json`
-- `data/translations/attractions.json`
-- `data/translations/culture.json`
-
-This is not yet a full machine translation engine. Voice STT/TTS is prepared as a browser capability path and should be completed in a later iteration.
-
-### Removed Standalone Tabs
-
-Cities, Map, Tools, and Trips are no longer primary tabs. Their core functions are aggregated into Dashboard so mobile portrait navigation stays simple.
-
-### Account
-
-Email/password login, registration without name, email verification, resend code, password reset, optional Google OAuth, profile update, logout.
-
-### Admin
-
-Minimal internal user-management surface at `web/admin.html`.
+These are gone, not stubbed. Do not assume any auth/session state exists anywhere in the current app.
 
 ## 3. Architecture
 
 ```text
-web/index.html
-web/app.css
-web/app.js
+web/index.html                    one shell, three <section role="tabpanel">
+web/css/app.css                   single design-system stylesheet
+web/js/main.js                    view switching + lazy panel loaders
+web/js/{chat,dashboard,translate}.js   per-panel logic
+web/js/api.js                     fetch wrapper + SSE chat streaming
+web/js/store.js                   localStorage helpers (vp_*_v7 keys)
+web/js/toast.js                   lightweight toast notifications
+web/manifest.json, web/sw.js      PWA shell, cache name visepanda-shell-v7.0.0
+        |
+        v  (same WSGI entrypoint serves both static assets and /api/*)
+api/index.py                      WSGI app: static resolver for non-/api/ paths,
+                                   Router.dispatch() for /api/*
+api/lib/http.py                   regex Router + Request/Response primitives
+api/lib/data.py                   cached JSON data-access layer over data/
+api/lib/deepseek.py                DeepSeek streaming client + local_answer fallback
+api/lib/amap.py                   Amap geocode/place proxy + local fixture fallback
+api/lib/static.py                 static file resolver for web/ and static/
+api/routes/{health,chat,cities,hotels,deals,maps,translations,tools}.py
         |
         v
-api/index.py
-        |
-        +-- api/auth.py
-        +-- api/chat.py
-        +-- api/cities.py
-        +-- api/deals.py
-        +-- api/health.py
-        +-- api/hotels.py
-        +-- api/maps.py
-        +-- api/tools.py
-        +-- api/translations.py
-        +-- api/visa.py
-        +-- api/config.py
-        |
-        v
-data/*.json
-data/translations/*.json
-SQLite auth/trips storage
-optional external model/email/OAuth providers
+data/*.json, data/translations/*.json, data/hotels/hotels.json, data/deals/deals.json
+optional external DeepSeek / Amap providers
 ```
 
-Frontend remains static HTML/CSS/vanilla JS. Backend remains Python WSGI with standard-library-first implementation.
+Frontend: static HTML/CSS/native ES modules, no bundler. Backend: Python WSGI, standard library only (`requirements.txt` has no external dependencies), matching the `vercel.json` catch-all route to `api/index.py`.
 
 ## 4. Important Files
 
 | File | Purpose |
 | --- | --- |
-| `README.md` | Fast project overview |
-| `PRD_PRODUCT_ANALYSIS.md` | Product positioning and phase plan |
-| `PLAN.md` | Active implementation roadmap |
-| `CONTEXT.md` | Current product and architecture context |
-| `DESIGN.md` | UI system and mobile rules |
-| `CHANGELOG.md` | Release notes |
-| `api/index.py` | Main WSGI router |
-| `api/health.py` | Health payload including DeepSeek reachability |
-| `api/maps.py` | Server-side map proxy contract and local POI stub |
-| `api/hotels.py` | Hotel search/detail/book intent API stub |
-| `api/deals.py` | Deals search/detail API stub |
-| `api/translations.py` | Translation library API |
-| `data/hotels/hotels.json` | Foreigner-friendly hotel seed data |
-| `data/deals/deals.json` | Group-buying/deals seed data |
-| `data/translations/*.json` | Native travel translation dictionaries |
-| `web/index.html` | Main UI |
-| `web/app.css` | Responsive visual system |
-| `web/app.js` | Frontend state and interactions |
-| `web/tests/*.test.js` | Frontend structure tests |
-| `tests/*.py` | Python API and contract tests |
+| `CHANGELOG.md` | Release notes, including the full v7.0.0 rewrite rationale |
+| `OPTIMIZATION_REPORT.md` | v7.0.0 rewrite scope, architecture decisions, and manual verification results |
+| `PRD_PRODUCT_ANALYSIS.md` | Product positioning and phase plan (updated for v7.0.0) |
+| `PLAN.md` | Active implementation roadmap (updated for v7.0.0) |
+| `api/index.py` | WSGI entrypoint: static serving + `/api/*` dispatch |
+| `api/lib/http.py` | `Router`, `Request`, `Response` |
+| `api/lib/data.py` | Cached JSON loaders (`cities()`, `hotels()`, `deals()`, `translations()`, `tips()`, `dining_tags()`, `attraction_signs()`) |
+| `api/lib/deepseek.py` | Chat client + offline fallback |
+| `api/lib/amap.py` | Maps proxy + offline fallback |
+| `api/routes/*.py` | One module per API resource |
+| `data/*.json`, `data/translations/*.json` | Knowledge base, reused as-is from pre-v7.0.0 |
+| `web/index.html` | App shell markup |
+| `web/css/app.css` | Ink-and-porcelain design system, light/dark via `prefers-color-scheme` |
+| `web/js/*.js` | Frontend modules (see Architecture above) |
 
 ## 5. Version State
 
-### v6.2.1
+### v7.0.0 (current)
 
-- Repositioned product as all-in-one China travel butler.
-- Collapsed primary navigation to Chatbot, Dashboard, and Translation.
-- Added DeepSeek health checks and stabilized `deepseek-v4-flash` chat calls with non-thinking mode.
-- Added map, hotel, and deals API stubs plus Dashboard aggregation.
-- Added native Translate tab.
-- Added translation JSON datasets.
-- Added `/api/translations`.
-- Updated app version to `6.2.1`.
-- Updated cache marker to `20260623-v621-travel-butler-translate`.
-- Updated service worker cache to `visepanda-shell-v621-travel-butler-translate`.
-- Added frontend and backend regression coverage for translation.
+Full rewrite — see `CHANGELOG.md` for the complete list. Highlights:
 
-### v6.1.4
+- New stdlib-only WSGI backend with a regex `Router` and one-module-per-resource routes.
+- New native-ES-module frontend, no bundler, three lazy-loaded tabpanels.
+- New ink-and-porcelain visual identity (porcelain blue / rice-paper / vermillion), serif display type, light/dark via `prefers-color-scheme`.
+- `localStorage` keys versioned with `_v7` suffix so old client data is never read.
+- Auth, admin panel, and all old tests removed (not carried forward).
 
-- Removed started-chat mode/model/depth and preset panels.
-- Added follow-up suggestions after AI answers.
-- Converted Overview into Dashboard.
-- Added Map tab.
-- Expanded colorful icon rail.
+Everything in this document describes v7.0.0 only. Version history before v7.0.0 (v6.2.1 and earlier) is preserved in `CHANGELOG.md` for record-keeping but describes a codebase that no longer exists.
 
 ## 6. Local Development
 
@@ -172,119 +125,72 @@ python -c "from api.index import app; from wsgiref.simple_server import make_ser
 Health:
 
 ```json
-{"ok":true,"service":"VisePanda","version":"6.2.1","llm":{"provider":"deepseek","status":"available"}}
+{"ok":true,"service":"VisePanda","version":"7.0.0","llm":{"provider":"deepseek","status":"fallback"},"maps":{"provider":"amap","status":"fallback"}}
 ```
+
+(`status` becomes `"configured"` once `DEEPSEEK_API_KEY` / `AMAP_KEY` are set.)
 
 ## 7. Verification
 
-Run:
+There is currently **no automated test suite** — `tests/` and `web/tests/` were deleted with the old code and have not been replaced yet (see Next Recommended Work, item 1).
+
+Until tests exist, verify manually:
 
 ```powershell
-python -m unittest discover -s tests -v
-node --test web/tests/*.test.js
-python -m py_compile api/config.py api/index.py api/translations.py
-node --check web/app.js
+node --check web/js/*.js
+python -m py_compile api/index.py api/lib/*.py api/routes/*.py
 git diff --check
 ```
 
-Latest known passing state for v6.2.1:
-
-- Python tests: 19/19 passing
-- Frontend tests: 24/24 passing
+Then exercise the WSGI app directly (no server needed) by calling `api.index:app` with a constructed `environ` dict, or run the dev server above and hit each route in `9. API Surface`. `OPTIMIZATION_REPORT.md` documents the exact routes manually verified for v7.0.0 and their expected status codes.
 
 ## 8. Environment Variables
 
 Do not commit secrets.
 
-- `DEEPSEEK_API_KEY`
-- `DEEPSEEK_MODEL`
-- `OPENAI_COMPATIBLE_API_KEY`
-- `OPENAI_COMPATIBLE_BASE_URL`
-- `OPENAI_COMPATIBLE_MODEL`
-- `APP_BASE_URL`
-- `GOOGLE_CLIENT_ID`
-- `GOOGLE_CLIENT_SECRET`
-- `GOOGLE_REDIRECT_URI`
-- `RESEND_API_KEY`
-- `EMAIL_FROM`
-- `AUTH_DB_PATH`
-- `ADMIN_EMAIL`
-- `ADMIN_PASSWORD`
-- `AUTH_EXPOSE_EMAIL_CODE=1` test only
-- `AUTH_EXPOSE_RESET_TOKEN=1` test only
+- `DEEPSEEK_API_KEY` — optional; enables remote chat completions. Without it, `/api/chat` always returns a local fallback answer.
+- `DEEPSEEK_MODEL` — optional; defaults to `deepseek-chat`.
+- `AMAP_KEY` — optional; enables real Amap geocode/place lookups. Without it, `/api/maps/*` falls back to local attraction fixtures in `data/translations/attractions.json`. Never expose this to frontend code.
+
+No auth-related environment variables exist in v7.0.0 — `AUTH_DB_PATH`, `ADMIN_EMAIL`, `RESEND_API_KEY`, `GOOGLE_CLIENT_*`, etc. from earlier versions are obsolete.
 
 ## 9. API Surface
 
-Public:
-
 - `GET /api/health`
-- `GET /api/config`
-- `GET /api/cities`
-- `GET /api/cities/:id`
-- `GET /api/map`
-- `GET /api/maps/geocode`
-- `GET /api/maps/place`
-- `GET /api/maps/translate`
-- `GET /api/hotels/search`
-- `GET /api/hotels/detail`
+- `POST /api/chat` (`{message, history, stream}`; SSE when `stream: true`)
+- `GET /api/cities` / `GET /api/cities?featured=1`
+- `GET /api/cities/<city_id>`
+- `GET /api/hotels/search?city=`
+- `GET /api/hotels/detail?id=`
 - `POST /api/hotels/book`
-- `GET /api/deals/search`
-- `GET /api/deals/detail`
-- `GET /api/translations`
+- `GET /api/deals/search?city=&type=`
+- `GET /api/deals/detail?id=`
+- `GET /api/translations?category=&q=`
 - `GET /api/tools`
-- `GET /api/tools/:id`
-- `GET /api/visa/countries`
-- `GET /api/visa/info?nationality=us`
-- `POST /api/visa/generate`
-- `GET /api/chat`
-- `POST /api/chat`
+- `GET /api/tools/visa?nationality=`
 
-Auth and trips:
-
-- `POST /api/auth/register`
-- `POST /api/auth/verify-email`
-- `POST /api/auth/resend-verification`
-- `GET /api/auth/google/start`
-- `GET /api/auth/google/callback`
-- `POST /api/auth/login`
-- `POST /api/auth/logout`
-- `GET /api/auth/me`
-- `POST /api/auth/update-profile`
-- `POST /api/auth/forgot-password`
-- `POST /api/auth/reset-password`
-- `GET /api/auth/config`
-- `GET /api/trips`
-- `POST /api/trips`
-- `DELETE /api/trips/:id`
-
-Admin:
-
-- `GET /api/admin/users`
-- `DELETE /api/admin/users/:id`
+No auth, trips, or admin routes exist in v7.0.0.
 
 ## 10. Next Recommended Work
 
-1. Harden Translate with search, categories, copy buttons, and TTS playback.
-2. Add real push-to-talk voice translation using browser STT/TTS where available.
-3. Expand `data/translations/` toward 200+ attractions and 500+ dishes.
-4. Add Dining Butler filters for spice, allergens, vegetarian, halal, English menu, and foreign cards.
-5. Add taxi driver-facing address cards and route handoff from Map to Translate.
-6. Add Meituan/Dianping group-buying guidance inside Tools.
-7. Connect active Trip city/day context to Translate suggestions.
+1. Rebuild a contract test suite for `api/lib/http.py` routing and each `api/routes/*` module — there is currently zero automated coverage.
+2. Re-verify `/api/chat` streaming and `/api/maps/*` against real `DEEPSEEK_API_KEY` / `AMAP_KEY` credentials; v7.0.0 was only verified against the local fallback paths.
+3. Update `CONTEXT.md`, `DESIGN.md`, and `README.md` to match v7.0.0 — they still describe the pre-rewrite architecture and API surface.
+4. Implement push-to-talk voice translation using browser STT/TTS in `web/js/translate.js`; the voice-readiness UI is currently a placeholder.
+5. Expand `data/translations/` content (more dishes/attractions) now that the rewrite has a clean consumer (`api/routes/translations.py`) for it.
 
 ## 11. Do Not Do First
 
-- Do not build Phase 2 community in this cycle.
-- Do not claim full offline machine translation before it exists.
-- Do not add a frontend framework migration without a concrete reason.
-- Do not commit API keys or OAuth secrets.
-- Do not enable test-only auth exposure flags in production.
+- Do not re-add auth, the admin panel, or Phase 2 community features in this cycle.
+- Do not assume `CONTEXT.md`, `DESIGN.md`, or `README.md` are accurate until they are updated — verify against the code in `api/` and `web/` instead.
+- Do not add a frontend framework/bundler without a concrete reason; the no-build native-ES-module approach is deliberate.
+- Do not commit API keys.
 
 ## 12. New-Agent Start
 
-1. Read `README.md`.
-2. Read this `HANDOFF.md`.
-3. Run the verification commands above.
-4. Open local app.
-5. Check Chatbot, Dashboard, and Translation.
-6. Check mobile portrait around 390x844.
+1. Read this `HANDOFF.md`.
+2. Read `OPTIMIZATION_REPORT.md` for the rewrite rationale and what was manually verified.
+3. Read `CHANGELOG.md` v7.0.0 entry for the full diff narrative.
+4. Run the local dev server above and manually exercise the routes in section 9.
+5. Open the app and check Chat, Dashboard, and Translate.
+6. Check mobile portrait (~390x844) and desktop (>=860px, icon rail) layouts.

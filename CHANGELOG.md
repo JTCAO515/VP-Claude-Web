@@ -1,5 +1,26 @@
 # Changelog
 
+## v7.0.0 - 2026-06-23
+
+### Changed
+
+- Full from-scratch rewrite of both the frontend and backend. No code from `web/` or `api/` in v6.2.1 and earlier was reused; only the curated knowledge base under `data/` (cities, hotels, deals, translations, tools, visa policies, tips) was kept and re-read for grounding.
+- Backend rebuilt as a small stdlib-only WSGI app (`api/index.py`) with a regex `Router` (`api/lib/http.py`), a cached JSON data-access layer (`api/lib/data.py`), a DeepSeek streaming chat client with a deterministic local fallback (`api/lib/deepseek.py`), an Amap geocode/place proxy with a local-fixture fallback (`api/lib/amap.py`), and a static-file resolver (`api/lib/static.py`) so the same WSGI entrypoint serves both `/api/*` JSON routes and the `web/`/`static/` assets, matching the existing `vercel.json` catch-all route.
+- Routes reorganized one-module-per-resource under `api/routes/`: `health`, `chat` (SSE streaming + non-streaming), `cities`, `hotels`, `deals`, `maps`, `translations`, `tools` (includes `/api/tools/visa`).
+- Frontend rebuilt as a single `web/index.html` shell with native ES modules (`web/js/{main,api,chat,dashboard,translate,store,toast}.js`, no bundler) and a single `web/css/app.css` design system.
+- New visual identity: a restrained ink-and-porcelain Chinese aesthetic (rice-paper background, porcelain blue, vermillion accents, serif display type for headings) instead of a literal red-lantern theme, with light/dark variants via `prefers-color-scheme`.
+- Mobile-first layout: bottom tab bar on narrow viewports, a fixed icon rail on desktop (`min-width: 860px`), one shared `<main>` with three `role="tabpanel"` sections (Chat, Dashboard, Translate) toggled by `hidden` instead of separate pages.
+- Dashboard and Translate panels lazy-load their backend data on first activation so the default Chat view stays fast on initial load.
+- Client-side persistence (trips, translation history, recent questions) moved to versioned `localStorage` keys (`vp_trips_v7`, `vp_translate_history_v7`, `vp_recent_questions_v7`) so old v6.2.1 local data is never read or migrated.
+- PWA shell (`web/manifest.json`, `web/sw.js`) rewritten with cache name `visepanda-shell-v7.0.0`.
+- Removed the admin panel (`web/admin.html`), auth (`api/auth.py`), and all v6.2.1-era contract tests (`tests/`, `web/tests/`) as part of the clean rewrite; they were not part of the v7.0.0 functional scope (Chat, Dashboard, Translate).
+
+### Regression
+
+- Manually exercised every `/api/*` route against the rewritten WSGI app (health, cities list/detail, hotels search/detail/book, deals search/detail, translations list/filter, tools list, tools/visa, maps geocode/place, chat non-streaming fallback) and confirmed correct status codes and payload shapes.
+- Verified static serving for `/`, `/web/css/app.css`, `/web/js/*.js`, and unknown paths return the expected 200/404 responses through the same WSGI entrypoint Vercel will invoke.
+- Checked all new frontend modules for syntax errors (`node --check`).
+
 ## v6.2.1 - 2026-06-23
 
 ### Changed
