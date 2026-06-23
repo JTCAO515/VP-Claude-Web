@@ -1,0 +1,43 @@
+{
+  "dishes": [
+    {
+      "chinese": "宫保鸡丁",
+      "english": "Kung Pao chicken",
+      "pinyin": "Gong bao ji ding",
+      "spice": "Medium",
+      "allergens": ["peanuts"],
+      "notes": "Chicken stir-fried with chili, peanuts, and a sweet-sour sauce."
+    },
+    {
+      "chinese": "小笼包",
+      "english": "Soup dumplings",
+      "pinyin": "Xiao long bao",
+      "spice": "None",
+      "allergens": ["gluten", "pork"],
+      "notes": "Steamed dumplings with hot broth inside."
+    },
+    {
+      "chinese": "北京烤鸭",
+      "english": "Peking duck",
+      "pinyin": "Bei jing kao ya",
+      "spice": "None",
+      "allergens": ["gluten"],
+      "notes": "Roasted duck served with pancakes, scallions, cucumber, and sauce."
+    },
+    {
+      "chinese": "火锅",
+      "english": "Hot pot",
+      "pinyin": "Huo guo",
+      "spice": "Optional",
+      "allergens": ["varies"],
+      "notes": "Cook meat, vegetables, and noodles in a shared broth."
+    }
+  ],
+  "restaurantTags": [
+    "English menu",
+    "Foreign cards",
+    "Vegetarian friendly",
+    "Halal options",
+    "Low spice available"
+  ]
+}

@@ -1,145 +1,110 @@
 # VisePanda Active Plan
 
-Last updated: 2026-06-22
-Current version: v6.0.8
+Last updated: 2026-06-23
+Current version: v6.2.1
 
 ## Current Objective
 
-Continue turning VisePanda into a professional China travel planning workspace. The next work should strengthen the product loop rather than rewrite the stack.
+Upgrade VisePanda from a China trip planning workspace into an all-in-one China travel butler for foreign visitors.
 
-The preferred loop is:
+The active product loop is now:
 
 ```text
-Plan -> Ask -> structured answer -> saved Trip -> related Cities/Tools -> refined Ask
+Ask before trip -> save/organize in Dashboard and Trips -> use Translate/Map/Tools during trip -> refine Ask with real context
 ```
 
 ## Current Baseline
 
-Already shipped in the current repository:
+Already shipped or actively implemented:
 
-- Clean static frontend foundation
-- Mobile-first Plan workspace
-- App-style bottom tabs
-- Streaming AI Ask workflow
-- Professional chat modes and presets
-- Email/password auth with email verification
-- Optional Google OAuth
-- Optional Resend email delivery
-- Guest and authenticated trip drafts
-- Searchable city cards
-- Travel tools
-- Minimal admin user management
-- Python and Node test coverage
+- English-native static frontend.
+- Mobile-first app shell.
+- Dashboard command center.
+- Clean Ask conversation with follow-up suggestions.
+- Native Translate tab foundation.
+- Translation JSON datasets under `data/translations/`.
+- `/api/translations` endpoint.
+- City, map, tools, trips, auth, and admin foundations.
+- Email verification, optional Resend, optional Google OAuth.
+- Local fallback behavior for AI and translation dictionary use.
 
-## Five-Round Iteration Plan
+## Phase Plan
 
-### Round 1: Chat Professionalization
+### Phase 1: Pre-Trip Planning
 
-Goal: make Ask feel like a professional travel consultant.
+Status: foundation complete, still needs depth.
 
-Work:
+- Improve trip-intake quality.
+- Convert strong Ask outputs into saved trip drafts.
+- Add hotel-area and foreigner-friendly accommodation guidance.
+- Add high-speed rail and 12306 foreign passport guidance.
+- Keep visa/payment/SIM/VPN readiness practical and conservative.
 
-- Add better preset question groups.
-- Make each mode ask sharper follow-up questions.
-- Add response sections such as assumptions, key questions, itinerary, budget, risks, and next actions.
-- Improve provider routing by task type.
-- Add tests for mode/depth/provider contracts.
+### Phase 1.5: During-Trip Butler
 
-Primary files:
+Status: current core direction.
 
-- `api/chat.py`
-- `web/index.html`
-- `web/app.js`
-- `web/app.css`
-- `tests/test_api_contract.py`
-- `web/tests/chat-stream.test.js`
-- `web/tests/stability-ui.test.js`
+- Translate text and phrase-library content natively.
+- Add browser speech recognition and TTS flow when available.
+- Expand dining translation: dishes, spice, allergens, vegetarian, halal, foreign-card signals.
+- Expand attractions translation: names, aliases, signs, opening notes, ticket reminders.
+- Add taxi snippets with Chinese driver-facing address templates.
+- Add local route tools for one-day city routing.
+- Add Meituan/Dianping group-buying guidance inside Tools, without pretending to purchase directly.
 
-### Round 2: Structured Trip Output
+### Phase 2: After-Trip Community
 
-Goal: convert useful AI answers into saved trip drafts.
+Status: documented only, out of current scope.
 
-Work:
+- Community.
+- Travel journals.
+- Companion matching.
+- Ratings and feedback.
+- Shared itinerary stories.
 
-- Detect structured itinerary sections.
-- Add "Save as trip" flow from Ask.
-- Store route summary, cities, dates, and notes.
-- Improve Trips card detail display.
+## Next Five Iterations
 
-Primary files:
+### Round 1: Translation MVP Hardening
 
-- `api/auth.py`
-- `web/app.js`
-- `web/index.html`
-- `web/app.css`
-- `tests/test_trips_contract.py`
+- Improve phrase search and category filters.
+- Add phrase copy and speaker playback.
+- Add more emergency, hotel, taxi, and restaurant phrases.
+- Add tests for `/api/translations` shape and frontend Translate structure.
 
-### Round 3: Cities and Tools Integration
+### Round 2: Voice Translation
 
-Goal: make Cities and Tools influence planning instead of being separate content islands.
+- Implement press-to-speak where browser STT is available.
+- Auto-detect Chinese/English and show both text directions.
+- Add TTS playback for translated output.
+- Keep text fallback visible when voice permission fails.
 
-Work:
+### Round 3: Dining Butler
 
-- Add "Ask about this city" from city cards.
-- Add "Add to readiness" or "Use in plan" from tool detail.
-- Pass selected city/tool context into Ask prompts.
-- Improve empty and loading states.
+- Expand dish database.
+- Add spice/allergen filters.
+- Add restaurant-friendly labels: English menu, foreign cards, halal, vegetarian.
+- Add point-and-show ordering cards.
 
-Primary files:
+### Round 4: Route/Ride Butler
 
-- `api/cities.py`
-- `api/tools.py`
-- `web/app.js`
-- `web/app.css`
+- Add taxi driver cards.
+- Add route handoff from Map to Translate.
+- Add city one-day route templates.
+- Add Gaode/Didi guidance without deep integration claims.
 
-### Round 4: Production Auth and Email QA
+### Round 5: Trip Context Loop
 
-Goal: make the account system production-ready on `go2china.space`.
-
-Work:
-
-- Verify Google OAuth redirect URI on production.
-- Verify Resend sender and delivery.
-- Confirm production does not expose email codes or reset tokens.
-- Add browser smoke tests for register -> verify -> login.
-
-Primary files:
-
-- `api/auth.py`
-- `web/app.js`
-- `tests/test_auth_contract.py`
-
-### Round 5: Real Mobile Polish and E2E
-
-Goal: reduce mobile release risk.
-
-Work:
-
-- Add a real browser smoke test suite.
-- Test 390x844, 430x932, tablet, and desktop.
-- Verify no tab/input overlap.
-- Verify Ask, Cities, Tools, Trips, and auth bottom sheet.
-
-Primary files:
-
-- `web/tests/*`
-- possible future `e2e/` folder
-- `web/app.css`
-- `web/app.js`
+- Connect saved trips to Translate suggestions.
+- Surface city-specific phrases based on active trip city.
+- Add "use in Ask" from Translate cards.
+- Add trip-day context to Dashboard.
 
 ## Near-Term Rules
 
-- Keep changes scoped.
-- Keep the current stack unless there is a concrete reason to migrate.
-- Add tests when touching shared auth, chat, trips, or navigation behavior.
-- Update cache busting when changing frontend CSS or JS.
-- Update `README.md`, `HANDOFF.md`, `CHANGELOG.md`, and this plan when shipping a named version.
-
-## Do Not Prioritize Yet
-
-- Full frontend framework migration
-- Full database migration
-- Payment or subscription features
-- Large map/POI rebuild
-- Public admin dashboard polish
-- Heavy design-system extraction before core workflows settle
+- UI must remain English-native.
+- Mobile portrait comes first.
+- Do not build Phase 2 community in this cycle.
+- Keep the stack vanilla JS + Python WSGI.
+- Add tests when changing navigation, APIs, chat, auth, trips, or translation data.
+- Update cache busting when CSS/JS changes.
+- Do not commit secrets.

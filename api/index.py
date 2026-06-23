@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from api import auth, chat, cities, tools, visa
+from api import auth, chat, cities, tools, translations, visa
 from api.common import error_response, json_response, static_response
 from api.config import public_config
 
@@ -14,7 +14,7 @@ def application(environ, start_response):
         return json_response(start_response, {"ok": True}, environ=environ)
 
     if path == "/api/health":
-        return json_response(start_response, {"ok": True, "service": "VisePanda", "version": "6.1.3"}, environ=environ)
+        return json_response(start_response, {"ok": True, "service": "VisePanda", "version": "6.2.1"}, environ=environ)
 
     if path == "/api/config":
         return json_response(start_response, public_config(), environ=environ)
@@ -26,6 +26,9 @@ def application(environ, start_response):
         if method != "GET":
             return error_response(start_response, HTTPStatus.METHOD_NOT_ALLOWED, "method_not_allowed", "Method not allowed.", environ)
         return json_response(start_response, cities.api_map_payload(), environ=environ)
+
+    if path == "/api/translations":
+        return translations.dispatch(method, environ, start_response)
 
     if path_parts[:2] == ["api", "tools"]:
         return tools.dispatch(method, path_parts, environ, start_response)

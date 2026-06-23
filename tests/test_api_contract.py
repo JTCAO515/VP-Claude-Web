@@ -49,6 +49,17 @@ class ApiContractTests(unittest.TestCase):
         self.assertIn("local-guide", {provider["id"] for provider in data["providers"]})
         self.assertIn("expert", {depth["id"] for depth in data["depths"]})
 
+    def test_translation_library_exposes_travel_butler_data(self):
+        code, data, _ = request("GET", "/api/translations")
+        self.assertEqual(code, 200)
+        self.assertIn("phrases", data)
+        self.assertIn("dining", data)
+        self.assertIn("attractions", data)
+        self.assertIn("culture", data)
+        self.assertGreaterEqual(len(data["phrases"]["phrases"]), 4)
+        self.assertGreaterEqual(len(data["dining"]["dishes"]), 4)
+        self.assertGreaterEqual(len(data["attractions"]["attractions"]), 4)
+
 
 if __name__ == "__main__":
     unittest.main()

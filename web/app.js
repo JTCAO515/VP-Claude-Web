@@ -2,12 +2,14 @@ const state = {
   token: sessionStorage.getItem("vp_token") || "",
   user: null,
   cities: [],
+  map: null,
+  translations: null,
+  translationDirection: "auto",
   tools: [],
   chat: {
     mode: "itinerary",
     provider: "auto",
     depth: "standard",
-    optionsLoaded: false,
     hasStarted: false,
     isStreaming: false,
   },
@@ -137,7 +139,10 @@ function setView(view) {
     panel.classList.toggle("is-hidden", hidden);
     panel.toggleAttribute("hidden", hidden);
   });
+  if (view === "dashboard") loadDashboard();
+  if (view === "translate") loadTranslations();
   if (view === "cities") loadCities();
+  if (view === "map") loadMap();
   if (view === "tools") loadTools();
   if (view === "trips") loadTrips();
   if (window.matchMedia("(max-width: 560px)").matches) {
@@ -183,14 +188,10 @@ function renderFacts(parent, className, items) {
 
 async function loadChatOptions() {
   try {
-    const data = await api("/api/chat");
-    populateSelect("#chatMode", data.modes, state.chat.mode);
-    populateSelect("#chatProvider", data.providers, state.chat.provider);
-    populateSelect("#chatDepth", data.depths, state.chat.depth);
-    state.chat.optionsLoaded = true;
+    await api("/api/chat");
     if (!state.chat.hasStarted) setStatus("#chatStatus", "Ready. Start with a question or a quick prompt.");
   } catch (error) {
-    setStatus("#chatStatus", "Chat options are using local defaults.", "error");
+    setStatus("#chatStatus", "Chat is using local defaults.", "error");
   }
 }
 
@@ -257,6 +258,226 @@ async function loadCities() {
     featured.replaceChildren(...state.cities.slice(0, 4).map(cityCard));
   } else if (featured && featured.querySelector(".skeleton-card")) {
     featured.replaceChildren(...state.cities.slice(0, 4).map(cityCard));
+  }
+}
+
+function getRecentQuestions() {
+  try {
+    return JSON.parse(localStorage.getItem("vp_recent_questions") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveRecentQuestion(message) {
+  const trimmed = message.trim();
+  if (!trimmed) return;
+  const questions = getRecentQuestions().filter((item) => item.question !== trimmed);
+  questions.unshift({
+    question: trimmed,
+    createdAt: new Date().toISOString(),
+  });
+  localStorage.setItem("vp_recent_questions", JSON.stringify(questions.slice(0, 8)));
+  loadDashboard();
+}
+
+function getGuestTrips() {
+  try {
+    return JSON.parse(localStorage.getItem("vp_guest_trips") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function loadDashboard() {
+  const questions = getRecentQuestions();
+  const trips = getGuestTrips();
+  const questionSummary = $("#questionSummary");
+  const dashboardTrips = $("#dashboardTrips");
+  const dashboardNext = $("#dashboardNext");
+  const recentQuestions = $("#recentQuestions");
+  if (questionSummary) {
+    questionSummary.textContent = questions.length
+      ? `${questions.length} recent question${questions.length === 1 ? "" : "s"} saved for this planning session.`
+      : "No questions yet. Ask VisePanda to start building context.";
+  }
+  if (dashboardTrips) {
+    dashboardTrips.textContent = trips.length
+      ? `${trips.length} saved trip${trips.length === 1 ? "" : "s"} on this device.`
+      : "No saved trips on this device yet.";
+  }
+  if (dashboardNext) {
+    dashboardNext.textContent = questions[0]?.question
+      ? "Continue from your latest question or turn the answer into a saved trip."
+      : "Start with dates, route style, or entry requirements.";
+  }
+  if (!recentQuestions) return;
+  const cards = questions.slice(0, 4).map((item) => {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "question-card";
+    card.textContent = item.question;
+    card.addEventListener("click", async () => {
+      setView("chat");
+      await sendChat(item.question);
+    });
+    return card;
+  });
+  recentQuestions.replaceChildren(...(cards.length ? cards : [
+    emptyState("No questions yet", "Your recent Ask messages will appear here so the dashboard can become a travel command center.", "Ask VisePanda", () => setView("chat")),
+  ]));
+}
+
+function renderMapBoard(payload = {}) {
+  const board = $("#mapBoard");
+  if (!board) return;
+  const cities = (payload.cities || state.cities || []).slice(0, 6);
+  const routes = payload.routes || [
+    { name: "Beijing to Xi'an", type: "High-speed rail", duration: "4.5-6h" },
+    { name: "Xi'an to Shanghai", type: "High-speed rail or flight", duration: "6-7h rail" },
+    { name: "Shanghai to Chengdu", type: "Flight favored", duration: "3.5h flight" },
+  ];
+  const routeCards = routes.slice(0, 4).map((route) => {
+    const card = document.createElement("article");
+    card.className = "map-card";
+    card.appendChild(createText("h3", "", route.name || route.label || "China route"));
+    card.appendChild(createText("p", "meta", [route.type, route.duration].filter(Boolean).join(" - ") || route.summary || "Compare rail, flight, and transfer friction."));
+    return card;
+  });
+  const cityPins = cities.map((city) => {
+    const pin = document.createElement("span");
+    pin.className = "map-pin";
+    pin.textContent = city.name || city;
+    return pin;
+  });
+  const canvas = document.createElement("div");
+  canvas.className = "map-canvas";
+  canvas.append(...cityPins);
+  board.replaceChildren(canvas, ...routeCards);
+}
+
+async function loadMap() {
+  try {
+    setStatus("#mapStatus", "Loading route intelligence...");
+    if (!state.map) {
+      const data = await api("/api/map");
+      state.map = data;
+    }
+    renderMapBoard(state.map);
+    setStatus("#mapStatus", "Map intelligence is ready.");
+  } catch (error) {
+    setStatus("#mapStatus", "Using starter route intelligence.", "error");
+    renderMapBoard();
+  }
+}
+
+function translationHistory() {
+  try {
+    return JSON.parse(localStorage.getItem("vp_translation_history") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveTranslationHistory(source, result) {
+  const history = translationHistory().filter((item) => item.source !== source);
+  history.unshift({ source, result, createdAt: new Date().toISOString() });
+  localStorage.setItem("vp_translation_history", JSON.stringify(history.slice(0, 10)));
+  renderTranslationHistory();
+}
+
+function flattenTranslationEntries(data) {
+  if (!data) return [];
+  return [
+    ...(data.phrases?.phrases || []).map((item) => ({ ...item, type: "Phrase" })),
+    ...(data.dining?.dishes || []).map((item) => ({ ...item, type: "Dish" })),
+    ...(data.attractions?.attractions || []).map((item) => ({ ...item, type: "Attraction" })),
+    ...(data.attractions?.signs || []).map((item) => ({ ...item, type: "Sign" })),
+    ...(data.culture?.culture || []).map((item) => ({ ...item, type: "Culture" })),
+  ];
+}
+
+function renderPhraseLibrary() {
+  const library = $("#phraseLibrary");
+  if (!library || !state.translations) return;
+  const entries = flattenTranslationEntries(state.translations).slice(0, 18);
+  const cards = entries.map((item) => {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "phrase-card";
+    card.dataset.source = item.english || item.chinese || item.topic;
+    card.innerHTML = "";
+    card.appendChild(createText("strong", "", item.english || item.topic || item.chinese));
+    card.appendChild(createText("span", "", item.chinese || ""));
+    card.appendChild(createText("small", "", [item.type, item.pinyin].filter(Boolean).join(" - ")));
+    card.addEventListener("click", () => {
+      $("#translationInput").value = card.dataset.source;
+      translateText(card.dataset.source);
+    });
+    return card;
+  });
+  library.replaceChildren(...cards);
+}
+
+function renderTranslationHistory() {
+  const wrap = $("#translationHistory");
+  if (!wrap) return;
+  const cards = translationHistory().map((item) => {
+    const card = document.createElement("article");
+    card.className = "history-card";
+    card.appendChild(createText("strong", "", item.source));
+    card.appendChild(createText("span", "", item.result));
+    return card;
+  });
+  wrap.replaceChildren(...(cards.length ? cards : [
+    emptyState("No translation history", "Recent translations stay on this device. Clear them anytime.", "", null),
+  ]));
+}
+
+function detectTranslationDirection(text) {
+  if (state.translationDirection !== "auto") return state.translationDirection;
+  return /[\u3400-\u9fff]/.test(text) ? "zh-en" : "en-zh";
+}
+
+function translateText(value) {
+  const text = (value || "").trim();
+  const output = $("#translationOutput");
+  if (!text) {
+    if (output) output.textContent = "Enter text to translate.";
+    return "";
+  }
+  const direction = detectTranslationDirection(text);
+  const entries = flattenTranslationEntries(state.translations);
+  const match = entries.find((item) => {
+    const haystack = [item.english, item.chinese, item.pinyin, item.topic, ...(item.aliases || [])].filter(Boolean).join(" ").toLowerCase();
+    return haystack.includes(text.toLowerCase()) || text.toLowerCase().includes((item.english || "").toLowerCase()) || text.includes(item.chinese || "\u0000");
+  });
+  let result;
+  if (match) {
+    const primary = direction === "zh-en" ? match.english || match.topic : match.chinese;
+    const secondary = direction === "zh-en" ? match.pinyin : match.english || match.topic;
+    result = [primary, secondary, match.notes || match.use].filter(Boolean).join(" | ");
+  } else if (direction === "zh-en") {
+    result = "Quick meaning unavailable in the local travel dictionary. Ask VisePanda for a fuller translation when online.";
+  } else {
+    result = "本地旅行词库暂未收录这句话。联网时可让 VisePanda 做完整翻译。";
+  }
+  if (output) output.textContent = result;
+  saveTranslationHistory(text, result);
+  return result;
+}
+
+async function loadTranslations() {
+  try {
+    if (!state.translations) {
+      setStatus("#translateStatus", "Loading travel translation library...");
+      state.translations = await api("/api/translations");
+    }
+    renderPhraseLibrary();
+    renderTranslationHistory();
+    setStatus("#translateStatus", "Translation library ready for taxi, hotel, dining, signs, and emergency moments.");
+  } catch (error) {
+    setStatus("#translateStatus", "Translation library could not load. Try again online.", "error");
   }
 }
 
@@ -342,21 +563,56 @@ function addMessage(author, text, kind = "") {
 
 function currentChatSettings(overrides = {}) {
   return {
-    mode: overrides.mode || $("#chatMode")?.value || state.chat.mode,
-    provider: overrides.provider || $("#chatProvider")?.value || state.chat.provider,
-    depth: overrides.depth || $("#chatDepth")?.value || state.chat.depth,
+    mode: overrides.mode || state.chat.mode,
+    provider: overrides.provider || state.chat.provider,
+    depth: overrides.depth || state.chat.depth,
   };
+}
+
+function buildFollowups(message, answer = "") {
+  const haystack = `${message} ${answer}`.toLowerCase();
+  const suggestions = [];
+  const add = (text) => {
+    if (suggestions.length < 3 && !suggestions.includes(text)) suggestions.push(text);
+  };
+  if (/visa|entry|passport|transit|document/.test(haystack)) add("What documents should I prepare before booking?");
+  if (/budget|cost|price|spend|money/.test(haystack)) add("Can you break this into low, mid, and comfortable budgets?");
+  if (/city|beijing|shanghai|chengdu|xi'an|xian|guilin|zhangjiajie/.test(haystack)) add("Which city should I choose if I want easier logistics?");
+  if (/rail|train|flight|airport|station|route/.test(haystack)) add("Can you compare rail and flight for this route?");
+  if (/food|restaurant|dish|hotpot|spice/.test(haystack)) add("What should I order and what should I avoid?");
+  add("Can you turn this into a day-by-day plan?");
+  add("What should I book first?");
+  add("What are the common mistakes to avoid?");
+  return suggestions;
+}
+
+function renderFollowups(items = []) {
+  const wrap = $("#followupSuggestions");
+  if (!wrap) return;
+  wrap.replaceChildren();
+  wrap.classList.toggle("is-hidden", !items.length);
+  items.forEach((item) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "followup-button";
+    button.dataset.followup = item;
+    button.textContent = item;
+    wrap.appendChild(button);
+  });
 }
 
 async function sendChat(message, overrides = {}) {
   const settings = currentChatSettings(overrides);
   state.chat = { ...state.chat, ...settings };
   startChatExperience();
+  renderFollowups();
   setStatus("#chatStatus", "Thinking through the route...");
+  saveRecentQuestion(message);
   addMessage("You", message, "user");
   const target = addMessage("VisePanda", "");
   const targetMessage = target.closest(".message");
   const input = $("#chatInput");
+  let completed = false;
   try {
     state.chat.isStreaming = true;
     if (input) input.disabled = true;
@@ -388,19 +644,22 @@ async function sendChat(message, overrides = {}) {
           return;
         }
         if (payload.meta) {
-          $(".message__author", targetMessage).textContent = `VisePanda - ${payload.meta.modeLabel} - ${payload.meta.providerLabel}`;
-          setStatus("#chatStatus", `${payload.meta.modeLabel} via ${payload.meta.providerLabel}`);
+          $(".message__author", targetMessage).textContent = "VisePanda";
+          setStatus("#chatStatus", "Thinking...");
         }
         if (payload.token) target.textContent += payload.token;
       });
       $("#chatLog").scrollTop = $("#chatLog").scrollHeight;
     }
+    completed = true;
   } catch (error) {
     target.textContent = "I could not reach the guide service. Please try again.";
     showToast(error.message, "error");
   } finally {
     state.chat.isStreaming = false;
     if (input) input.disabled = false;
+    setStatus("#chatStatus", "");
+    if (completed && target.textContent.trim()) renderFollowups(buildFollowups(message, target.textContent));
     if (window.matchMedia("(max-width: 560px)").matches) {
       document.body.classList.remove("is-chat-composing");
       requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
@@ -415,19 +674,13 @@ function startChatExperience() {
   state.chat.hasStarted = true;
   $("#panel-chat")?.classList.add("has-started");
   $("#chatWelcome")?.classList.add("is-hidden");
-  [".chat-toolbar", ".chat-prompts"].forEach((selector) => {
-    const node = $(selector);
-    if (!node) return;
-    node.classList.remove("is-hidden");
-    node.classList.add("fade-in");
-  });
 }
 
 async function loadTrips() {
   const list = $("#tripList");
   try {
     if (!state.token) {
-      const localTrips = JSON.parse(localStorage.getItem("vp_guest_trips") || "[]");
+      const localTrips = getGuestTrips();
       setStatus("#tripStatus", localTrips.length ? "Guest trips are saved on this device." : "Guest mode: save a quick trip on this device.");
       list.replaceChildren(...(localTrips.length ? localTrips.map(tripCard) : [
         emptyState("No trips yet", "Save a draft here, or sign in later to sync across devices.", "Ask AI", () => setView("chat")),
@@ -472,6 +725,7 @@ async function saveTrip(form) {
     throw error;
   }
   form.reset();
+  loadDashboard();
   await loadTrips();
   showToast("Trip saved");
 }
@@ -533,17 +787,37 @@ function bindEvents() {
   });
   $$("[data-prompt]").forEach((button) => button.addEventListener("click", async () => {
     setView("chat");
-    if (button.dataset.mode && $("#chatMode")) $("#chatMode").value = button.dataset.mode;
-    if (button.dataset.depth && $("#chatDepth")) $("#chatDepth").value = button.dataset.depth;
     await sendChat(button.dataset.prompt, { mode: button.dataset.mode, depth: button.dataset.depth });
   }));
-  ["#chatMode", "#chatProvider", "#chatDepth"].forEach((selector) => {
-    const control = $(selector);
-    if (!control) return;
-    control.addEventListener("change", () => {
-      state.chat = { ...state.chat, ...currentChatSettings() };
-      setStatus("#chatStatus", "Chat settings updated.");
-    });
+  $("#followupSuggestions").addEventListener("click", async (event) => {
+    const button = event.target.closest("button[data-followup]");
+    if (!button || state.chat.isStreaming) return;
+    await sendChat(button.dataset.followup);
+  });
+  $("#mapAskButton").addEventListener("click", async () => {
+    setView("chat");
+    await sendChat("Help me compare the best China route by map logic, including rail, flight, and transfer difficulty.", { mode: "transit", depth: "expert" });
+  });
+  $("#translationForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+    translateText($("#translationInput").value);
+  });
+  $("#swapTranslationDirection").addEventListener("click", () => {
+    state.translationDirection = state.translationDirection === "auto" ? "en-zh" : state.translationDirection === "en-zh" ? "zh-en" : "auto";
+    setStatus("#translateStatus", `Direction: ${state.translationDirection === "auto" ? "auto detect" : state.translationDirection === "en-zh" ? "English to Chinese" : "Chinese to English"}.`);
+  });
+  $("#burnTranslationHistory").addEventListener("click", () => {
+    localStorage.removeItem("vp_translation_history");
+    renderTranslationHistory();
+    showToast("Translation history cleared");
+  });
+  $("#voiceTranslateButton").addEventListener("click", () => {
+    const speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!speechRecognition || !window.speechSynthesis) {
+      setStatus("#translateStatus", "Voice translation needs browser speech recognition and speech synthesis. Text translation is ready.", "error");
+      return;
+    }
+    setStatus("#translateStatus", "Voice tools are available in this browser. Full push-to-talk flow is planned for the next build.");
   });
   $("#citySearch").addEventListener("input", loadCities);
   $("#chatForm").addEventListener("submit", async (event) => {
@@ -689,7 +963,11 @@ async function boot() {
   handleAuthReturn();
   bindEvents();
   setView("chat");
-  Promise.all([loadCities(), restoreSession(), loadChatOptions(), loadAuthConfig()]).catch(() => {});
+  Promise.all([loadCities(), restoreSession(), loadChatOptions(), loadAuthConfig(), loadTranslations()]).catch(() => {});
 }
 
-document.addEventListener("DOMContentLoaded", boot);
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", boot);
+} else {
+  boot();
+}

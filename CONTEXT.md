@@ -1,53 +1,47 @@
 # VisePanda Context
 
-Last updated: 2026-06-22
-Current version: v6.0.8
+Last updated: 2026-06-23
+Current version: v6.2.1
 Repository: https://github.com/JTCAO515/VP-Codex-Web
 Domain: https://go2china.space
 
 ## Product Definition
 
-VisePanda is an English-language China travel workspace for international visitors. It combines AI travel consultation, city intelligence, entry readiness, practical travel tools, saved trip drafts, and account sync.
+VisePanda is an English-native China travel butler for foreign visitors. It helps before the trip with planning and readiness, then helps during the trip with translation, meals, routes, rides, local tools, and practical city context.
 
-The product should feel like a mobile-friendly travel planning app, not a generic marketing site and not a raw chatbot.
+The product should feel like a mobile travel companion, not a generic chatbot, not a pure booking site, and not a marketing landing page.
 
-## Primary User
+## Primary User Needs
 
-The primary user is an international traveler planning a trip to mainland China or Greater China destinations. They need help with:
-
-- Choosing cities and route order
-- Understanding visa or transit readiness
-- Estimating budget and logistics
-- Planning high-speed rail or flight transfers
-- Handling payment, translation, maps, and local friction
-- Saving a trip draft for later
+- Decide when to visit China and which cities to choose.
+- Understand visa, transit, phone, VPN, payment, culture, and safety readiness.
+- Build a route and daily itinerary.
+- Find foreigner-friendly hotel and transport guidance.
+- Translate taxi, hotel, restaurant, attraction, shopping, and emergency situations.
+- Understand dishes, signs, cultural customs, and common local app workflows.
+- Save or resume trip context.
 
 ## Current Product Views
 
 | View | Purpose | Current state |
 | --- | --- | --- |
-| Plan | First-screen travel planning workspace | Active main entry |
-| Ask | Streaming AI consultation workflow | Active, mode-based |
-| Cities | Searchable city cards | Active |
-| Tools | Practical travel helper cards and details | Active |
+| Dashboard | Command center for questions, saved trips, and readiness | Active |
+| Ask | AI travel butler conversation | Active |
+| Translate | Native text/phrase translation for on-trip situations | Active foundation |
+| Cities | Searchable city intelligence | Active |
+| Map | Route and geography intelligence | Active foundation |
+| Tools | Practical travel helpers | Active |
 | Trips | Guest and authenticated trip drafts | Active |
 | Account | Email/password, email verification, optional Google OAuth | Active |
 | Admin | Minimal user management | Internal only |
 
-## Domain Vocabulary
+## Product Phases
 
-| Term | Meaning |
-| --- | --- |
-| VisePanda | The product and brand |
-| Plan | Home/workspace view for starting a trip |
-| Ask | AI guide view |
-| City fit | Comparing destinations by traveler preferences |
-| Entry readiness | Visa, transit, documents, and pre-departure checks |
-| Travel tools | Packing, pricing, phrases, emergency, visa helpers |
-| Guest trip | Local-only trip draft saved in browser storage |
-| Synced trip | Authenticated trip saved through backend persistence |
-| Local guide | Deterministic fallback chat provider |
-| DeepSeek route | Remote model route when configured |
+| Phase | Scope | Status |
+| --- | --- | --- |
+| Phase 1 | Pre-trip planning, entry readiness, itinerary, hotels, major transport | Foundation complete |
+| Phase 1.5 | During-trip butler: translate, restaurants, local routes, taxis, group-buying guidance | Current focus |
+| Phase 2 | Community, journals, companions, ratings, social feedback | Out of scope for this release |
 
 ## Current Architecture
 
@@ -61,36 +55,38 @@ api/index.py
         +-- api/chat.py
         +-- api/cities.py
         +-- api/tools.py
+        +-- api/translations.py
         +-- api/visa.py
         +-- api/config.py
         |
         v
-data/*.json + SQLite + optional external APIs
+data/*.json + data/translations/*.json + SQLite + optional providers
 ```
 
 ## Key Decisions
 
-- Keep the frontend lightweight: static HTML, CSS, and vanilla JavaScript.
-- Keep the backend simple: Python WSGI with standard-library-first implementation.
-- Treat mobile portrait as a primary product surface.
-- Keep the interface English-native.
-- Use curated JSON datasets before adding complex retrieval infrastructure.
-- Hide optional provider features until their environment variables are configured.
-- Do not commit secrets or test-only exposed verification codes.
+- Keep the frontend lightweight: static HTML, CSS, vanilla JavaScript.
+- Keep UI English-native.
+- Treat mobile portrait as the primary surface.
+- Use curated JSON translation data before adding complex retrieval.
+- Keep Phase 2 community documented only.
+- Hide optional provider features until configured.
+- Do not commit secrets.
 
 ## Current External Providers
 
-| Provider | Use | Required for basic local use |
+| Provider | Use | Required for local use |
 | --- | --- | --- |
 | DeepSeek | Remote AI chat route | No |
 | OpenAI-compatible provider | Optional alternate chat route | No |
 | Resend | Email verification delivery | No |
 | Google OAuth | Optional Google login | No |
+| Browser speech APIs | Future voice translation STT/TTS | No |
 
-## Current Known Constraints
+## Known Constraints
 
-- SQLite is acceptable for the current MVP but should be revisited for scale.
-- Chat output is still mostly conversational and needs stronger structured trip conversion.
-- `web/app.js` and `api/auth.py` are high-change files and should be edited carefully.
-- Real-device mobile QA is still recommended before major production releases.
-- Historical docs may mention VP-Hermes, Supabase, or older v5/v3 plans; treat them as archive unless this document or `HANDOFF.md` says otherwise.
+- Translation is currently dictionary/phrase based, not full machine translation.
+- Voice translation is a browser capability placeholder and needs a fuller STT/TTS path.
+- SQLite is acceptable for MVP but should be revisited for scale.
+- `web/app.js` is high-change and should eventually be split by feature.
+- Real-device mobile QA remains important.

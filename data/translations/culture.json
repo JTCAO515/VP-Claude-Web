@@ -1,0 +1,32 @@
+{
+  "culture": [
+    {
+      "topic": "红包",
+      "english": "Red envelope",
+      "chinese": "红包",
+      "pinyin": "Hong bao",
+      "notes": "A gift envelope with money, common during Spring Festival and weddings."
+    },
+    {
+      "topic": "不给小费",
+      "english": "Tipping is not expected",
+      "chinese": "一般不需要给小费。",
+      "pinyin": "Yi ban bu xu yao gei xiao fei.",
+      "notes": "Tipping is uncommon in most restaurants, taxis, and hotels in mainland China."
+    },
+    {
+      "topic": "敬酒",
+      "english": "Toast etiquette",
+      "chinese": "敬酒",
+      "pinyin": "Jing jiu",
+      "notes": "At formal meals, people may toast repeatedly. It is acceptable to drink tea or say you do not drink alcohol."
+    },
+    {
+      "topic": "急救",
+      "english": "Emergency medical help",
+      "chinese": "请帮我叫救护车。",
+      "pinyin": "Qing bang wo jiao jiu hu che.",
+      "notes": "Use this sentence when you need an ambulance. Emergency number: 120."
+    }
+  ]
+}

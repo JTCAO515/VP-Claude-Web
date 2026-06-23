@@ -1,12 +1,12 @@
 # VisePanda
 
-VisePanda is an English-language China travel workspace for international visitors. It combines city discovery, visa readiness, saved trips, practical travel tools, and a streaming AI guide behind a small Vercel + Python WSGI deployment.
+VisePanda is an English-native China travel butler for international visitors. It combines pre-trip planning, translation, city intelligence, route help, visa readiness, saved trips, practical tools, and a streaming AI guide behind a small Vercel + Python WSGI deployment.
 
 Active repository: `https://github.com/JTCAO515/VP-Codex-Web`
 
 ## Current Version
 
-`v6.1.3` moves the product shell closer to Claude/Gemini: icon-only app tabs live in a left rail on desktop, while the first Ask screen is reduced to one greeting and one prompt box floating over the China-tech background.
+`v6.2.1` upgrades VisePanda from travel planner to all-in-one China travel butler. It adds a native Translate tab, translation JSON datasets, `/api/translations`, and Phase 1.5 during-trip service direction while keeping Phase 2 community out of scope.
 
 ## Documentation
 
@@ -20,9 +20,11 @@ Active repository: `https://github.com/JTCAO515/VP-Codex-Web`
 
 ## Product Surface
 
-- Ask: default first-screen AI travel guide with quick prompts, consultation modes, progressive settings, model routing, and a deterministic local fallback.
-- Overview: secondary planning workspace with destination input, featured cities, and readiness checklist.
+- Dashboard: planning command center with destination input, recent question summaries, saved trip summaries, featured cities, and readiness checklist.
+- Ask: default first-screen AI travel guide with a clean conversation surface, generated follow-up suggestions, and a deterministic local fallback.
+- Translate: native text translation, phrase cards, local history, and voice-readiness for taxi, hotel, dining, attractions, shopping, and emergency moments.
 - Cities: searchable China destination cards built from the curated city dataset.
+- Map: route and geography intelligence panel backed by `/api/map` with a starter fallback.
 - Tools: packing, pricing, phrase, emergency, and visa helper views.
 - Trips: authenticated saved trips with a guest local draft mode.
 - Admin: minimal user management console gated by explicit admin credentials.
@@ -71,6 +73,7 @@ node --test web/tests/*.test.js
 - `GET /api/cities`
 - `GET /api/cities/:id`
 - `GET /api/map`
+- `GET /api/translations`
 - `GET /api/tools`
 - `GET /api/tools/:id`
 - `GET /api/visa/countries`
@@ -98,6 +101,7 @@ node --test web/tests/*.test.js
 ```text
 api/        WSGI router and API modules
 data/       JSON knowledge and policy datasets
+data/translations/ Native travel translation dictionaries
 static/img/ Visual assets used by the app
 tests/      Python contract tests
 web/        Static app, PWA manifest, service worker, and Node tests

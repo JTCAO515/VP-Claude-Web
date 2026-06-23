@@ -1,0 +1,39 @@
+{
+  "attractions": [
+    {
+      "chinese": "故宫",
+      "english": "The Forbidden City",
+      "pinyin": "Gu gong",
+      "aliases": ["Palace Museum"],
+      "notes": "Former imperial palace in central Beijing. Book tickets in advance and bring your passport."
+    },
+    {
+      "chinese": "长城",
+      "english": "The Great Wall",
+      "pinyin": "Chang cheng",
+      "aliases": ["Mutianyu Great Wall", "Badaling Great Wall"],
+      "notes": "Choose Mutianyu for a calmer foreigner-friendly first visit."
+    },
+    {
+      "chinese": "兵马俑",
+      "english": "Terracotta Warriors",
+      "pinyin": "Bing ma yong",
+      "aliases": ["Terracotta Army"],
+      "notes": "Major Xi'an attraction. Hire a guide or audio guide for historical context."
+    },
+    {
+      "chinese": "外滩",
+      "english": "The Bund",
+      "pinyin": "Wai tan",
+      "aliases": ["Shanghai Bund"],
+      "notes": "Shanghai waterfront skyline area. Best at sunset or early evening."
+    }
+  ],
+  "signs": [
+    { "chinese": "入口", "english": "Entrance", "pinyin": "Ru kou" },
+    { "chinese": "出口", "english": "Exit", "pinyin": "Chu kou" },
+    { "chinese": "售票处", "english": "Ticket office", "pinyin": "Shou piao chu" },
+    { "chinese": "洗手间", "english": "Restroom", "pinyin": "Xi shou jian" },
+    { "chinese": "禁止拍照", "english": "No photography", "pinyin": "Jin zhi pai zhao" }
+  ]
+}

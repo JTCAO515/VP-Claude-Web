@@ -8,13 +8,14 @@ class ConfigContractTests(unittest.TestCase):
         code, data, _ = request("GET", "/api/health")
         self.assertEqual(code, 200)
         self.assertTrue(data["ok"])
-        self.assertEqual(data["version"], "6.1.3")
+        self.assertEqual(data["version"], "6.2.1")
 
         code, config, _ = request("GET", "/api/config")
         self.assertEqual(code, 200)
         self.assertEqual(config["app"]["domain"], "go2china.space")
-        self.assertEqual(config["app"]["version"], "6.1.3")
+        self.assertEqual(config["app"]["version"], "6.2.1")
         self.assertTrue(config["features"]["chat"])
+        self.assertTrue(config["features"]["translate"])
         self.assertIn("local-guide", config["ai"]["routes"])
         self.assertTrue(config["auth"]["emailVerification"])
 

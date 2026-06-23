@@ -1,5 +1,39 @@
 # Changelog
 
+## v6.2.1 - 2026-06-23
+
+### Changed
+
+- Repositioned VisePanda as an all-in-one China travel butler for foreign visitors.
+- Added Phase 1.5 during-trip service direction: translation, dining, routes, taxi help, and local-service guidance.
+- Added a native Translate tab with voice-readiness, text translation, phrase cards, and local translation history.
+- Added `data/translations/` JSON dictionaries for phrases, dining, attractions, and culture.
+- Added `/api/translations`.
+- Updated the app shell cache marker to `20260623-v621-travel-butler-translate`.
+- Marked Phase 2 community features as future scope only.
+
+### Regression
+
+- Added frontend structure coverage for the Translate tab and translation database files.
+- Added backend contract coverage for `/api/translations`.
+- Updated version contract coverage to `6.2.1`.
+
+## v6.1.4 - 2026-06-23
+
+### Changed
+
+- Removed the started-chat mode, model route, depth, and professional preset panels so the conversation stays focused like Claude/Gemini.
+- Added generated follow-up question buttons after completed AI answers.
+- Converted Home/Overview into a Dashboard command center with recent question summaries, saved trip summaries, quick planning, featured cities, and readiness state.
+- Added a dedicated Map tab for route and geography intelligence.
+- Expanded the icon rail to Dashboard, Ask, Cities, Map, Tools, and Trips with stronger per-tab colors.
+- Updated cache busting and service worker naming for the new frontend shell.
+
+### Regression
+
+- Updated frontend structure coverage for the simplified chat surface, follow-up suggestions, Dashboard, Map tab, colorful icon rail, and v6.1.4 cache marker.
+- Updated backend version contract coverage to `6.1.4`.
+
 ## v6.1.3 - 2026-06-23
 
 ### Changed

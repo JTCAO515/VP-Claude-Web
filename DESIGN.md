@@ -1,207 +1,108 @@
 # VisePanda Design System
 
-Last updated: 2026-06-22
-Current version: v6.0.8
+Last updated: 2026-06-23
+Current version: v6.2.1
 
 ## Design Direction
 
-VisePanda should feel like a focused travel planning workspace for international visitors to China. The interface should be calm, practical, mobile-friendly, and trustworthy.
+VisePanda should feel like a practical China travel butler for foreigners: calm, fast, mobile-first, and useful in real-world moments such as taxi rides, hotel check-in, restaurant ordering, attraction signs, and emergency help.
 
-The current design direction is:
+The active direction:
 
-- English-native travel product
-- Light sky-blue workspace
-- Warm orange primary actions
-- Clear app-style tabs
-- Real destination imagery
-- Compact mobile-first controls
-- Professional AI assistant tone
+- English-native UI.
+- Mobile portrait first.
+- Light sky-blue workspace with warm orange primary actions.
+- Icon-only desktop rail.
+- Bottom mobile app tabs.
+- Clear task surfaces: Dashboard, Ask, Translate, Cities, Map, Tools, Trips.
+- Real travel imagery and concise operational copy.
 
-Avoid returning to the older dark ink-wash visual system unless explicitly requested as a new brand exploration. The active product UI is now lighter and more utilitarian.
+## Tokens
 
-## Current Tokens
+Source of truth: `web/app.css`.
 
-Current source of truth: `web/app.css`.
+Important colors:
 
-Important active colors:
-
-| Token | Value | Use |
-| --- | --- | --- |
-| `--bg` | `#eef8fc` | Page background |
-| `--bg-elevated` | `#f8fcff` | Elevated background |
-| `--surface` | `#ffffff` | Cards, controls, panels |
-| `--surface-soft` | `#f3f9fc` | Soft sections |
-| `--surface-tint` | `#dff4fb` | Selected tab / tint |
-| `--text` | `#0f2633` | Primary text |
-| `--text-muted` | `#486474` | Secondary text |
-| `--border` | `#d4e6ee` | Default border |
-| `--brand` | `#0ea5e9` | Sky-blue brand/action accent |
-| `--brand-strong` | `#075985` | Strong brand text |
-| `--accent` | `#f97316` | Primary CTA |
-| `--accent-strong` | `#c2410c` | CTA hover |
-| `--success` | `#2d8a63` | Success/check states |
-| `--danger` | `#b42318` | Error states |
-
-## Typography
-
-Current font stack:
-
-```css
-"Plus Jakarta Sans", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif
-```
-
-Rules:
-
-- Do not scale font sizes with viewport width.
-- Keep letter spacing at `0` unless there is a clear local reason.
-- Body text must stay readable on mobile.
-- Buttons, tabs, inputs, status text, and chat controls need explicit, polished sizing.
-
-## Shape and Spacing
-
-Current radius:
-
-```css
---radius: 8px;
-```
-
-Use 8px cards and controls by default. Mobile bottom nav uses a slightly larger shell radius for ergonomic separation.
-
-Spacing rules:
-
-- Mobile sides: about 14px.
-- Desktop page sides: responsive clamp from 18px to 48px.
-- Avoid nested cards.
-- Use cards for repeated items, dialogs, and tool surfaces.
-- Keep page sections as open bands or unframed layouts.
+| Token | Use |
+| --- | --- |
+| `--bg` | Page background |
+| `--surface` | Cards, controls, panels |
+| `--surface-soft` | Soft tool areas |
+| `--text` | Primary copy |
+| `--text-muted` | Secondary copy |
+| `--border` | Default borders |
+| `--brand` | Sky-blue brand accent |
+| `--accent` | Orange primary actions |
+| `--success` | Ready/check states |
+| `--danger` | Error states |
 
 ## Navigation
 
-The primary nav has five tabs:
+Primary tabs:
 
-1. Plan
+1. Dashboard
 2. Ask
-3. Cities
-4. Tools
-5. Trips
+3. Translate
+4. Cities
+5. Map
+6. Tools
+7. Trips
 
 Desktop:
 
-- Sticky below the topbar.
-- Centered tab row.
-- Active tab has sky tint and orange underline.
+- Fixed left icon rail.
+- Icon color should distinguish each module.
+- Text labels are visually hidden but available to assistive technology.
 
 Mobile:
 
-- Fixed bottom app-style tab bar.
-- Five equally sized tab targets.
-- Safe-area aware.
-- Active state must be visually obvious.
-- `aria-selected` must stay in sync with the active tab.
+- Fixed bottom tab bar.
+- Seven icon targets are allowed, but each must remain tappable and visually clear.
+- Hide tab labels visually to preserve space.
+- Hide nav while composing in chat.
 
-## Mobile UX Rules
+## Ask Design
 
-Mobile portrait is a primary surface.
+Ask should feel like Claude/Gemini after a conversation starts:
 
-Required checks after UI changes:
+- No visible mode/model/depth controls.
+- No preset panel after the first message.
+- Conversation, input, and follow-up suggestions only.
+- Keep status text minimal and hide it when empty.
 
-- No horizontal overflow at 390px width.
-- Bottom nav does not cover core controls.
-- Chat input does not fight the bottom nav.
-- Auth dialog acts like a bottom sheet.
-- Floating Ask button hides in Ask view.
+## Translate Design
+
+Translate is a Phase 1.5 during-trip surface. It must feel operational, not decorative.
+
+Required areas:
+
+- Voice card: clear browser-capability status and future push-to-talk affordance.
+- Text translator: large input, clear output, simple direction swap.
+- Phrase library: tappable cards for taxi, hotel, dining, attractions, shopping, emergency, and culture.
+- History: local recent translations with clear-history control.
+
+Principles:
+
+- UI copy must be English-native.
+- Chinese text appears as translated content, not as interface chrome.
+- Cards should be easy to show to another person.
+- Emergency phrases should be direct and visible.
+- Avoid implying full offline machine translation until implemented.
+
+## Mobile Rules
+
+- No horizontal overflow at 390px.
+- Bottom nav must not cover core controls.
+- Textareas must remain usable with keyboard.
+- Translation cards should stack vertically.
+- Phrase cards should be scannable and tappable.
 - Tap targets should be at least 44px where practical.
 
-## Plan View
+## Phase 2 Boundary
 
-The Plan view is the first product screen.
+Do not design community, journals, companion matching, or social feedback UI in this release. Mention them only in planning documents.
 
-It should show:
-
-- Brand topbar
-- Quick planning copy
-- Prompt chips
-- Destination/length planner
-- Primary Ask AI CTA
-- Entry / Route / Local snapshot cards
-- Destination imagery
-- Featured city cards
-- Readiness checklist
-
-The first screen should not become a marketing landing page. It must remain usable.
-
-## Ask View
-
-Ask is a professional AI consultation workspace.
-
-It should show:
-
-- Mode selector
-- Provider/model route selector
-- Depth selector
-- Professional preset prompts
-- Chat status surface
-- Chat log
-- Input composer
-
-Chat messages should remain readable and structured. Avoid decorative chrome that reduces space for answers.
-
-## Cities, Tools, Trips
-
-Cities:
-
-- Use real city imagery.
-- Keep cards scannable.
-- Search should remain prominent.
-
-Tools:
-
-- Cards should clearly describe practical use.
-- Opened tool details should be readable and actionable.
-
-Trips:
-
-- Guest and synced states should be clear.
-- Empty states should offer a useful next action.
-
-## Auth Dialog
-
-The auth dialog supports:
-
-- Sign in
-- Create account
-- Verify email
-- Resend code
-- Optional Google login
-- Profile update
-- Logout
-
-Mobile behavior:
-
-- Bottom-sheet layout.
-- Visible sheet handle.
-- Inputs are full width.
-- No name field during registration.
-
-## Visual Asset Rules
-
-- Use real travel imagery for cities and hero/supporting surfaces.
-- Avoid dark blurred overlays.
-- Avoid decorative blobs and one-note palettes.
-- Keep product imagery inspectable.
-- Do not use emoji as primary UI icons.
-- Inline SVG icons are acceptable and currently used.
-
-## Accessibility Rules
-
-- Preserve semantic buttons and labels.
-- Keep focus states visible.
-- Keep color contrast strong.
-- Preserve `role="tablist"`, `role="tab"`, `role="tabpanel"`, and `aria-selected`.
-- Keep status text in live regions where already present.
-- Respect `prefers-reduced-motion`.
-
-## Cache and Release Rule
+## Cache Rule
 
 When CSS or JS changes, update:
 
@@ -213,11 +114,11 @@ When CSS or JS changes, update:
 Current frontend cache marker:
 
 ```text
-20260622-v608-mobile-ui3
+20260623-v621-travel-butler-translate
 ```
 
 Current service worker cache:
 
 ```text
-visepanda-shell-v608-mobile-ui3
+visepanda-shell-v621-travel-butler-translate
 ```

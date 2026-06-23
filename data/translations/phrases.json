@@ -1,0 +1,46 @@
+{
+  "phrases": [
+    {
+      "category": "Taxi",
+      "english": "Please take me to this address.",
+      "chinese": "请带我去这个地址。",
+      "pinyin": "Qing dai wo qu zhe ge di zhi.",
+      "use": "Show this to a taxi or ride-hailing driver."
+    },
+    {
+      "category": "Hotel",
+      "english": "I have a reservation under this name.",
+      "chinese": "我用这个名字预订了房间。",
+      "pinyin": "Wo yong zhe ge ming zi yu ding le fang jian.",
+      "use": "Hotel check-in."
+    },
+    {
+      "category": "Restaurant",
+      "english": "Do you have an English menu?",
+      "chinese": "你们有英文菜单吗？",
+      "pinyin": "Ni men you Ying wen cai dan ma?",
+      "use": "Restaurant ordering."
+    },
+    {
+      "category": "Restaurant",
+      "english": "I cannot eat spicy food.",
+      "chinese": "我不能吃辣。",
+      "pinyin": "Wo bu neng chi la.",
+      "use": "Food preference."
+    },
+    {
+      "category": "Emergency",
+      "english": "I lost my passport. Please help me contact the police.",
+      "chinese": "我的护照丢了，请帮我联系警察。",
+      "pinyin": "Wo de hu zhao diu le, qing bang wo lian xi jing cha.",
+      "use": "Passport emergency."
+    },
+    {
+      "category": "Shopping",
+      "english": "Can this price be lower?",
+      "chinese": "这个价格可以便宜一点吗？",
+      "pinyin": "Zhe ge jia ge ke yi pian yi yi dian ma?",
+      "use": "Market bargaining."
+    }
+  ]
+}
