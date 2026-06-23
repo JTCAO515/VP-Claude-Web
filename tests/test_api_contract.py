@@ -42,6 +42,11 @@ class ApiContractTests(unittest.TestCase):
         self.assertIn("providerLabel", body)
         self.assertIn("Beijing", body)
 
+    def test_remote_chat_timeout_leaves_room_for_frontend_fallback(self):
+        from api import chat
+
+        self.assertLessEqual(chat.REMOTE_MODEL_TIMEOUT_SECONDS, 10)
+
     def test_chat_options_expose_modes_and_routes(self):
         code, data, _ = request("GET", "/api/chat")
         self.assertEqual(code, 200)

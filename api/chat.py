@@ -12,6 +12,7 @@ SYSTEM_BRIEF = (
     "You are VisePanda, an English-language China travel assistant. "
     "Give practical, safety-aware planning help for international visitors."
 )
+REMOTE_MODEL_TIMEOUT_SECONDS = 8
 
 CHAT_MODES = {
     "itinerary": {
@@ -226,7 +227,7 @@ def _chat_completion(endpoint, api_key, model, prompt):
         headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
         method="POST",
     )
-    with urllib.request.urlopen(request, timeout=22) as response:
+    with urllib.request.urlopen(request, timeout=REMOTE_MODEL_TIMEOUT_SECONDS) as response:
         data = json.loads(response.read().decode("utf-8"))
         return data["choices"][0]["message"]["content"]
 

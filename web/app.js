@@ -622,7 +622,7 @@ async function sendChat(message, overrides = {}) {
       method: "POST",
       headers,
       body: JSON.stringify({ message, ...settings }),
-    }, 22000);
+    }, 45000);
     if (!response.ok || !response.body) {
       throw new Error("I could not reach the guide service. Please try again.");
     }
