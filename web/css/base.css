@@ -1,0 +1,68 @@
+html, body { background-color: var(--paper-white); color: var(--ink-black); }
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  background-image: url('/web/assets/paper-noise.svg');
+  background-size: 240px 240px;
+  background-repeat: repeat;
+  background-attachment: fixed;
+  background-blend-mode: multiply;
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: var(--header-h);
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  padding: 0 var(--space-3);
+  background: var(--paper-white);
+  border-bottom: var(--hairline-soft);
+}
+
+.header-btn {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  color: var(--ink-black);
+  border-radius: var(--radius-button);
+  transition: background-color var(--dur-fast) var(--ease);
+}
+.header-btn:hover { background: var(--paper-warm); }
+
+.wordmark {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: var(--text-md);
+  letter-spacing: 0.02em;
+}
+.wordmark .zh {
+  font-family: var(--font-sc-serif);
+  font-size: 14px;
+  font-style: normal;
+  color: var(--ink-soft);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+.wordmark strong { font-weight: 500; }
+
+.view {
+  min-height: calc(100vh - var(--header-h));
+  min-height: calc(100dvh - var(--header-h));
+  padding: 0;
+}
+
+/* Make space at the bottom so the FAB doesn't cover content. */
+.view::after {
+  content: '';
+  display: block;
+  height: calc(var(--fab-size) + var(--space-5));
+}

@@ -1,0 +1,50 @@
+// VisePanda v7 — single-page bootstrap.
+// Loads features + current user, wires header + FAB, mounts chat.
+
+import { api } from './api.js';
+import * as chat from './chat.js';
+import * as dashboard from './dashboard.js';
+import * as translate from './translate.js';
+import * as auth from './auth.js';
+
+window.vp = window.vp || {};
+window.vp.features = {
+  has_deepseek: false,
+  has_voice: false,
+  has_supabase: false,
+  has_email: false,
+  has_google: false,
+};
+window.vp.user = null;
+window.vp.city = localStorage.getItem('vp.city') || 'beijing';
+
+async function boot() {
+  // 1) Feature flags first (informs UI affordances).
+  try {
+    const data = await api.get('/api/config/public');
+    window.vp.features = { ...window.vp.features, ...data };
+  } catch (_) { /* keep defaults */ }
+
+  // 2) Resolve session if any.
+  try {
+    const data = await api.get('/api/auth/profile');
+    if (data && data.user) window.vp.user = data.user;
+  } catch (_) { /* unauthed; ignore */ }
+
+  // 3) Mount chat (the home screen).
+  chat.mount(document.getElementById('view-chat'));
+
+  // 4) Wire chrome.
+  document.getElementById('open-dashboard').addEventListener('click', () => dashboard.open());
+  document.getElementById('open-account').addEventListener('click', () => auth.openAccount());
+  document.getElementById('fab-translate').addEventListener('click', () => translate.open());
+
+  window.addEventListener('vp:auth-required', () => auth.openSignIn());
+
+  // 5) Service worker (best effort).
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+}
+
+boot();

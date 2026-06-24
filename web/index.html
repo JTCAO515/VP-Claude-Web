@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f5f0e8">
+  <meta name="description" content="VisePanda — your English-native, mobile-first China travel butler. Chat, translate, plan.">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:wght@400;500;600&family=Noto+Serif+SC:wght@300;500;700&family=Noto+Sans+SC:wght@400;500&family=IBM+Plex+Mono:wght@400&display=swap">
+  <link rel="stylesheet" href="/web/css/tokens.css">
+  <link rel="stylesheet" href="/web/css/reset.css">
+  <link rel="stylesheet" href="/web/css/base.css">
+  <link rel="stylesheet" href="/web/css/components.css">
+  <link rel="stylesheet" href="/web/css/chat.css">
+  <link rel="stylesheet" href="/web/css/dashboard.css">
+  <link rel="stylesheet" href="/web/css/translate.css">
+  <link rel="stylesheet" href="/web/css/auth.css">
+  <title>VisePanda — your China travel butler</title>
+</head>
+<body>
+  <header class="app-header">
+    <button id="open-dashboard" class="header-btn" aria-label="Open dashboard">
+      <svg viewBox="0 0 20 20" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4">
+        <path d="M3 6h14M3 10h14M3 14h14"/>
+      </svg>
+    </button>
+    <span class="wordmark">
+      <em class="zh">视野</em>
+      <strong>VisePanda</strong>
+    </span>
+    <button id="open-account" class="header-btn" aria-label="Account">
+      <svg viewBox="0 0 20 20" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4">
+        <circle cx="10" cy="7" r="3"/>
+        <path d="M3.5 17c1.2-3 3.6-4.5 6.5-4.5s5.3 1.5 6.5 4.5"/>
+      </svg>
+    </button>
+  </header>
+
+  <main id="view-chat" class="view view-chat"></main>
+
+  <div id="drawer-backdrop" class="drawer-backdrop" hidden></div>
+  <aside id="view-dashboard" class="drawer" aria-hidden="true"></aside>
+
+  <div id="modal-backdrop" class="modal-backdrop" hidden></div>
+  <section id="view-translate" class="modal" aria-hidden="true"></section>
+
+  <div id="sheet-backdrop" class="sheet-backdrop" hidden></div>
+  <section id="view-auth" class="sheet" aria-hidden="true"></section>
+
+  <button id="fab-translate" class="fab" aria-label="Open translate" type="button">
+    <span class="chop">译</span>
+  </button>
+
+  <script type="module" src="/web/js/app.js"></script>
+</body>
+</html>
