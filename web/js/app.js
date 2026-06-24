@@ -25,11 +25,12 @@ async function boot() {
     window.vp.features = { ...window.vp.features, ...data };
   } catch (_) { /* keep defaults */ }
 
-  // 2) Resolve session if any.
+  // 2) Resolve session if any. Profile returns {user: null} when not signed in
+  //    (rather than 401), so no try/catch is needed for the common case.
   try {
     const data = await api.get('/api/auth/profile');
     if (data && data.user) window.vp.user = data.user;
-  } catch (_) { /* unauthed; ignore */ }
+  } catch (_) { /* network down; stay unauthed */ }
 
   // 3) Mount chat (the home screen).
   chat.mount(document.getElementById('view-chat'));

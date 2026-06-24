@@ -274,8 +274,9 @@ def _google_callback(environ, start_response):
 def _profile(environ, start_response):
     user = require_session(environ)
     if not user:
-        return error_response(start_response, "Not signed in",
-                              status="401 Unauthorized", code="auth_required")
+        # Return 200 with a null user so the frontend can probe at boot
+        # without polluting the browser console with 401s on every page load.
+        return ok_response(start_response, {"user": None})
     return ok_response(start_response, {"user": _public_user(user)},
                        extra_headers=_issue_cookie_header(user))
 
