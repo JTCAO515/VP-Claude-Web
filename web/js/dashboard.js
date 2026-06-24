@@ -59,31 +59,31 @@ function render() {
       <span class="wordmark">
         <em class="zh">视野</em><strong>Dashboard</strong>
       </span>
-      <span class="chop">览</span>
+      <span class="chop stamp-in">览</span>
     </header>
     <nav class="city-chips" id="dash-cities"></nav>
     <section class="chapter" data-key="now">
-      <h2><span>Now<span class="zh-tag">此刻</span></span><span class="chop sm">今</span></h2>
+      <h2><span>Now<span class="zh-tag">此刻</span></span><span class="chop sm stamp-in">今</span></h2>
       <div class="chapter-body" id="ch-now"><div class="skeleton" style="height: 120px"></div></div>
     </section>
     <section class="chapter" data-key="stay">
-      <h2><span>Stay<span class="zh-tag">居</span></span><span class="chop sm">居</span></h2>
+      <h2><span>Stay<span class="zh-tag">居</span></span><span class="chop sm stamp-in" style="animation-delay:80ms">居</span></h2>
       <div class="chapter-body" id="ch-stay"><div class="skeleton" style="height: 80px"></div></div>
     </section>
     <section class="chapter" data-key="eat">
-      <h2><span>Eat &amp; Do<span class="zh-tag">食</span></span><span class="chop sm">食</span></h2>
+      <h2><span>Eat &amp; Do<span class="zh-tag">食</span></span><span class="chop sm stamp-in" style="animation-delay:140ms">食</span></h2>
       <div class="chapter-body" id="ch-eat"><div class="skeleton" style="height: 80px"></div></div>
     </section>
     <section class="chapter" data-key="move">
-      <h2><span>Move<span class="zh-tag">行</span></span><span class="chop sm">行</span></h2>
+      <h2><span>Move<span class="zh-tag">行</span></span><span class="chop sm stamp-in" style="animation-delay:200ms">行</span></h2>
       <div class="chapter-body" id="ch-move"></div>
     </section>
     <section class="chapter" data-key="plan">
-      <h2><span>Plan<span class="zh-tag">程</span></span><span class="chop sm">程</span></h2>
+      <h2><span>Plan<span class="zh-tag">程</span></span><span class="chop sm stamp-in" style="animation-delay:260ms">程</span></h2>
       <div class="chapter-body" id="ch-plan"></div>
     </section>
     <section class="chapter" data-key="toolbox">
-      <h2><span>Toolbox<span class="zh-tag">具</span></span><span class="chop sm">具</span></h2>
+      <h2><span>Toolbox<span class="zh-tag">具</span></span><span class="chop sm stamp-in" style="animation-delay:320ms">具</span></h2>
       <div class="chapter-body" id="ch-toolbox"></div>
     </section>
   `;

@@ -33,21 +33,36 @@
 }
 .city-chips::-webkit-scrollbar { display: none; }
 .city-chip {
+  position: relative;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  padding: 8px 14px;
+  padding: 10px 14px;
   border: var(--hairline);
   border-radius: var(--radius-chip);
   background: var(--paper-white);
   transition: all var(--dur-fast) var(--ease);
+  min-height: 44px;
+  cursor: pointer;
 }
 .city-chip:hover { border-color: var(--qinghua-blue); }
 .city-chip.active {
   border-color: var(--qinghua-blue);
   background: var(--qinghua-mist);
+  padding-right: 28px;
+}
+.city-chip.active::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  color: var(--qinghua-blue);
+  font-size: 12px;
+  font-weight: 700;
 }
 .city-chip .en {
   font-family: var(--font-serif);
@@ -64,8 +79,19 @@
 .chapter {
   padding: var(--space-5) var(--space-4) var(--space-3);
   border-top: var(--hairline-soft);
+  animation: chapter-in 460ms var(--ease) both;
 }
 .chapter:first-of-type { border-top: none; }
+.chapter:nth-of-type(2) { animation-delay: 50ms; }
+.chapter:nth-of-type(3) { animation-delay: 100ms; }
+.chapter:nth-of-type(4) { animation-delay: 150ms; }
+.chapter:nth-of-type(5) { animation-delay: 200ms; }
+.chapter:nth-of-type(6) { animation-delay: 250ms; }
+.chapter:nth-of-type(7) { animation-delay: 300ms; }
+@keyframes chapter-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 .chapter h2 {
   display: flex;
   justify-content: space-between;
@@ -123,7 +149,15 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
+  animation: card-in 360ms var(--ease) both;
 }
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.chapter-body > *:nth-child(2) { animation-delay: 60ms; }
+.chapter-body > *:nth-child(3) { animation-delay: 120ms; }
+.chapter-body > *:nth-child(4) { animation-delay: 180ms; }
 .hotel-card .name, .deal-card .title, .tool-card .title {
   font-family: var(--font-serif);
   font-weight: 500;

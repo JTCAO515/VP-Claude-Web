@@ -3,10 +3,12 @@ import { api } from './api.js';
 import { chop } from './components/chop.js';
 
 const SUGGESTIONS = [
-  'How do I set up Alipay TourCard as a foreigner?',
-  'Which Chinese cities are worth 10 days?',
-  'Best foreigner-friendly hotels in Beijing?',
-  'How do I take the high-speed rail with my passport?',
+  { icon: '💳', label: 'Payment',    q: 'How do I set up Alipay TourCard as a foreigner?' },
+  { icon: '🚄', label: 'Transport',  q: 'How do I take the high-speed rail with my passport?' },
+  { icon: '🏯', label: 'Itinerary',  q: 'Which Chinese cities are worth 10 days?' },
+  { icon: '🏨', label: 'Stay',       q: 'Best foreigner-friendly hotels in Beijing?' },
+  { icon: '📶', label: 'Connectivity', q: 'eSIM or local SIM — which should I get on arrival?' },
+  { icon: '🍜', label: 'Food',       q: 'How do I order food if I can\'t read the menu?' },
 ];
 
 let state = {
@@ -52,8 +54,14 @@ function renderEmpty() {
     const li = document.createElement('li');
     const btn = document.createElement('button');
     btn.className = 'suggestion';
-    btn.textContent = s;
-    btn.addEventListener('click', () => send(s));
+    btn.innerHTML = `
+      <span class="s-icon">${s.icon}</span>
+      <span class="s-body">
+        <span class="s-label">${s.label}</span>
+        <span class="s-q">${esc(s.q)}</span>
+      </span>
+    `;
+    btn.addEventListener('click', () => send(s.q));
     li.appendChild(btn);
     list.appendChild(li);
   }
@@ -70,11 +78,16 @@ function renderLog() {
   if (state.thinking) {
     const t = document.createElement('li');
     t.className = 'msg msg-ai';
-    t.innerHTML = `<div class="bubble thinking">
+    const inner = document.createElement('div');
+    inner.className = 'bubble thinking';
+    inner.innerHTML = `
+      <span class="thinking-label">VisePanda is thinking</span>
       <span class="thinking-dot">•</span>
       <span class="thinking-dot">•</span>
       <span class="thinking-dot">•</span>
-    </div>`;
+    `;
+    inner.appendChild(chop('问', { size: 'sm' }));
+    t.appendChild(inner);
     log.appendChild(t);
   }
   state.root.appendChild(log);
@@ -85,11 +98,24 @@ function renderMessage(msg, i) {
   const li = document.createElement('li');
   li.className = 'msg msg-' + msg.role;
   const bubble = document.createElement('div');
-  bubble.className = 'bubble';
+  bubble.className = 'bubble' + (msg.error ? ' error' : '');
   bubble.textContent = msg.content;
-  if (msg.role === 'ai') bubble.appendChild(chop('问', { size: 'sm' }));
+  if (msg.role === 'ai') bubble.appendChild(chop('问', { size: 'sm', animate: true }));
   li.appendChild(bubble);
-  if (msg.role === 'ai' && Array.isArray(msg.follow_ups) && msg.follow_ups.length) {
+  if (msg.error && msg.retryFor) {
+    const retry = document.createElement('button');
+    retry.className = 'btn-outline retry-btn';
+    retry.textContent = '↻ Retry';
+    retry.addEventListener('click', () => {
+      state.messages = state.messages.slice(0, i);
+      render();
+      send(msg.retryFor);
+    });
+    const row = document.createElement('div');
+    row.className = 'followups';
+    row.appendChild(retry);
+    li.appendChild(row);
+  } else if (msg.role === 'ai' && Array.isArray(msg.follow_ups) && msg.follow_ups.length) {
     const fwrap = document.createElement('div');
     fwrap.className = 'followups';
     for (const q of msg.follow_ups) {
@@ -147,6 +173,12 @@ function autosize(ta) {
   ta.style.height = Math.min(ta.scrollHeight, 9 * 16) + 'px';
 }
 
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[c]));
+}
+
 async function send(message) {
   state.messages.push({ role: 'user', content: message });
   state.thinking = true;
@@ -171,8 +203,12 @@ async function send(message) {
   } catch (e) {
     state.messages.push({
       role: 'ai',
-      content: 'Something went wrong reaching the server. Try again.',
+      content: e?.code === 'network'
+        ? 'No network connection. Check your Wi-Fi or VPN and retry.'
+        : 'Reaching the server failed. Tap retry to try again.',
       follow_ups: [],
+      error: true,
+      retryFor: message,
     });
   } finally {
     state.thinking = false;

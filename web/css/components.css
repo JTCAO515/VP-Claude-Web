@@ -10,12 +10,29 @@
   line-height: 1;
   color: var(--paper-white);
   background: var(--cinnabar);
-  box-shadow: 0 0 0 0.5px rgba(198,61,47,0.8);
+  box-shadow: 0 0 0 0.5px rgba(198,61,47,0.8),
+              inset 0 0 0 1px rgba(0,0,0,0.04);
   letter-spacing: 0;
   user-select: none;
+  /* Subtle "stamped on paper" texture via gradient noise */
+  background-image:
+    linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0.04) 100%),
+    var(--cinnabar);
 }
 .chop.lg { font-size: 1.1em; }
 .chop.sm { font-size: 0.75em; width: 1.4em; height: 1.4em; }
+
+/* Stamp-in entrance — used on first reveal of any chop */
+@keyframes chop-stamp {
+  0%   { transform: scale(0.4) rotate(-12deg); opacity: 0; filter: blur(2px); }
+  60%  { transform: scale(1.12) rotate(2deg);  opacity: 1; filter: blur(0); }
+  80%  { transform: scale(0.96) rotate(-1deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.chop.stamp-in {
+  animation: chop-stamp 480ms var(--ease-stamp) both;
+  transform-origin: center;
+}
 
 /* Bilingual term — structural three-line stack */
 .bilingual-term {
@@ -148,11 +165,11 @@
 }
 .link-btn:hover { color: var(--qinghua-deep); }
 
-/* FAB — fixed bottom-right */
+/* FAB — fixed bottom-right, respects iOS safe area */
 .fab {
   position: fixed;
-  bottom: var(--space-5);
-  right: var(--space-5);
+  bottom: calc(var(--space-5) + var(--safe-bottom));
+  right: calc(var(--space-5) + var(--safe-right));
   width: var(--fab-size);
   height: var(--fab-size);
   display: grid;
@@ -162,10 +179,27 @@
   border-radius: var(--radius-fab);
   box-shadow: var(--shadow-fab);
   z-index: 40;
-  transition: transform var(--dur-fast) var(--ease);
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-base) var(--ease);
+  -webkit-tap-highlight-color: transparent;
 }
-.fab:hover { transform: translateY(-2px); }
+.fab:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(30,111,159,0.32); }
+.fab:active { transform: translateY(0); }
 .fab .chop { font-size: 1em; }
+
+/* First-load FAB ambient — fades after 6s, prompts the user to try it. */
+.fab.intro {
+  animation: fab-intro 1100ms var(--ease-stamp) 600ms both,
+             fab-breathe 2400ms var(--ease) 1800ms 3;
+}
+@keyframes fab-intro {
+  0%   { transform: scale(0) rotate(-90deg); opacity: 0; }
+  60%  { transform: scale(1.08) rotate(8deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); }
+}
+@keyframes fab-breathe {
+  0%, 100% { box-shadow: var(--shadow-fab); }
+  50%      { box-shadow: 0 6px 22px rgba(30,111,159,0.45); }
+}
 
 /* Drawer (Dashboard) */
 .drawer-backdrop, .modal-backdrop, .sheet-backdrop {
@@ -191,6 +225,9 @@
   transition: transform var(--dur-base) var(--ease);
   overflow-y: auto;
   overscroll-behavior: contain;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+  padding-left: var(--safe-left);
 }
 .drawer.open { transform: translateX(0); }
 
@@ -233,8 +270,9 @@
   transition: transform var(--dur-base) var(--ease);
   box-shadow: var(--shadow-sheet);
   border-top: var(--hairline);
-  max-height: 92vh;
+  max-height: 92dvh;
   overflow-y: auto;
+  padding-bottom: var(--safe-bottom);
 }
 .sheet.open { transform: translateY(0); }
 @media (min-width: 720px) {

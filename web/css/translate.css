@@ -93,19 +93,46 @@
 .hero-card .action-btn.primary:hover { background: var(--qinghua-deep); }
 
 .translate-empty {
-  padding: var(--space-7) var(--space-4);
-  text-align: center;
-  color: var(--ink-soft);
-  font-family: var(--font-serif);
-  font-size: var(--text-md);
+  padding: var(--space-5) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  align-items: center;
 }
-.translate-empty .py {
-  display: block;
-  margin-top: var(--space-2);
+.translate-empty .empty-demo {
+  background: var(--paper-warm);
+  border-left: 2px solid var(--qinghua-blue);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-card);
+  max-width: 100%;
+  opacity: 0.75;
+  text-align: left;
+  width: 100%;
+}
+.translate-empty .demo-en {
+  font-family: var(--font-serif);
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-1);
+}
+.translate-empty .demo-zh {
+  font-family: var(--font-sc-serif);
+  color: var(--ink-black);
+  font-size: var(--text-lg);
+  line-height: 1.3;
+}
+.translate-empty .demo-py {
   font-family: var(--font-sans);
   font-style: italic;
-  font-size: var(--text-sm);
   color: var(--stone-gray);
+  font-size: var(--text-xs);
+  margin-top: 2px;
+}
+.translate-empty .empty-hint {
+  color: var(--stone-gray);
+  font-size: var(--text-sm);
+  text-align: center;
+  font-style: italic;
 }
 
 .translate-compose {

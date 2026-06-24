@@ -37,7 +37,14 @@ async function boot() {
   // 4) Wire chrome.
   document.getElementById('open-dashboard').addEventListener('click', () => dashboard.open());
   document.getElementById('open-account').addEventListener('click', () => auth.openAccount());
-  document.getElementById('fab-translate').addEventListener('click', () => translate.open());
+  const fab = document.getElementById('fab-translate');
+  fab.addEventListener('click', () => translate.open());
+  // First-load intro animation (only first session)
+  if (!sessionStorage.getItem('vp.fab.seen')) {
+    fab.classList.add('intro');
+    sessionStorage.setItem('vp.fab.seen', '1');
+    setTimeout(() => fab.classList.remove('intro'), 10000);
+  }
 
   window.addEventListener('vp:auth-required', () => auth.openSignIn());
 

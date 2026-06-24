@@ -100,8 +100,14 @@ function renderHero() {
   if (!state.current) {
     root.innerHTML = `
       <div class="translate-empty">
-        Type or speak to translate.
-        <span class="py">Tap the result to enlarge it for a driver or vendor.</span>
+        <div class="empty-demo">
+          <div class="demo-en">Please take me to this address.</div>
+          <div class="demo-zh">请带我去这个地址。</div>
+          <div class="demo-py">qǐng dài wǒ qù zhè ge dì zhǐ</div>
+        </div>
+        <div class="empty-hint">
+          Type or hold the mic. Tap any translation to show it full-screen.
+        </div>
       </div>
     `;
     return;
