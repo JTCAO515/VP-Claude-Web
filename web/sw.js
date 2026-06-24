@@ -1,5 +1,7 @@
 // VisePanda v7 service worker — shell + translations cache.
-const CACHE = 'vp-v7-1';
+// ⚠️ Bump the cache version on EVERY shell asset change. Otherwise old
+//   visitors stay on the stale build until they clear site data.
+const CACHE = 'vp-v7-2';
 const SHELL = [
   '/', '/manifest.json', '/favicon.svg',
   '/web/assets/paper-noise.svg',
