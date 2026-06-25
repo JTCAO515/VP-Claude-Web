@@ -1,11 +1,13 @@
-// VisePanda v8 service worker — shell + translations.
-const CACHE = 'vp-v8-5';
+// VisePanda v9 service worker — shell + translations.
+const CACHE = 'vp-v9-1';
 const SHELL = [
   '/', '/manifest.json', '/favicon.svg',
+  '/web/assets/bg-mountains.svg',
   '/web/css/tokens.css',
   '/web/css/reset.css',
   '/web/css/base.css',
   '/web/css/sidebar.css',
+  '/web/css/topbar.css',
   '/web/css/ask.css',
   '/web/css/plan.css',
   '/web/css/cities.css',
@@ -15,6 +17,7 @@ const SHELL = [
   '/web/js/app.js',
   '/web/js/api.js',
   '/web/js/sidebar.js',
+  '/web/js/topbar.js',
   '/web/js/ask.js',
   '/web/js/plan.js',
   '/web/js/cities.js',

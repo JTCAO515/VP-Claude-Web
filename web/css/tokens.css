@@ -1,35 +1,45 @@
 :root {
-  /* v8 — Claude-style sidebar palette */
+  /* v9 — warm cream + blush + gold "新国风" palette */
   /* Surfaces */
-  --bg:             #e9e7e2;   /* app outer bg */
-  --sidebar-bg:     #faf9f6;
-  --canvas:         #ffffff;
-  --canvas-soft:    #f5f2ed;   /* AI bubble */
-  --canvas-warm:    #efe9e1;   /* active nav row, chip bg */
-  --canvas-tint:    #f1ede7;   /* inactive day pill */
+  --bg-grad-1:      #f9efe0;   /* page bg gradient top */
+  --bg-grad-2:      #f3dcc9;   /* page bg gradient bottom */
+  --bg:             #f5e9d8;   /* flat fallback */
+  --sidebar-bg:     #fdf9f1;
+  --canvas:         #fffcf6;
+  --canvas-soft:    #f8efe2;   /* AI bubble */
+  --canvas-warm:    #f3e3d1;   /* active nav row, chip bg */
+  --canvas-tint:    #f6ebdc;   /* inactive day pill */
 
   /* Ink */
-  --ink-1:          #332f29;   /* primary text + user bubble */
-  --ink-2:          #4a443c;   /* card title */
-  --ink-3:          #5a544b;   /* secondary */
-  --ink-4:          #6b655c;   /* meta */
-  --ink-5:          #7d776d;   /* tertiary */
-  --ink-mute:       #9a948b;
-  --ink-soft:       #a39d93;   /* labels */
-  --ink-faint:      #b0aaa0;
-  --ink-ghost:      #b4aea4;   /* placeholder */
+  --ink-1:          #2e2620;   /* primary text + user bubble */
+  --ink-2:          #46392f;   /* card title */
+  --ink-3:          #5c4c3f;   /* secondary */
+  --ink-4:          #6e5c4d;   /* meta */
+  --ink-5:          #84705f;   /* tertiary */
+  --ink-mute:       #9c8a78;
+  --ink-soft:       #a89683;   /* labels */
+  --ink-faint:      #b6a690;
+  --ink-ghost:      #c2b39d;   /* placeholder */
 
   /* Borders */
-  --line-1:         #ddd8d0;
-  --line-2:         #e6e2db;   /* sidebar divider */
-  --line-3:         #eae5de;   /* card border */
-  --line-4:         #efece6;   /* very faint */
-  --line-soft:      #f2efe9;
+  --line-1:         #e3cfb4;
+  --line-2:         #ecdcc4;   /* sidebar divider */
+  --line-3:         #ecdfc9;   /* card border */
+  --line-4:         #f1e6d3;   /* very faint */
+  --line-soft:      #f4ebdc;
 
-  /* Brand — terracotta */
-  --brand:          #cf6a4a;
-  --brand-tint:     #fbeeea;   /* SOS card bg */
+  /* Brand — cinnabar / deep vermillion */
+  --brand:          #a23728;
+  --brand-deep:     #832a1e;
+  --brand-tint:     #f8e3da;   /* SOS card bg */
   --brand-ink:      #ffffff;
+  --brand-grad-1:   #f6dccd;   /* suggestion card gradient start */
+  --brand-grad-2:   #efc2ae;   /* suggestion card gradient end */
+
+  /* Gold accent */
+  --gold:           #b8862c;
+  --gold-soft:      #e9d3a3;
+  --gold-line:      #d8b876;
 
   /* Success (sage) */
   --success:        #5a8a5a;
@@ -61,24 +71,28 @@
   /* Geometry */
   --r-nav:          8px;
   --r-card:         10px;
-  --r-card-lg:      12px;
+  --r-card-lg:      16px;
   --r-card-xl:      13px;
   --r-btn:          8px;
-  --r-input:        22px;
+  --r-input:        24px;
   --r-pill:         15px;
   --r-chip:         18px;
   --r-bubble-ai:    4px 16px 16px 16px;
   --r-bubble-user:  16px 16px 4px 16px;
-  --r-app:          4px;
+  --r-app:          18px;
+  --r-header:       16px;
 
   /* Effects */
-  --shadow-card:    0 3px 14px rgba(0,0,0,0.10);
-  --shadow-input:   0 2px 8px rgba(0,0,0,0.06);
-  --shadow-pop:     0 4px 16px rgba(0,0,0,0.13);
+  --shadow-card:    0 3px 14px rgba(80,50,20,0.10);
+  --shadow-app:     0 12px 48px rgba(80,40,20,0.16);
+  --shadow-input:   0 2px 8px rgba(80,50,20,0.08);
+  --shadow-pop:     0 4px 16px rgba(80,40,20,0.15);
   --shadow-pin:     0 2px 6px rgba(0,0,0,0.25);
 
   /* Layout */
-  --sidebar-w:      218px;
+  --sidebar-w:      220px;
+  --sidebar-w-collapsed: 64px;
+  --header-h:       56px;
   --content-max:    820px;
   --safe-top:       env(safe-area-inset-top, 0px);
   --safe-bottom:    env(safe-area-inset-bottom, 0px);

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#e9e7e2">
+  <meta name="theme-color" content="#f5e9d8">
   <meta name="description" content="VisePanda — your AI travel butler for China. Plan trips, ask anything, get on the ground help.">
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="/web/css/reset.css">
   <link rel="stylesheet" href="/web/css/base.css">
   <link rel="stylesheet" href="/web/css/sidebar.css">
+  <link rel="stylesheet" href="/web/css/topbar.css">
   <link rel="stylesheet" href="/web/css/ask.css">
   <link rel="stylesheet" href="/web/css/plan.css">
   <link rel="stylesheet" href="/web/css/cities.css">
@@ -23,9 +24,14 @@
   <title>VisePanda — your China travel butler</title>
 </head>
 <body>
-  <div class="app">
-    <aside id="sidebar" class="sidebar"></aside>
-    <main id="main" class="main"></main>
+  <div class="shell">
+    <div class="app">
+      <aside id="sidebar" class="sidebar"></aside>
+      <div class="main-col">
+        <header id="topbar" class="topbar"></header>
+        <main id="main" class="main"></main>
+      </div>
+    </div>
   </div>
   <div id="view-auth" class="sheet" aria-hidden="true"></div>
   <div id="sheet-backdrop" class="sheet-backdrop" hidden></div>

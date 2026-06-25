@@ -6,15 +6,28 @@
 import { api } from './api.js';
 
 const SUGGESTIONS = [
-  { icon: '✚', label: 'Plan my itinerary',
+  { icon: tripIconSvg(), label: 'Plan my Itinerary',
     q: 'Plan a 10-day China itinerary covering Beijing, Xi\'an, and Chengdu for a first-time visitor.' },
-  { icon: '◉', label: 'Explore cities',
+  { icon: pinIconSvg(), label: 'Explore Cities',
     q: 'Which Chinese cities should I visit for my first trip?' },
-  { icon: '○', label: 'Travel tools',
+  { icon: toolsIconSvg(), label: 'Essential Tools',
     q: 'How do I set up payments and a SIM card as a foreigner in China?' },
-  { icon: '☐', label: 'My trips',
+  { icon: bookingIconSvg(), label: 'My Bookings',
     q: 'I have 5 days in Shanghai — what should I do?' },
 ];
+
+function tripIconSvg() {
+  return `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8.5 14.5l1.5 1.5 3-3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+function pinIconSvg() {
+  return `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg>`;
+}
+function toolsIconSvg() {
+  return `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14.7 6.3a1 1 0 0 1 1.4 0l1.6 1.6a1 1 0 0 1 0 1.4l-8 8a1 1 0 0 1-.5.27l-2.7.6.6-2.7a1 1 0 0 1 .27-.5z"/><path d="M5 19h5" stroke-linecap="round"/></svg>`;
+}
+function bookingIconSvg() {
+  return `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/><path d="M8 14l1.6 1.6L14 11.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
 
 let state = {
   root: null,
@@ -71,24 +84,23 @@ function renderEmpty() {
   wrap.className = 'ask-empty';
   wrap.innerHTML = `
     <div class="panda-mark">
-      <svg width="52" height="52" viewBox="0 0 52 52" aria-hidden="true">
-        <rect width="52" height="52" rx="16" fill="#cf6a4a"/>
-        <circle cx="18" cy="18" r="7" fill="#332f29"/>
-        <circle cx="34" cy="18" r="7" fill="#332f29"/>
+      <svg width="56" height="56" viewBox="0 0 52 52" aria-hidden="true">
+        <rect width="52" height="52" rx="16" fill="#a23728"/>
+        <circle cx="18" cy="18" r="7" fill="#2e2620"/>
+        <circle cx="34" cy="18" r="7" fill="#2e2620"/>
         <circle cx="18" cy="18" r="4" fill="#fff"/>
         <circle cx="34" cy="18" r="4" fill="#fff"/>
         <ellipse cx="26" cy="30" rx="10" ry="8" fill="#fff"/>
-        <circle cx="23" cy="28" r="2" fill="#332f29"/>
-        <circle cx="29" cy="28" r="2" fill="#332f29"/>
-        <ellipse cx="26" cy="32" rx="3" ry="2" fill="#332f29" opacity="0.3"/>
+        <circle cx="23" cy="28" r="2" fill="#2e2620"/>
+        <circle cx="29" cy="28" r="2" fill="#2e2620"/>
+        <ellipse cx="26" cy="32" rx="3" ry="2" fill="#2e2620" opacity="0.3"/>
       </svg>
       <svg class="cloud" width="36" height="20" viewBox="0 0 36 20" aria-hidden="true">
-        <path d="M6 16a6 6 0 0 1 6-6 5 5 0 0 1 5-5 6 6 0 0 1 11 2 5 5 0 0 1 4 5 4 4 0 0 1-1 8H6a4 4 0 0 1 0-4z" fill="#332f29"/>
+        <path d="M6 16a6 6 0 0 1 6-6 5 5 0 0 1 5-5 6 6 0 0 1 11 2 5 5 0 0 1 4 5 4 4 0 0 1-1 8H6a4 4 0 0 1 0-4z" fill="#2e2620"/>
       </svg>
     </div>
     <h1>What can I help you plan?</h1>
     <div class="zh">你好！欢迎来中国</div>
-    <div class="sub">Ask anything about traveling in China — visas, routes, payments, language tips…</div>
     <div class="ask-suggestions"></div>
   `;
   const grid = wrap.querySelector('.ask-suggestions');

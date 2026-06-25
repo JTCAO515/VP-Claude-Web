@@ -1,25 +1,13 @@
-// Sidebar — VisePanda wordmark, + New chat, 4 nav rows with icons,
-// Recent chats, Current trip card (shown while inside the Plan builder,
-// which is a sub-view of Trips — see app.js), avatar.
+// Sidebar — collapse handle, + New chat, Recent Conversations list, Current
+// trip card (shown while inside the Plan builder, a sub-view of Trips —
+// see app.js), account row pinned to the bottom (avatar + name).
 //
-// Renders into #sidebar. Exposes setActive(tab) and refresh().
+// The four primary views (Ask/Trips/Explore/Tools) live in the topbar now
+// (see topbar.js) — this sidebar is purely a conversation-history rail.
 //
-// 'plan' is not its own nav row — Plan and Trips were merged into one tab.
-// app.js still calls setActive('plan') while the itinerary builder is open;
-// we highlight the 'trips' row for that state (see highlightKey() below).
+// Renders into #sidebar. Exposes setActive(tab), setRecent(), setTripContext().
 
 import { api } from './api.js';
-
-const NAV = [
-  { key: 'ask',    label: 'Ask',    icon: askIcon },
-  { key: 'trips',  label: 'Trips',  icon: tripsIcon },
-  { key: 'cities', label: 'Cities', icon: cityIcon },
-  { key: 'tools',  label: 'Tools',  icon: toolsIcon },
-];
-
-function highlightKey(active) {
-  return active === 'plan' ? 'trips' : active;
-}
 
 let state = {
   active: 'ask',
@@ -57,11 +45,25 @@ function rerender() {
 function render(root) {
   root.innerHTML = '';
 
-  // Wordmark
-  const wm = document.createElement('div');
-  wm.className = 'wordmark';
-  wm.innerHTML = `<span class="dot"></span><span class="name">VisePanda</span>`;
-  root.appendChild(wm);
+  // Collapse handle (top-left, mirrors the topbar toggle for discoverability)
+  const collapseRow = document.createElement('div');
+  collapseRow.className = 'sb-collapse-row';
+  const menuBtn = document.createElement('button');
+  menuBtn.type = 'button';
+  menuBtn.className = 'sb-menu-btn';
+  menuBtn.setAttribute('aria-label', 'Menu');
+  menuBtn.innerHTML = `<svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h14M3 10h14M3 14h14" stroke-linecap="round"/></svg>`;
+  const collapseBtn = document.createElement('button');
+  collapseBtn.type = 'button';
+  collapseBtn.className = 'sb-collapse-btn';
+  collapseBtn.setAttribute('aria-label', 'Collapse sidebar');
+  collapseBtn.innerHTML = `<svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 4l-6 6 6 6M14 4l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  collapseBtn.addEventListener('click', () => {
+    document.querySelector('.shell')?.classList.add('sidebar-collapsed');
+  });
+  collapseRow.appendChild(menuBtn);
+  collapseRow.appendChild(collapseBtn);
+  root.appendChild(collapseRow);
 
   // New chat
   const nc = document.createElement('button');
@@ -73,27 +75,13 @@ function render(root) {
   });
   root.appendChild(nc);
 
-  // Nav
-  const nav = document.createElement('nav');
-  nav.className = 'sb-nav';
-  const highlighted = highlightKey(state.active);
-  for (const item of NAV) {
-    const row = document.createElement('button');
-    row.type = 'button';
-    row.className = 'sb-nav-row' + (item.key === highlighted ? ' active' : '');
-    row.innerHTML = `<span class="icon">${item.icon()}</span><span class="sb-label">${item.label}</span>`;
-    row.addEventListener('click', () => {
-      if (state.onNav) state.onNav(item.key);
-    });
-    nav.appendChild(row);
-  }
-  root.appendChild(nav);
-
-  // Recent chats (only shown when on Ask)
-  if (state.active === 'ask' || state.active === '') {
+  // Recent conversations — the sidebar's main job now that the four
+  // primary views live in the topbar. Shown regardless of active view
+  // so it's always one click away.
+  {
     const label = document.createElement('div');
     label.className = 'sb-section-label';
-    label.textContent = 'RECENT CHATS';
+    label.textContent = 'Recent Conversations';
     root.appendChild(label);
 
     const list = document.createElement('div');
@@ -121,8 +109,11 @@ function render(root) {
       }
     }
     root.appendChild(list);
-  } else if (state.active === 'plan' && state.trip) {
-    // Current trip card
+  }
+
+  if (state.active === 'plan' && state.trip) {
+    // Current trip card — shown above the account row while inside the
+    // Plan builder, regardless of the recent-conversations list above.
     const card = document.createElement('div');
     card.className = 'sb-trip-card';
     card.innerHTML = `
@@ -133,14 +124,9 @@ function render(root) {
       }</div>
     `;
     root.appendChild(card);
-  } else {
-    // Spacer to push account to bottom
-    const sp = document.createElement('div');
-    sp.style.flex = '1';
-    root.appendChild(sp);
   }
 
-  // Account
+  // Account — pinned to the bottom via CSS (margin-top: auto)
   const u = window.vp.user;
   const acct = document.createElement('button');
   acct.type = 'button';
@@ -150,8 +136,7 @@ function render(root) {
     : '?';
   acct.innerHTML = `
     <span class="avatar">${initials}</span>
-    <span class="sb-account-meta">${u ? esc(u.email || 'You') : 'Sign in'}</span>
-    <span class="lang">EN ▾</span>
+    <span class="sb-account-meta">${u ? esc(u.name || u.email || 'You') : 'Sign in'}</span>
   `;
   acct.addEventListener('click', () => {
     if (state.onNav) state.onNav('account');
@@ -186,38 +171,4 @@ function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, (c) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
   }[c]));
-}
-
-// --------- Tab icons (SVG, follow wireframe shapes) ---------
-
-function askIcon() {
-  return `<svg viewBox="0 0 20 20" width="20" height="20" fill="none">
-    <rect x="2" y="3" width="16" height="13" rx="3" fill="currentColor" opacity="0.85"/>
-    <path d="M7 17l1.5 2 1.5-2" fill="currentColor" opacity="0.85"/>
-  </svg>`;
-}
-function planIcon() {
-  return `<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
-    <rect x="3" y="3" width="14" height="14" rx="2"/>
-    <line x1="3" y1="8" x2="17" y2="8"/>
-    <line x1="8" y1="3" x2="8" y2="17"/>
-  </svg>`;
-}
-function cityIcon() {
-  return `<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
-    <circle cx="10" cy="8" r="6"/>
-    <path d="M5 14l5 5 5-5" fill="currentColor" stroke="none"/>
-  </svg>`;
-}
-function toolsIcon() {
-  return `<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
-    <rect x="3" y="3" width="14" height="14" rx="2"/>
-    <circle cx="10" cy="10" r="3"/>
-  </svg>`;
-}
-function tripsIcon() {
-  return `<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
-    <rect x="3" y="6" width="14" height="11" rx="2"/>
-    <path d="M7 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>
-  </svg>`;
 }

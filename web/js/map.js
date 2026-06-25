@@ -44,7 +44,7 @@ export async function renderMap(container, { center, points = [], zoom = 13 } = 
       position: [p.lng, p.lat],
       map,
       label: { content: String(i + 1), direction: 'center' },
-      content: `<div style="width:30px;height:30px;border-radius:50%;background:#cf6a4a;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;box-shadow:0 2px 6px rgba(0,0,0,.25)">${i + 1}</div>`,
+      content: `<div style="width:30px;height:30px;border-radius:50%;background:#a23728;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;box-shadow:0 2px 6px rgba(0,0,0,.25)">${i + 1}</div>`,
     });
     if (p.label) marker.setTitle(p.label);
   });

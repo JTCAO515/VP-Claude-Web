@@ -5,6 +5,7 @@
 
 import { api } from './api.js';
 import * as sidebar from './sidebar.js';
+import * as topbar from './topbar.js';
 import * as ask from './ask.js';
 import * as plan from './plan.js';
 import * as cities from './cities.js';
@@ -41,6 +42,13 @@ async function boot() {
     container: document.getElementById('sidebar'),
     onNav: handleNav,
   });
+  topbar.mount({
+    container: document.getElementById('topbar'),
+    onNav: handleNav,
+    onToggleSidebar: () => {
+      document.querySelector('.shell').classList.toggle('sidebar-collapsed');
+    },
+  });
 
   setView('ask');
 
@@ -61,6 +69,7 @@ function handleNav(key, opts = {}) {
 
 function setView(name, opts = {}) {
   sidebar.setActive(name);
+  topbar.setActive(name);
   const main = document.getElementById('main');
   main.innerHTML = '';
   main.className = 'main';

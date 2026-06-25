@@ -2,6 +2,68 @@
 
 All notable changes to VisePanda.
 
+## v9.0.0 — 2026-06-25
+
+New visual direction: warm cream/blush "新国风" palette with a cinnabar
+brand color and a hand-drawn mountain/pagoda/cloud SVG backdrop, plus a
+restructured chrome — a dedicated top bar carries the 3 primary nav tabs
+and language selector, leaving the sidebar focused purely on conversation
+history.
+
+### Added
+- `web/assets/bg-mountains.svg` — hand-coded line-art mountain ridges +
+  a pagoda silhouette + drifting clouds, used as the page backdrop behind
+  the app card. Placeholder pending a generated illustration (see the
+  image-generation prompt saved this session) — swap the file in place
+  when one is ready, no code changes needed.
+- `web/js/topbar.js` + `web/css/topbar.css` — new top bar: wordmark,
+  Trips/Explore/Tools tabs (Ask has no tab — it's the implicit landing
+  view, reached via the wordmark or sidebar's "+ New chat"), and a
+  language selector (EN/中文/ES/FR/JA; persists to `localStorage`,
+  exposed as `window.vp.lang` for a future i18n layer — no translation
+  wiring yet, this just captures intent).
+- Sidebar/topbar collapse toggle (hamburger + chevron), mirrored in both
+  components so either can re-expand the other.
+
+### Changed
+- **Visual tokens overhauled** (`tokens.css`): terracotta (#cf6a4a) on
+  flat beige replaced with a cinnabar/vermillion brand (#a23728) on warm
+  cream surfaces, a soft-gold accent line/border color, and a blush
+  gradient for the Ask suggestion cards (#f6dccd → canvas).
+- **Layout restructured**: the app is now a centered, rounded card
+  (`.shell > .app`) floating over the background illustration, rather
+  than a flush full-bleed layout. `.main-col` wraps the new topbar + main
+  content area.
+- **Sidebar simplified**: removed the wordmark and the 4-row primary nav
+  (moved to the topbar) — now just the collapse handle, "+ New chat",
+  Recent Conversations (shown on every view, not just Ask), the
+  in-progress trip card, and the account row pinned to the bottom via
+  `margin-top: auto`.
+- **Account row**: dropped the inline "EN ▾" language indicator (now in
+  the topbar) — shows just avatar + name/email.
+- **Ask empty state**: suggestion cards restyled as a 4-up icon grid
+  (gradient card background, icon swatch, label) instead of the previous
+  2-up icon+text list; outlined SVG icons (itinerary/pin/tools/calendar)
+  replace the old single-glyph icons. Labels updated to title case
+  ("Plan my Itinerary", "Explore Cities", "Essential Tools",
+  "My Bookings") to match the new visual direction.
+- `web/js/map.js`'s Amap marker pin color synced to the new brand hex.
+- `cities` nav key now displays as **"Explore"** in both the topbar and
+  (historically) the sidebar — the internal route key is unchanged, only
+  the label.
+
+### Notes for next session
+- The background SVG is hand-coded placeholder art, not the AI-generated
+  pavilion/plum-blossom/stone-bridge illustration the product owner
+  originally described — this environment had no image-generation tool
+  available, so a detailed prompt was produced instead (see prior
+  `garden-gpt-image-2/prompt/` output) for the product owner to run
+  externally. Swap `web/assets/bg-mountains.svg` for a generated PNG/SVG
+  by updating the two `background-image` references in `base.css` —
+  no other code changes needed.
+- Language selector is UI-only — no actual string translation exists yet.
+  Treat `window.vp.lang` as the integration point for a future i18n pass.
+
 ## v8.4.0 — 2026-06-25
 
 Ctrip Union retired the callable hotel-search API this project originally
