@@ -9,7 +9,7 @@ import os
 import secrets
 from pathlib import Path
 
-VERSION = "8.1.0"
+VERSION = "8.2.0"
 APP_NAME = "VisePanda"
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -63,6 +63,28 @@ GOOGLE_REDIRECT_URI = _env(
 AMAP_JS_KEY = _env("AMAP_JS_KEY")
 AMAP_SECURITY_CODE = _env("AMAP_SECURITY_CODE")
 
+# ---------- Maps: Amap Web Service API (server-side POI search + ratings) ----------
+# Different key type from AMAP_JS_KEY ("Web服务" key, not "Web端(JS API)" key).
+# Used as the realistic substitute for restaurant/attraction ratings — Dianping
+# and Meituan do not offer a public review/rating API to third parties without
+# a data-licensing deal, but Amap's POI search returns a rating field
+# (biz_ext.rating) for dining and attraction categories.
+AMAP_WEB_SERVICE_KEY = _env("AMAP_WEB_SERVICE_KEY")
+
+# ---------- Ctrip / Trip.com Union (携程联盟) — hotel/flight/train affiliate ----------
+# An affiliate/CPS program, not an order-placement API: this searches Union
+# inventory and produces a tracked deep link for the user to complete
+# checkout on Trip.com. Requires partner approval at union.ctrip.com.
+CTRIP_UNION_API_KEY = _env("CTRIP_UNION_API_KEY")
+CTRIP_UNION_API_SECRET = _env("CTRIP_UNION_API_SECRET")
+CTRIP_UNION_PID = _env("CTRIP_UNION_PID")
+
+# ---------- Meituan Union (美团联盟) — group-buy deal affiliate ----------
+# Same CPS/affiliate model as Ctrip Union, scoped to group-buy deals.
+# Requires partner approval at union.meituan.com.
+MEITUAN_UNION_API_KEY = _env("MEITUAN_UNION_API_KEY")
+MEITUAN_UNION_API_SECRET = _env("MEITUAN_UNION_API_SECRET")
+
 # ---------- JWT / Session ----------
 _jwt_env = _env("JWT_SECRET")
 if _jwt_env:
@@ -101,6 +123,18 @@ def has_map() -> bool:
     return bool(AMAP_JS_KEY)
 
 
+def has_amap_ratings() -> bool:
+    return bool(AMAP_WEB_SERVICE_KEY)
+
+
+def has_ctrip() -> bool:
+    return bool(CTRIP_UNION_API_KEY and CTRIP_UNION_API_SECRET)
+
+
+def has_meituan() -> bool:
+    return bool(MEITUAN_UNION_API_KEY and MEITUAN_UNION_API_SECRET)
+
+
 def is_production() -> bool:
     return APP_ENV == "production"
 
@@ -119,5 +153,8 @@ def public_features() -> dict:
         "has_map": has_map(),
         "amap_key": AMAP_JS_KEY,
         "amap_security": AMAP_SECURITY_CODE,
+        "has_amap_ratings": has_amap_ratings(),
+        "has_ctrip": has_ctrip(),
+        "has_meituan": has_meituan(),
         "app_env": APP_ENV,
     }

@@ -3,6 +3,7 @@
 
 import { api } from './api.js';
 import { openSheet, closeSheet, sheetHeader } from './components/sheet.js';
+import { fetchRatings, matchRating, ratingBadge } from './ratings.js';
 
 let state = {
   root: null,
@@ -115,8 +116,10 @@ async function openDetail(city) {
     <p style="font-size:var(--text-sm);color:var(--ink-soft);margin-top:6px">Best months: ${esc(city.best_months || '—')}</p>
     <div class="detail-section-label">FOREIGNER-FRIENDLY HOTELS</div>
     <div class="detail-list" id="city-hotels"><div class="skeleton" style="height:50px"></div></div>
+    <button class="btn-outline" type="button" id="book-hotel-link" style="margin-top:8px;display:none">Book on Trip.com →</button>
     <div class="detail-section-label">DEALS NEARBY</div>
     <div class="detail-list" id="city-deals"><div class="skeleton" style="height:50px"></div></div>
+    <button class="btn-outline" type="button" id="book-deal-link" style="margin-top:8px;display:none">Book on Meituan →</button>
     <div class="sheet-footer-actions">
       <button class="btn-outline" type="button" data-act="close">Close</button>
       <button class="btn-primary" type="button" data-act="add-to-plan">+ Add to Plan</button>
@@ -129,28 +132,41 @@ async function openDetail(city) {
     if (state.onAddToPlan) state.onAddToPlan(city);
   });
 
-  const [hotels, deals] = await Promise.all([
-    api.get('/api/hotels?city=' + city.id).catch(() => ({ hotels: [] })),
-    api.get('/api/deals?city=' + city.id).catch(() => ({ deals: [] })),
+  const [hotelsRes, dealsRes, hotelRatings, dealRatings] = await Promise.all([
+    api.get('/api/partners/hotels?city=' + city.id).catch(() => ({ hotels: [] })),
+    api.get('/api/partners/deals?city=' + city.id).catch(() => ({ deals: [] })),
+    fetchRatings(city.id, 'hotel'),
+    fetchRatings(city.id, 'dining'),
   ]);
   const hotelsRoot = content.querySelector('#city-hotels');
-  hotelsRoot.innerHTML = (hotels.hotels || []).length
-    ? hotels.hotels.map((h) => `
+  hotelsRoot.innerHTML = (hotelsRes.hotels || []).length
+    ? hotelsRes.hotels.map((h) => `
         <div class="detail-card">
-          <div class="name">${esc(h.name)}</div>
+          <div class="name">${esc(h.name)}${ratingBadge(matchRating(hotelRatings, h.name))}</div>
           <div class="meta">${esc(h.neighborhood)} · ★ ${h.rating} · ${esc(h.price_band)}</div>
         </div>
       `).join('')
     : `<div class="meta" style="padding:8px 0">No curated hotels yet.</div>`;
+  if (hotelsRes.book_url) {
+    const btn = content.querySelector('#book-hotel-link');
+    btn.style.display = '';
+    btn.addEventListener('click', () => window.open(hotelsRes.book_url, '_blank'));
+  }
+
   const dealsRoot = content.querySelector('#city-deals');
-  dealsRoot.innerHTML = (deals.deals || []).length
-    ? deals.deals.map((d) => `
+  dealsRoot.innerHTML = (dealsRes.deals || []).length
+    ? dealsRes.deals.map((d) => `
         <div class="detail-card">
-          <div class="name">${esc(d.title)}</div>
+          <div class="name">${esc(d.title)}${ratingBadge(matchRating(dealRatings, d.vendor))}</div>
           <div class="meta">${esc(d.vendor)} · ${esc(d.discount)}</div>
         </div>
       `).join('')
     : `<div class="meta" style="padding:8px 0">No curated deals yet.</div>`;
+  if (dealsRes.book_url) {
+    const btn = content.querySelector('#book-deal-link');
+    btn.style.display = '';
+    btn.addEventListener('click', () => window.open(dealsRes.book_url, '_blank'));
+  }
 }
 
 function esc(s) {

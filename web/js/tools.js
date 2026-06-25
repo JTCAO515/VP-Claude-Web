@@ -3,6 +3,7 @@
 
 import { api } from './api.js';
 import { openTranslatePanel } from './components/translate-panel.js';
+import { openHotelBooking, openTransportBooking, openDealsBooking } from './components/booking-panel.js';
 
 const ESSENTIALS = [
   { id: 'currency',  name: 'Currency converter', desc: 'Live CNY ↔ USD/EUR/GBP and offline cheat sheets.', ico: '¥' },
@@ -15,6 +16,11 @@ const GROUND = [
   { id: 'sim',       name: 'eSIM & VPN',         desc: 'What to install before you board; what to skip.', ico: '◑' },
   { id: 'phrases',   name: 'Phrases & etiquette', desc: 'Taxi, hotel, food, emergency — with audio.', ico: '语' },
   { id: 'emergency', name: 'Emergency / SOS',    desc: 'Embassy contacts, hospital finder, lost passport flow.', ico: '!', tone: 'sos' },
+];
+const BOOKING = [
+  { id: 'book-hotel',     name: 'Hotels',      desc: 'Search and book via Trip.com (携程), with ratings.', ico: '🏨' },
+  { id: 'book-transport', name: 'Transport',   desc: 'Trains and flights via Trip.com (携程).', ico: '🚄' },
+  { id: 'book-deals',     name: 'Group deals', desc: 'Dining & experience deals via Meituan (美团).', ico: '🏷️' },
 ];
 
 let state = { root: null, onAsk: null };
@@ -41,6 +47,8 @@ function render() {
       <div class="tools-grid" id="tools-essentials"></div>
       <div class="tools-section-label" style="margin-top:22px">GETTING AROUND</div>
       <div class="tools-grid" id="tools-ground"></div>
+      <div class="tools-section-label" style="margin-top:22px">BOOK &amp; REVIEWS</div>
+      <div class="tools-grid" id="tools-booking"></div>
       <div class="tools-ai-strip">
         <span class="panda-mini"></span>
         <div class="text">
@@ -53,6 +61,7 @@ function render() {
   `;
   paint('tools-essentials', ESSENTIALS);
   paint('tools-ground',     GROUND);
+  paint('tools-booking',    BOOKING);
   state.root.querySelector('.ask-btn').addEventListener('click', () => {
     if (state.onAsk) state.onAsk();
   });
@@ -76,10 +85,10 @@ function paint(id, items) {
 }
 
 async function openTool(t) {
-  if (t.id === 'translate') {
-    openTranslatePanel();
-    return;
-  }
+  if (t.id === 'translate') { openTranslatePanel(); return; }
+  if (t.id === 'book-hotel') { openHotelBooking(); return; }
+  if (t.id === 'book-transport') { openTransportBooking(); return; }
+  if (t.id === 'book-deals') { openDealsBooking(); return; }
   try {
     const data = await api.get('/api/tools?id=' + encodeURIComponent(t.id));
     if (data.ok && data.tool) {

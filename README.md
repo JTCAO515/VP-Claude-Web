@@ -67,6 +67,12 @@ gracefully when its key is absent.
 | `GOOGLE_REDIRECT_URI`   | Default `${APP_BASE_URL}/api/auth/callback`       |
 | `AMAP_JS_KEY`           | 高德地图 (Amap) JS API key — used in Plan's map column |
 | `AMAP_SECURITY_CODE`    | Amap's paired security code (safe to expose client-side per Amap's docs) |
+| `AMAP_WEB_SERVICE_KEY`  | Amap **Web服务** key (different type from `AMAP_JS_KEY`) — server-side POI ratings |
+| `CTRIP_UNION_API_KEY`   | 携程联盟 (Ctrip/Trip.com Union) affiliate app key  |
+| `CTRIP_UNION_API_SECRET`| Ctrip Union signing secret                        |
+| `CTRIP_UNION_PID`       | Ctrip Union promotion/affiliate id (for link attribution) |
+| `MEITUAN_UNION_API_KEY` | 美团联盟 (Meituan Union) affiliate app key         |
+| `MEITUAN_UNION_API_SECRET` | Meituan Union signing secret                  |
 | `JWT_SECRET`            | 32+ char random hex; auto-generated if missing    |
 | `APP_BASE_URL`          | Default `https://claude.go2china.space`           |
 | `APP_ENV`               | `production` or `development`                     |
@@ -85,7 +91,31 @@ then redeploy. None are required for the app to boot or to demo end-to-end.
 | `RESEND_API_KEY`       | Account auto-verified on register                 |
 | `GOOGLE_CLIENT_*`      | "Continue with Google" button hidden              |
 | `AMAP_JS_KEY`          | Plan's map column shows the striped placeholder + numbered pins instead of a live map |
+| `AMAP_WEB_SERVICE_KEY` | Rating badges simply don't appear (not an error)  |
+| `CTRIP_UNION_*`        | Hotels/Transport tools show curated local data + an untracked link to the right Trip.com section |
+| `MEITUAN_UNION_*`      | Group deals tool shows curated local data + a link to meituan.com |
 | `JWT_SECRET`           | Per-process random secret (sessions reset on boot)|
+
+### Booking & ratings — what's actually possible
+
+Dianping has **no public API** for third parties to pull reviews or ratings
+— that data requires a formal licensing deal with Meituan/Dianping. Meituan
+itself doesn't expose an order-placement API to outside apps either. What
+*is* realistically available, and what this app integrates:
+
+- **携程联盟 (Ctrip/Trip.com Union)** — an affiliate/CPS program. Search
+  their hotel inventory and generate a tracked deep link; the user completes
+  checkout on Trip.com. Apply at [union.ctrip.com](https://union.ctrip.com).
+- **美团联盟 (Meituan Union)** — same affiliate model, scoped to group-buy
+  deals. Apply at [union.meituan.com](https://union.meituan.com).
+- **Amap (高德地图) POI ratings** — used as the realistic substitute for
+  Dianping ratings. Amap's own POI search returns a `rating` field for
+  dining/attraction categories, sourced from its own review data.
+
+Until partner accounts are approved, `api/partners.py` returns curated
+local data (`data` already in `api/dashboard.py`) plus a safe, untracked
+link to the relevant Trip.com/Meituan section — never a guessed or
+fabricated deep-link URL.
 
 ### Setting up Google Sign-In
 
@@ -160,6 +190,10 @@ POST /api/favorites              { kind, ref_id, payload? }
 DELETE /api/favorites/<id>
 GET  /api/chat-history
 GET  /api/chat-history/<id>
+GET  /api/partners/hotels?city=<id>&checkin=&checkout=
+GET  /api/partners/transport?from=&to=&date=&mode=train|flight
+GET  /api/partners/deals?city=<id>
+GET  /api/ratings?city=<id>&category=hotel|dining|attraction
 ```
 
 All JSON responses are `{ ok: true, ...data }` or

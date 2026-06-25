@@ -68,6 +68,12 @@ def _route_api(environ, start_response, path: str):
     if path.startswith("/api/trips"):
         from api import trips
         return trips.handle(environ, start_response, path)
+    if path.startswith("/api/partners"):
+        from api import partners
+        return partners.handle(environ, start_response, path)
+    if path == "/api/ratings":
+        from api import ratings
+        return ratings.handle(environ, start_response, path)
     return error_response(start_response, "Endpoint not found", "404 Not Found")
 
 

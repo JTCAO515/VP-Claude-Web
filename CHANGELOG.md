@@ -2,6 +2,39 @@
 
 All notable changes to VisePanda.
 
+## v8.2.0 — 2026-06-25
+
+Booking + ratings: 携程联盟 (Ctrip/Trip.com Union), 美团联盟 (Meituan Union),
+Amap POI ratings as the realistic substitute for Dianping data (which has
+no public third-party API).
+
+### Added
+- `api/partners.py` — `/api/partners/hotels`, `/api/partners/transport`,
+  `/api/partners/deals`. When `CTRIP_UNION_*`/`MEITUAN_UNION_*` keys are
+  configured, calls the respective Union (affiliate/CPS) API for live
+  search + a tracked deep link. Without keys, returns curated local data
+  (already in `api/dashboard.py`) plus a safe, verified-stable link to the
+  right Trip.com/Meituan section — never a guessed deep-link URL.
+- `api/ratings.py` — `/api/ratings?city=&category=` via Amap's Web Service
+  POI search (`AMAP_WEB_SERVICE_KEY`, a different key type from the JS-API
+  `AMAP_JS_KEY` already used for the Plan map). Returns `rating` per POI
+  when available; empty list (not an error) when the key is unset.
+- Tools gained a third section, **Book & Reviews**: Hotels, Transport, and
+  Group deals cards, each opening a sheet (`components/booking-panel.js`)
+  that searches via the new endpoints and opens the book_url in a new tab.
+- Cities' detail sheet now shows a ★ rating badge next to hotels/deals
+  (fuzzy name-matched against Amap POI data) and "Book on Trip.com" /
+  "Book on Meituan" buttons.
+
+### Why not a direct Dianping/Meituan integration?
+Dianping review/rating data and Meituan order placement are not exposed via
+any public third-party API — both require a formal business/data-licensing
+agreement, not just an API key signup. Building a fake "integration" that
+can't actually fetch real data would be worse than being upfront about it.
+Ctrip/Trip.com Union and Meituan Union are real, application-based affiliate
+programs that this app is wired for; Amap's POI ratings are a genuine public
+API that approximates what Dianping ratings would have shown.
+
 ## v8.1.0 — 2026-06-25
 
 Fills in the v8 sidebar redesign's placeholder interactions.
