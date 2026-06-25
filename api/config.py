@@ -9,7 +9,7 @@ import os
 import secrets
 from pathlib import Path
 
-VERSION = "8.3.0"
+VERSION = "8.4.0"
 APP_NAME = "VisePanda"
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -71,13 +71,17 @@ AMAP_SECURITY_CODE = _env("AMAP_SECURITY_CODE")
 # (biz_ext.rating) for dining and attraction categories.
 AMAP_WEB_SERVICE_KEY = _env("AMAP_WEB_SERVICE_KEY")
 
-# ---------- Ctrip / Trip.com Union (携程联盟) — hotel/flight/train affiliate ----------
-# An affiliate/CPS program, not an order-placement API: this searches Union
-# inventory and produces a tracked deep link for the user to complete
-# checkout on Trip.com. Requires partner approval at union.ctrip.com.
-CTRIP_UNION_API_KEY = _env("CTRIP_UNION_API_KEY")
-CTRIP_UNION_API_SECRET = _env("CTRIP_UNION_API_SECRET")
-CTRIP_UNION_PID = _env("CTRIP_UNION_PID")
+# ---------- Ctrip / Trip.com Union (携程联盟) — hotel/flight/train deep links ----------
+# Ctrip Union retired its callable search API; the current integration model
+# is their "URL生成工具" (URL builder): pick a page type (hotel list, hotel
+# detail, train list, flight list) in their open-platform console, fill in
+# the search parameters, and it hands you a templated H5 deep link. There is
+# no request/response to call — AID + SID are affiliate-attribution IDs
+# baked directly into the URL query string, not secrets, so it's fine for
+# them to have a default here. Override via env var if the product owner's
+# affiliate IDs ever change.
+CTRIP_AID = _env("CTRIP_AID", "8269906")
+CTRIP_SID = _env("CTRIP_SID", "314255103")
 
 # ---------- Meituan Union (美团联盟) — group-buy deal affiliate ----------
 # Same CPS/affiliate model as Ctrip Union, scoped to group-buy deals.
@@ -128,7 +132,10 @@ def has_amap_ratings() -> bool:
 
 
 def has_ctrip() -> bool:
-    return bool(CTRIP_UNION_API_KEY and CTRIP_UNION_API_SECRET)
+    # CTRIP_AID/CTRIP_SID ship with working defaults (see above), so the
+    # H5 deep-link builder is available out of the box — this flag exists
+    # so the product owner can blank out both env vars to disable it.
+    return bool(CTRIP_AID and CTRIP_SID)
 
 
 def has_meituan() -> bool:

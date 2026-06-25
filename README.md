@@ -33,7 +33,7 @@ VisePanda 不是又一个旅游攻略 App，而是定位为**贯穿入境全程�
 
 ### 产品路线图
 
-**已完成（v7 → v8.3，详见 [`CHANGELOG.md`](CHANGELOG.md)）**
+**已完成（v7 → v8.4，详见 [`CHANGELOG.md`](CHANGELOG.md)）**
 - ✅ AI 问答（DeepSeek）+ 实时语音翻译（Qwen3 TTS/ASR）
 - ✅ 城市/酒店/餐厅/景点精选数据 + 评分（高德 POI，替代无公开 API 的大众点评）
 - ✅ 行程规划 + AI 生成 + 地图可视化（高德地图）
@@ -118,9 +118,8 @@ gracefully when its key is absent.
 | `AMAP_JS_KEY`           | 高德地图 (Amap) JS API key — used in Plan's map column |
 | `AMAP_SECURITY_CODE`    | Amap's paired security code (safe to expose client-side per Amap's docs) |
 | `AMAP_WEB_SERVICE_KEY`  | Amap **Web服务** key (different type from `AMAP_JS_KEY`) — server-side POI ratings |
-| `CTRIP_UNION_API_KEY`   | 携程联盟 (Ctrip/Trip.com Union) affiliate app key  |
-| `CTRIP_UNION_API_SECRET`| Ctrip Union signing secret                        |
-| `CTRIP_UNION_PID`       | Ctrip Union promotion/affiliate id (for link attribution) |
+| `CTRIP_AID`             | 携程联盟 (Ctrip/Trip.com) affiliate ID — ships with a working default, override only if it changes |
+| `CTRIP_SID`             | 携程联盟 sub-affiliate ID — ships with a working default, override only if it changes |
 | `MEITUAN_UNION_API_KEY` | 美团联盟 (Meituan Union) affiliate app key         |
 | `MEITUAN_UNION_API_SECRET` | Meituan Union signing secret                  |
 | `JWT_SECRET`            | 32+ char random hex; auto-generated if missing    |
@@ -142,7 +141,7 @@ then redeploy. None are required for the app to boot or to demo end-to-end.
 | `GOOGLE_CLIENT_*`      | "Continue with Google" button hidden              |
 | `AMAP_JS_KEY`          | Plan's map column shows the striped placeholder + numbered pins instead of a live map |
 | `AMAP_WEB_SERVICE_KEY` | Rating badges simply don't appear (not an error)  |
-| `CTRIP_UNION_*`        | Hotels/Transport tools show curated local data + an untracked link to the right Trip.com section |
+| `CTRIP_AID`/`CTRIP_SID` | Not applicable — these ship with working defaults, so Hotels/Transport always produce an attributed Ctrip H5 deep link out of the box |
 | `MEITUAN_UNION_*`      | Group deals tool shows curated local data + a link to meituan.com |
 | `JWT_SECRET`           | Per-process random secret (sessions reset on boot)|
 
@@ -150,22 +149,32 @@ then redeploy. None are required for the app to boot or to demo end-to-end.
 
 Dianping has **no public API** for third parties to pull reviews or ratings
 — that data requires a formal licensing deal with Meituan/Dianping. Meituan
-itself doesn't expose an order-placement API to outside apps either. What
-*is* realistically available, and what this app integrates:
+itself doesn't expose an order-placement API to outside apps either. Ctrip
+Union also **retired its callable search API** (this changed mid-project —
+see CHANGELOG v8.4.0). What *is* realistically available, and what this app
+integrates:
 
-- **携程联盟 (Ctrip/Trip.com Union)** — an affiliate/CPS program. Search
-  their hotel inventory and generate a tracked deep link; the user completes
-  checkout on Trip.com. Apply at [union.ctrip.com](https://union.ctrip.com).
-- **美团联盟 (Meituan Union)** — same affiliate model, scoped to group-buy
-  deals. Apply at [union.meituan.com](https://union.meituan.com).
+- **携程 (Ctrip/Trip.com) H5 deep links** — no API call at all. Ctrip's
+  open-platform **URL生成工具** (URL builder) hands you a templated H5 page
+  URL per product type (hotel list, hotel detail, train list, flight list)
+  with your affiliate ID baked into the query string. `api/partners.py`
+  builds these links directly using `CTRIP_AID`/`CTRIP_SID` (defaults
+  already set — see env var table above); the user taps through and
+  completes checkout on Trip.com's own page. ⚠️ The exact query-parameter
+  names are a best-effort reconstruction from Ctrip's public affiliate
+  docs, not yet confirmed against a real generated link — see
+  `api/partners.py` for the verification note.
+- **美团联盟 (Meituan Union)** — still a callable affiliate/CPS API (as of
+  this writing). Search their group-buy inventory and generate a tracked
+  deep link. Apply at [union.meituan.com](https://union.meituan.com).
 - **Amap (高德地图) POI ratings** — used as the realistic substitute for
   Dianping ratings. Amap's own POI search returns a `rating` field for
   dining/attraction categories, sourced from its own review data.
 
-Until partner accounts are approved, `api/partners.py` returns curated
-local data (`data` already in `api/dashboard.py`) plus a safe, untracked
-link to the relevant Trip.com/Meituan section — never a guessed or
-fabricated deep-link URL.
+Without `MEITUAN_UNION_*` configured, `api/partners.py` returns curated
+local data (already in `api/dashboard.py`) plus a safe, untracked link to
+Meituan's site — never a guessed or fabricated deep-link URL. Ctrip links
+work out of the box (default AID/SID), independent of any key.
 
 ### Setting up Google Sign-In
 

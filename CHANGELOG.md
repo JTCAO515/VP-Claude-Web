@@ -2,6 +2,48 @@
 
 All notable changes to VisePanda.
 
+## v8.4.0 — 2026-06-25
+
+Ctrip Union retired the callable hotel-search API this project originally
+integrated against. Switched to their current integration surface (an H5
+deep-link URL builder) and synced all docs that still described the old
+API-key model.
+
+### Changed
+- `api/partners.py` rewritten: `_hotels`/`_transport` no longer attempt an
+  API call to Ctrip Union. Instead `_ctrip_url()` builds four kinds of H5
+  deep links directly — hotel list, hotel detail, train list, flight list
+  — with the affiliate ID/sub-ID baked into the query string per Ctrip's
+  current "URL生成工具" (URL builder) model. New `GET /api/partners/hotel-detail`
+  endpoint for the hotel-detail link type.
+  ⚠️ Exact query-parameter names (`allianceid`, `sid`, `dcity`/`acity`,
+  `triptype`, etc.) are a best-effort reconstruction from Ctrip's public
+  affiliate docs — **not yet verified against a real generated link**.
+  See the module docstring for how to confirm once the product owner
+  pastes a real example link from their open-platform console.
+- `api/config.py`: replaced `CTRIP_UNION_API_KEY`/`CTRIP_UNION_API_SECRET`/
+  `CTRIP_UNION_PID` (signed-API model) with `CTRIP_AID`/`CTRIP_SID`
+  (affiliate-attribution IDs baked into the URL, not secrets — both ship
+  with working defaults so hotel/transport links work out of the box with
+  zero configuration).
+- `web/js/components/booking-panel.js`: Hotels panel gained check-in/out
+  date fields (defaults to tomorrow + 2 nights). Transport panel split
+  into Train and Flight sub-forms — Flight supports one-way/round-trip
+  with a return-date field, matching what Ctrip's H5 pages actually need.
+- Synced `README.md`, `docs/HANDOFF.md`, and `docs/VERCEL_KEYS_GUIDE.md` —
+  all three still described the retired Ctrip Union API-key flow. The
+  Vercel guide now explains the URL-builder model in plain language and
+  notes the booking feature works immediately, no application/approval
+  needed (unlike Meituan Union, which is still a signed API requiring
+  partner approval).
+
+### Why this matters for whoever reads the docs next
+This is the kind of "the third party changed their integration model
+out from under us" gap that's easy to miss if you only read the code —
+the docs kept describing an API that no longer exists. Worth specifically
+checking partner-integration docs against the actual code after any
+external API change, not just after a redesign.
+
 ## v8.3.0 — 2026-06-25
 
 Merged Plan+Trips into one tab; Cities detail sheet now browses Hotels/

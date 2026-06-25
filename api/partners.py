@@ -1,30 +1,51 @@
-"""Partner booking links — Ctrip/Trip.com Union (hotels, flights, trains)
-and Meituan Union (group-buy deals).
+"""Partner booking links — Ctrip/Trip.com H5 deep links (hotels, flights,
+trains) and Meituan Union (group-buy deals).
 
-Both are CPS/affiliate programs, not order-placement APIs: the realistic
-integration is searching their inventory (once the partner account is
-approved and keys are set) and producing a tracked deep link for the user
-to complete checkout on the partner's own site. Dianping/Meituan review
-data has no public ratings API for third parties — see api/ratings.py for
-the Amap-based substitute.
+## Ctrip — URL builder, not an API call
 
-Without keys, every endpoint still returns curated local data plus a
-working (untracked) link to the right top-level section of the partner
-site, so this feature is useful immediately and never breaks while
-waiting on partner approval. We deliberately do NOT fabricate deep-link
-query parameters we haven't verified — only the stable, well-known
-top-level paths are used as fallback targets.
+Ctrip Union retired the callable search API this integration originally
+targeted. The current integration surface is their **URL生成工具**
+(URL builder) in the open-platform console: you pick a page type, fill in
+search parameters, and it hands you a templated H5 deep link — there is no
+request/response, just a query string the user's browser opens directly.
+
+`_ctrip_url()` below builds four kinds of links:
+  - hotel list   (city + check-in/out dates)
+  - hotel detail (hotel id + check-in/out dates)
+  - train list   (origin + destination + date)
+  - flight list  (origin + destination + trip type + dates)
+
+⚠️ **The exact path and query-parameter names below are not yet verified
+against the product owner's real account.** `allianceid`/`sid` are the
+affiliate-attribution parameters used consistently across Ctrip's public
+affiliate documentation, and the URL skeletons follow their documented H5
+page structure — but until the product owner pastes a real generated link
+from their open-platform console (see docs/HANDOFF.md), treat these as
+best-effort and re-check the query param names if a link doesn't resolve
+to the right page.
+
+## Meituan — still an affiliate API, not yet swapped
+
+Meituan Union has not announced the same API retirement, so `_deals()`
+still attempts a Union API call when keys are present (same best-effort,
+needs-verification caveat as before) and falls back to curated local data
++ a generic meituan.com link otherwise.
+
+## Dianping ratings
+
+No public API exists for third parties; `api/ratings.py` uses Amap POI
+ratings as the realistic substitute — unrelated to the Ctrip change above,
+documented here only so this isn't mistaken for an oversight.
 
 GET /api/partners/hotels?city=<id>&checkin=&checkout=
-GET /api/partners/transport?from=<city>&to=<city>&date=&mode=train|flight
+GET /api/partners/hotel-detail?hotel_id=<id>&checkin=&checkout=
+GET /api/partners/transport?from=<city>&to=<city>&date=&mode=train|flight&return_date=&trip_type=oneway|roundtrip
 GET /api/partners/deals?city=<id>
+GET /api/partners/attractions?city=<id>
 """
 from __future__ import annotations
 
-import hashlib
-import hmac
 import json
-import time
 import urllib.parse
 
 from . import config
@@ -37,46 +58,28 @@ def _city(city_id: str) -> dict | None:
 
 
 # ============================================================
-# Ctrip / Trip.com Union (携程联盟)
+# Ctrip / Trip.com H5 deep-link builder (URL工具, no API call)
 # ============================================================
 
-def _ctrip_hotel_search(city: dict, checkin: str, checkout: str) -> dict | None:
-    """Best-effort Union API call — returns None on any failure so the
-    caller falls back to curated data + a generic link.
+def _ctrip_affiliate_params() -> dict:
+    return {"allianceid": config.CTRIP_AID, "sid": config.CTRIP_SID}
 
-    NOTE: the exact endpoint path and signing scheme below must be
-    validated against the current 携程联盟 (Ctrip Union) API docs once a
-    partner account is approved; this scaffold follows their documented
-    appkey + HMAC-SHA256-over-sorted-params pattern but has not been
-    tested against a live account.
+
+def _ctrip_url(kind: str, **params) -> str:
+    """Build a Ctrip/Trip.com H5 deep link. `kind` is one of:
+    'hotel_list', 'hotel_detail', 'train_list', 'flight_list'.
+    Unset params are simply omitted from the query string.
     """
-    if not config.has_ctrip():
-        return None
-    try:
-        ts = str(int(time.time()))
-        payload = {
-            "appkey": config.CTRIP_UNION_API_KEY,
-            "pid": config.CTRIP_UNION_PID,
-            "city": city["name"],
-            "checkin": checkin,
-            "checkout": checkout,
-            "timestamp": ts,
-        }
-        sign_str = "&".join(f"{k}={v}" for k, v in sorted(payload.items()) if v)
-        signature = hmac.new(
-            config.CTRIP_UNION_API_SECRET.encode(), sign_str.encode(), hashlib.sha256
-        ).hexdigest()
-        payload["sign"] = signature
-        code, body, _ = http_request(
-            "https://openapi.ctrip.com/osp/apiplatform/union/hotel/list",
-            method="POST", data=payload, timeout=10,
-        )
-        if code != 200:
-            return None
-        data = json.loads(body.decode("utf-8"))
-        return data if data.get("hotels") else None
-    except Exception:  # noqa: BLE001
-        return None
+    base_by_kind = {
+        "hotel_list": "https://hotels.ctrip.com/domestic/list",
+        "hotel_detail": "https://hotels.ctrip.com/hotel",
+        "train_list": "https://trains.ctrip.com/webapp/train/list",
+        "flight_list": "https://flights.ctrip.com/online/list",
+    }
+    base = base_by_kind[kind]
+    query = {k: v for k, v in params.items() if v}
+    query.update(_ctrip_affiliate_params())
+    return f"{base}?{urllib.parse.urlencode(query)}"
 
 
 def _hotels(environ, start_response):
@@ -87,21 +90,24 @@ def _hotels(environ, start_response):
     checkin = params.get("checkin", "")
     checkout = params.get("checkout", "")
 
-    live = _ctrip_hotel_search(city, checkin, checkout)
-    if live:
-        return json_response(start_response, {
-            "ok": True, "provider": "ctrip_union",
-            "hotels": live.get("hotels", []),
-            "book_url": live.get("deep_link") or "https://www.trip.com/hotels/",
-        })
-
     curated = [h for h in HOTELS if h["city"] == city["id"]]
-    qs = urllib.parse.urlencode({"city": city["name"]})
+    book_url = _ctrip_url("hotel_list", city=city["name"], checkin=checkin, checkout=checkout)
     return json_response(start_response, {
-        "ok": True, "provider": "local",
+        "ok": True, "provider": "ctrip_h5",
         "hotels": curated,
-        "book_url": f"https://www.trip.com/hotels/?{qs}",
+        "book_url": book_url,
     })
+
+
+def _hotel_detail(environ, start_response):
+    params = parse_query(environ)
+    hotel_id = params.get("hotel_id", "")
+    if not hotel_id:
+        return error_response(start_response, "hotel_id is required")
+    checkin = params.get("checkin", "")
+    checkout = params.get("checkout", "")
+    book_url = _ctrip_url("hotel_detail", hotelId=hotel_id, checkin=checkin, checkout=checkout)
+    return json_response(start_response, {"ok": True, "provider": "ctrip_h5", "book_url": book_url})
 
 
 def _transport(environ, start_response):
@@ -109,29 +115,37 @@ def _transport(environ, start_response):
     origin = params.get("from", "")
     dest = params.get("to", "")
     date = params.get("date", "")
+    return_date = params.get("return_date", "")
     mode = params.get("mode", "train")
-    section = "trains" if mode == "train" else "flights"
+    trip_type = params.get("trip_type", "oneway")  # 'oneway' | 'roundtrip'
 
-    # NOTE: Ctrip Union also exposes flight/train search; left as a
-    # fallback-only path until a partner account + endpoint docs confirm
-    # the exact request shape (same caveat as _ctrip_hotel_search above).
+    if mode == "flight":
+        book_url = _ctrip_url(
+            "flight_list",
+            dcity=origin, acity=dest, ddate=date,
+            rdate=return_date if trip_type == "roundtrip" else "",
+            triptype="1" if trip_type == "oneway" else "2",
+        )
+    else:
+        book_url = _ctrip_url("train_list", dstation=origin, astation=dest, date=date)
 
     return json_response(start_response, {
-        "ok": True, "provider": "local",
-        "book_url": f"https://www.trip.com/{section}/",
-        "note": f"Search {origin or 'your city'} → {dest or 'destination'}"
+        "ok": True, "provider": "ctrip_h5",
+        "book_url": book_url,
+        "note": f"Search {origin or 'your origin'} → {dest or 'destination'}"
                 f" on {date or 'your travel date'} once there.",
     })
 
 
 # ============================================================
-# Meituan Union (美团联盟)
+# Meituan Union (美团联盟) — still an affiliate API (unverified scaffold)
 # ============================================================
 
 def _meituan_deal_search(city: dict) -> dict | None:
     """NOTE: exact 美团联盟 (Meituan Union) endpoint/signing must be
     confirmed against current docs once a partner account is approved —
-    same scaffold-not-yet-verified caveat as the Ctrip path above.
+    unlike Ctrip, Meituan has not (as of this writing) announced retiring
+    its callable API, so this path is left as a best-effort scaffold.
     """
     if not config.has_meituan():
         return None
@@ -173,9 +187,9 @@ def _deals(environ, start_response):
 
 
 def _attractions(environ, start_response):
-    """Curated attraction list + a link to Trip.com's "things to do" section.
-    Ctrip Union also sells tickets/activities, but the exact endpoint isn't
-    confirmed against current docs yet — same caveat as hotels/transport.
+    """Curated attraction list + a Ctrip H5 hotel-list-style link is wrong
+    for activities, so this stays on Trip.com's "things to do" page (no
+    affiliate params confirmed for this page type yet — add when verified).
     """
     params = parse_query(environ)
     city = _city(params.get("city", ""))
@@ -194,6 +208,8 @@ def _attractions(environ, start_response):
 def handle(environ, start_response, path: str):
     if path == "/api/partners/hotels":
         return _hotels(environ, start_response)
+    if path == "/api/partners/hotel-detail":
+        return _hotel_detail(environ, start_response)
     if path == "/api/partners/transport":
         return _transport(environ, start_response)
     if path == "/api/partners/deals":

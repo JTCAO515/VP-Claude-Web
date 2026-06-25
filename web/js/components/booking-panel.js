@@ -1,8 +1,12 @@
 // Booking panels — Hotels / Transport / Group deals, opened from Tools.
-// Hotels and Deals call /api/partners/* for curated data + a book_url
-// (tracked deep link once Ctrip/Meituan Union keys are configured, a
-// safe top-level partner-site link otherwise). Transport collects a
-// from/to/date and opens the relevant Trip.com section.
+//
+// Hotels: city + check-in/out dates → /api/partners/hotels, which builds a
+// Ctrip H5 hotel-list deep link (Ctrip Union's API was retired in favor of
+// their URL-builder tool — see api/partners.py for the full explanation).
+// Transport: separate Train (origin/destination station + date) and Flight
+// (origin/destination city + one-way/round-trip + dates) sub-forms, since
+// Ctrip's H5 list pages for each take different field names.
+// Deals: still Meituan Union (unchanged).
 
 import { api } from '../api.js';
 import { openSheet, closeSheet, sheetHeader } from './sheet.js';
@@ -16,6 +20,22 @@ async function loadCities() {
     citiesCache = data.cities || [];
   } catch (_) { citiesCache = []; }
   return citiesCache;
+}
+
+function dateInputStyle() {
+  return `style="padding:10px 12px;border:1px solid var(--line-1);border-radius:8px;background:var(--sidebar-bg);font:inherit;color:var(--ink-1)"`;
+}
+
+function isoDate(d) {
+  return d.toISOString().slice(0, 10);
+}
+
+function defaultDateRange(startEl, endEl, startDaysFromNow, endDaysFromNow) {
+  const now = new Date();
+  const start = new Date(now); start.setDate(now.getDate() + startDaysFromNow);
+  const end = new Date(now); end.setDate(now.getDate() + endDaysFromNow);
+  if (!startEl.value) startEl.value = isoDate(start);
+  if (!endEl.value) endEl.value = isoDate(end);
 }
 
 function citySelectHTML(id) {
@@ -38,19 +58,36 @@ export async function openHotelBooking() {
       City
       ${citySelectHTML('hb-city')}
     </label>
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <label style="flex:1;display:flex;flex-direction:column;gap:4px;font-size:var(--text-base);color:var(--ink-5)">
+        Check in
+        <input type="date" id="hb-checkin" ${dateInputStyle()}>
+      </label>
+      <label style="flex:1;display:flex;flex-direction:column;gap:4px;font-size:var(--text-base);color:var(--ink-5)">
+        Check out
+        <input type="date" id="hb-checkout" ${dateInputStyle()}>
+      </label>
+    </div>
     <div class="detail-list" id="hb-results"><div class="meta">Pick a city to see options.</div></div>
   `;
   openSheet(content, { wide: true });
   const sel = content.querySelector('#hb-city');
+  const checkinEl = content.querySelector('#hb-checkin');
+  const checkoutEl = content.querySelector('#hb-checkout');
   await fillCitySelect(sel);
-  sel.addEventListener('change', () => search(sel.value));
-  if (sel.value) search(sel.value);
+  defaultDateRange(checkinEl, checkoutEl, 1, 3);
+  const triggerSearch = () => search(sel.value, checkinEl.value, checkoutEl.value);
+  sel.addEventListener('change', triggerSearch);
+  checkinEl.addEventListener('change', triggerSearch);
+  checkoutEl.addEventListener('change', triggerSearch);
+  if (sel.value) triggerSearch();
 
-  async function search(cityId) {
+  async function search(cityId, checkin, checkout) {
     const results = content.querySelector('#hb-results');
     results.innerHTML = `<div class="skeleton" style="height:60px"></div>`;
+    const qs = new URLSearchParams({ city: cityId, checkin: checkin || '', checkout: checkout || '' });
     const [partnerRes, ratingPois] = await Promise.all([
-      api.get('/api/partners/hotels?city=' + cityId).catch(() => null),
+      api.get('/api/partners/hotels?' + qs.toString()).catch(() => null),
       fetchRatings(cityId, 'hotel'),
     ]);
     if (!partnerRes) { results.innerHTML = `<div class="meta">Could not load hotels.</div>`; return; }
@@ -74,42 +111,78 @@ export async function openHotelBooking() {
 // ---------- Transport ----------
 
 export function openTransportBooking() {
+  let mode = 'train';
   const content = document.createElement('div');
   content.className = 'sheet-content';
   content.appendChild(sheetHeader('Book transport'));
   content.innerHTML += `
-    <form id="tb-form" style="display:flex;flex-direction:column;gap:12px">
-      <label style="display:flex;flex-direction:column;gap:4px;font-size:var(--text-base);color:var(--ink-5)">
-        From
-        <input type="text" name="from" placeholder="Beijing" required
-          style="padding:10px 12px;border:1px solid var(--line-1);border-radius:8px;background:var(--sidebar-bg);font:inherit;color:var(--ink-1)">
-      </label>
-      <label style="display:flex;flex-direction:column;gap:4px;font-size:var(--text-base);color:var(--ink-5)">
-        To
-        <input type="text" name="to" placeholder="Xi'an" required
-          style="padding:10px 12px;border:1px solid var(--line-1);border-radius:8px;background:var(--sidebar-bg);font:inherit;color:var(--ink-1)">
-      </label>
-      <label style="display:flex;flex-direction:column;gap:4px;font-size:var(--text-base);color:var(--ink-5)">
-        Date
-        <input type="date" name="date"
-          style="padding:10px 12px;border:1px solid var(--line-1);border-radius:8px;background:var(--sidebar-bg);font:inherit;color:var(--ink-1)">
-      </label>
-      <div style="display:flex;gap:16px;font-size:var(--text-base);color:var(--ink-5)">
-        <label style="display:flex;align-items:center;gap:6px"><input type="radio" name="mode" value="train" checked> Train</label>
-        <label style="display:flex;align-items:center;gap:6px"><input type="radio" name="mode" value="flight"> Flight</label>
-      </div>
-      <div id="tb-note" style="font-size:var(--text-sm);color:var(--ink-soft)"></div>
-      <button class="btn-primary" type="submit">Search on Trip.com →</button>
-    </form>
+    <div class="cat-tabs" style="margin-bottom:16px">
+      <button type="button" class="cat-tab active" data-mode="train">🚄 Train</button>
+      <button type="button" class="cat-tab" data-mode="flight">✈️ Flight</button>
+    </div>
+    <form id="tb-form" style="display:flex;flex-direction:column;gap:12px"></form>
   `;
   openSheet(content);
-  content.querySelector('#tb-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    const qs = new URLSearchParams({
-      from: fd.get('from') || '', to: fd.get('to') || '',
-      date: fd.get('date') || '', mode: fd.get('mode') || 'train',
+  const form = content.querySelector('#tb-form');
+  form.addEventListener('submit', onSubmit);
+  content.querySelectorAll('.cat-tab').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      mode = btn.dataset.mode;
+      content.querySelectorAll('.cat-tab').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderForm();
     });
+  });
+  renderForm();
+
+  function renderForm() {
+    if (mode === 'train') {
+      form.innerHTML = `
+        ${textField('tb-from', 'Departure station', 'Beijing')}
+        ${textField('tb-to', 'Arrival station', "Xi'an")}
+        ${dateField('tb-date', 'Departure date')}
+        <div id="tb-note" style="font-size:var(--text-sm);color:var(--ink-soft)"></div>
+        <button class="btn-primary" type="submit">Search trains on Trip.com →</button>
+      `;
+    } else {
+      form.innerHTML = `
+        ${textField('tb-from', 'Departure city', 'Beijing')}
+        ${textField('tb-to', 'Arrival city', 'Shanghai')}
+        <div style="display:flex;gap:16px;font-size:var(--text-base);color:var(--ink-5)">
+          <label style="display:flex;align-items:center;gap:6px"><input type="radio" name="trip_type" value="oneway" checked> One-way</label>
+          <label style="display:flex;align-items:center;gap:6px"><input type="radio" name="trip_type" value="roundtrip"> Round-trip</label>
+        </div>
+        ${dateField('tb-date', 'Departure date')}
+        <label id="tb-return-wrap" style="display:none;flex-direction:column;gap:4px;font-size:var(--text-base);color:var(--ink-5)">
+          Return date
+          <input type="date" id="tb-return-date" ${dateInputStyle()}>
+        </label>
+        <div id="tb-note" style="font-size:var(--text-sm);color:var(--ink-soft)"></div>
+        <button class="btn-primary" type="submit">Search flights on Trip.com →</button>
+      `;
+      const returnWrap = form.querySelector('#tb-return-wrap');
+      form.querySelectorAll('input[name="trip_type"]').forEach((r) => {
+        r.addEventListener('change', () => {
+          if (r.checked) returnWrap.style.display = r.value === 'roundtrip' ? 'flex' : 'none';
+        });
+      });
+    }
+  }
+
+  async function onSubmit(e) {
+    e.preventDefault();
+    const qs = new URLSearchParams({
+      from: form.querySelector('#tb-from').value || '',
+      to: form.querySelector('#tb-to').value || '',
+      date: form.querySelector('#tb-date').value || '',
+      mode,
+    });
+    if (mode === 'flight') {
+      const tripTypeEl = form.querySelector('input[name="trip_type"]:checked');
+      qs.set('trip_type', tripTypeEl ? tripTypeEl.value : 'oneway');
+      const returnDate = form.querySelector('#tb-return-date');
+      if (returnDate && returnDate.value) qs.set('return_date', returnDate.value);
+    }
     try {
       const data = await api.get('/api/partners/transport?' + qs.toString());
       content.querySelector('#tb-note').textContent = data.note || '';
@@ -117,7 +190,26 @@ export function openTransportBooking() {
     } catch (_) {
       alert('Could not reach transport search.');
     }
-  });
+  }
+}
+
+function textField(id, label, placeholder) {
+  return `
+    <label style="display:flex;flex-direction:column;gap:4px;font-size:var(--text-base);color:var(--ink-5)">
+      ${label}
+      <input type="text" id="${id}" placeholder="${placeholder}" required
+        style="padding:10px 12px;border:1px solid var(--line-1);border-radius:8px;background:var(--sidebar-bg);font:inherit;color:var(--ink-1)">
+    </label>
+  `;
+}
+
+function dateField(id, label) {
+  return `
+    <label style="display:flex;flex-direction:column;gap:4px;font-size:var(--text-base);color:var(--ink-5)">
+      ${label}
+      <input type="date" id="${id}" ${dateInputStyle()}>
+    </label>
+  `;
 }
 
 // ---------- Group deals ----------
