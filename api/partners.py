@@ -29,7 +29,7 @@ import urllib.parse
 
 from . import config
 from .common import error_response, http_request, json_response, parse_query
-from .dashboard import CITIES, DEALS, HOTELS
+from .dashboard import ATTRACTIONS, CITIES, DEALS, HOTELS
 
 
 def _city(city_id: str) -> dict | None:
@@ -172,6 +172,25 @@ def _deals(environ, start_response):
     })
 
 
+def _attractions(environ, start_response):
+    """Curated attraction list + a link to Trip.com's "things to do" section.
+    Ctrip Union also sells tickets/activities, but the exact endpoint isn't
+    confirmed against current docs yet — same caveat as hotels/transport.
+    """
+    params = parse_query(environ)
+    city = _city(params.get("city", ""))
+    if not city:
+        return error_response(start_response, "Unknown city")
+
+    curated = [a for a in ATTRACTIONS if a["city"] == city["id"]]
+    qs = urllib.parse.urlencode({"city": city["name"]})
+    return json_response(start_response, {
+        "ok": True, "provider": "local",
+        "attractions": curated,
+        "book_url": f"https://www.trip.com/things-to-do/?{qs}",
+    })
+
+
 def handle(environ, start_response, path: str):
     if path == "/api/partners/hotels":
         return _hotels(environ, start_response)
@@ -179,4 +198,6 @@ def handle(environ, start_response, path: str):
         return _transport(environ, start_response)
     if path == "/api/partners/deals":
         return _deals(environ, start_response)
+    if path == "/api/partners/attractions":
+        return _attractions(environ, start_response)
     return error_response(start_response, "Route not found", "404 Not Found")

@@ -2,6 +2,41 @@
 
 All notable changes to VisePanda.
 
+## v8.3.0 — 2026-06-25
+
+Merged Plan+Trips into one tab; Cities detail sheet now browses Hotels/
+Dining/Attractions by category; two handoff docs added.
+
+### Added
+- `docs/VERCEL_KEYS_GUIDE.md` — plain-language (Chinese), non-technical
+  walkthrough for every environment variable: what it's for, where to get
+  it, how to paste it into Vercel. Flags the `APP_ENV=production` gotcha
+  (without it, auth silently tries to write to a local JSON file that
+  doesn't persist on Vercel's serverless filesystem).
+- `docs/HANDOFF.md` — full project handoff: intent, architecture, every
+  major version's backstory, this session's work, known gaps, the
+  product owner's working style, and a prioritized roadmap. Written so
+  a cold-start session (human or AI) can pick up without re-deriving
+  context from git history alone.
+- `ATTRACTIONS` curated list + `/api/attractions` + `/api/partners/attractions`
+  (curated data + a `things-to-do` Trip.com link, same fallback pattern as
+  hotels/deals).
+- Cities' detail sheet now has three tabs — **Hotels / Dining / Attractions**
+  — each lazy-loaded once and cached per-sheet-session, with rating badges
+  and a category-appropriate book/view link (Trip.com or Meituan).
+
+### Changed
+- **Plan and Trips merged into one sidebar tab.** The sidebar nav now has
+  4 rows (Ask / Trips / Cities / Tools) instead of 5. "Trips" shows the
+  saved-trip list; opening or creating a trip switches the same tab into
+  the Plan-style itinerary builder, with a "← All trips" link back to the
+  list. `sidebar.js` highlights the Trips row whenever the active view is
+  `'plan'` (the internal view name is unchanged — only the nav row was
+  removed — to minimize churn in `app.js`/`plan.js`).
+- Cities' "Add to Plan" button renamed to "Add to Trip" for consistency
+  with the merged tab.
+- SW cache bumped to `vp-v8-5`.
+
 ## v8.2.0 — 2026-06-25
 
 Booking + ratings: 携程联盟 (Ctrip/Trip.com Union), 美团联盟 (Meituan Union),

@@ -29,12 +29,14 @@ let state = {
   active_day: 0,
   citiesCache: [],
   generating: false,
+  onBackToTrips: null,
 };
 
-export function mount({ container, tripId = null }) {
+export function mount({ container, tripId = null, onBackToTrips = null }) {
   state.root = container;
   container.classList.add('view-plan');
   state.tripId = tripId;
+  state.onBackToTrips = onBackToTrips;
   init();
 }
 
@@ -128,8 +130,29 @@ function publishTripContext() {
 function render() {
   if (!state.root) return;
   state.root.innerHTML = '';
+  if (state.onBackToTrips) state.root.appendChild(renderBackLink());
   state.root.appendChild(renderToolbar());
   state.root.appendChild(renderBody());
+}
+
+function renderBackLink() {
+  const bar = document.createElement('div');
+  bar.style.cssText = 'padding:10px 22px 0;display:flex;align-items:center;gap:6px';
+  const link = document.createElement('button');
+  link.type = 'button';
+  link.textContent = '← All trips';
+  link.style.cssText = 'background:none;border:none;font-size:var(--text-base);color:var(--ink-5);cursor:pointer;font-weight:500';
+  link.addEventListener('mouseenter', () => { link.style.color = 'var(--brand)'; });
+  link.addEventListener('mouseleave', () => { link.style.color = 'var(--ink-5)'; });
+  link.addEventListener('click', () => state.onBackToTrips());
+  bar.appendChild(link);
+  if (state._trip) {
+    const sep = document.createElement('span');
+    sep.textContent = '· ' + (state._trip.name || 'Untitled trip');
+    sep.style.cssText = 'font-size:var(--text-base);color:var(--ink-soft)';
+    bar.appendChild(sep);
+  }
+  return bar;
 }
 
 function renderToolbar() {

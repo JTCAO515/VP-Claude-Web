@@ -1,17 +1,25 @@
-// Sidebar — VisePanda wordmark, + New chat, 5 nav rows with icons,
-// Recent chats, Current trip card (Plan view), avatar.
+// Sidebar — VisePanda wordmark, + New chat, 4 nav rows with icons,
+// Recent chats, Current trip card (shown while inside the Plan builder,
+// which is a sub-view of Trips — see app.js), avatar.
 //
 // Renders into #sidebar. Exposes setActive(tab) and refresh().
+//
+// 'plan' is not its own nav row — Plan and Trips were merged into one tab.
+// app.js still calls setActive('plan') while the itinerary builder is open;
+// we highlight the 'trips' row for that state (see highlightKey() below).
 
 import { api } from './api.js';
 
 const NAV = [
   { key: 'ask',    label: 'Ask',    icon: askIcon },
-  { key: 'plan',   label: 'Plan',   icon: planIcon },
+  { key: 'trips',  label: 'Trips',  icon: tripsIcon },
   { key: 'cities', label: 'Cities', icon: cityIcon },
   { key: 'tools',  label: 'Tools',  icon: toolsIcon },
-  { key: 'trips',  label: 'Trips',  icon: tripsIcon },
 ];
+
+function highlightKey(active) {
+  return active === 'plan' ? 'trips' : active;
+}
 
 let state = {
   active: 'ask',
@@ -68,10 +76,11 @@ function render(root) {
   // Nav
   const nav = document.createElement('nav');
   nav.className = 'sb-nav';
+  const highlighted = highlightKey(state.active);
   for (const item of NAV) {
     const row = document.createElement('button');
     row.type = 'button';
-    row.className = 'sb-nav-row' + (item.key === state.active ? ' active' : '');
+    row.className = 'sb-nav-row' + (item.key === highlighted ? ' active' : '');
     row.innerHTML = `<span class="icon">${item.icon()}</span><span class="sb-label">${item.label}</span>`;
     row.addEventListener('click', () => {
       if (state.onNav) state.onNav(item.key);

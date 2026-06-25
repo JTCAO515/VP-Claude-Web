@@ -9,7 +9,7 @@ import os
 import secrets
 from pathlib import Path
 
-VERSION = "8.2.0"
+VERSION = "8.3.0"
 APP_NAME = "VisePanda"
 
 ROOT_DIR = Path(__file__).resolve().parent.parent

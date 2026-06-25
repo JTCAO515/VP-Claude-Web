@@ -286,3 +286,23 @@
   font-weight: 700; font-size: var(--text-3xl); color: var(--ink-1);
   min-width: 2.2em; text-align: center;
 }
+
+/* Category tabs inside the Cities detail sheet (Hotels/Dining/Attractions) */
+.cat-tabs {
+  display: flex; gap: var(--s-3);
+  margin-bottom: var(--s-6);
+}
+.cat-tab {
+  font-weight: 500; font-size: var(--text-base);
+  color: var(--ink-5);
+  background: var(--canvas-tint);
+  padding: 7px 14px;
+  border-radius: var(--r-pill);
+  border: none;
+  cursor: pointer;
+}
+.cat-tab.active {
+  background: var(--brand);
+  color: #fff;
+  font-weight: 600;
+}

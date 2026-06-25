@@ -1,9 +1,17 @@
 // Cities — browse curated cities. Search + filters + sort. Hero featured card + grid.
-// Clicking a card opens a detail sheet with hotels/deals + "Add to Plan".
+// Clicking a card opens a detail sheet: pick a category — Hotels / Dining /
+// Attractions — each backed by /api/partners/* (curated data + a Trip.com/
+// Meituan book link) with Amap rating badges where available.
 
 import { api } from './api.js';
 import { openSheet, closeSheet, sheetHeader } from './components/sheet.js';
 import { fetchRatings, matchRating, ratingBadge } from './ratings.js';
+
+const CATEGORIES = [
+  { key: 'hotels',      label: 'Hotels',      endpoint: 'hotels',      itemsKey: 'hotels',      ratingCat: 'hotel',      bookLabel: 'Book on Trip.com →' },
+  { key: 'dining',      label: 'Dining',      endpoint: 'deals',       itemsKey: 'deals',       ratingCat: 'dining',     bookLabel: 'Book on Meituan →' },
+  { key: 'attractions', label: 'Attractions', endpoint: 'attractions', itemsKey: 'attractions', ratingCat: 'attraction', bookLabel: 'View on Trip.com →' },
+];
 
 let state = {
   root: null,
@@ -107,22 +115,22 @@ function render() {
 }
 
 async function openDetail(city) {
+  const cache = {};       // category.key -> { items, book_url, ratings }
+  let activeCat = CATEGORIES[0].key;
+
   const content = document.createElement('div');
   content.className = 'sheet-content';
   content.appendChild(sheetHeader(city.name));
   content.innerHTML += `
     <div class="detail-hero"><span class="name">${esc(city.name)}</span></div>
     <p style="font-size:var(--text-base);color:var(--ink-5);line-height:1.5">${esc(city.tagline || '')}</p>
-    <p style="font-size:var(--text-sm);color:var(--ink-soft);margin-top:6px">Best months: ${esc(city.best_months || '—')}</p>
-    <div class="detail-section-label">FOREIGNER-FRIENDLY HOTELS</div>
-    <div class="detail-list" id="city-hotels"><div class="skeleton" style="height:50px"></div></div>
-    <button class="btn-outline" type="button" id="book-hotel-link" style="margin-top:8px;display:none">Book on Trip.com →</button>
-    <div class="detail-section-label">DEALS NEARBY</div>
-    <div class="detail-list" id="city-deals"><div class="skeleton" style="height:50px"></div></div>
-    <button class="btn-outline" type="button" id="book-deal-link" style="margin-top:8px;display:none">Book on Meituan →</button>
+    <p style="font-size:var(--text-sm);color:var(--ink-soft);margin:2px 0 14px">Best months: ${esc(city.best_months || '—')}</p>
+    <div class="cat-tabs"></div>
+    <div class="detail-list" id="city-cat-results"><div class="skeleton" style="height:60px"></div></div>
+    <button class="btn-outline" type="button" id="city-cat-book" style="margin-top:10px;display:none;width:100%"></button>
     <div class="sheet-footer-actions">
       <button class="btn-outline" type="button" data-act="close">Close</button>
-      <button class="btn-primary" type="button" data-act="add-to-plan">+ Add to Plan</button>
+      <button class="btn-primary" type="button" data-act="add-to-plan">+ Add to Trip</button>
     </div>
   `;
   openSheet(content, { wide: true });
@@ -132,41 +140,81 @@ async function openDetail(city) {
     if (state.onAddToPlan) state.onAddToPlan(city);
   });
 
-  const [hotelsRes, dealsRes, hotelRatings, dealRatings] = await Promise.all([
-    api.get('/api/partners/hotels?city=' + city.id).catch(() => ({ hotels: [] })),
-    api.get('/api/partners/deals?city=' + city.id).catch(() => ({ deals: [] })),
-    fetchRatings(city.id, 'hotel'),
-    fetchRatings(city.id, 'dining'),
-  ]);
-  const hotelsRoot = content.querySelector('#city-hotels');
-  hotelsRoot.innerHTML = (hotelsRes.hotels || []).length
-    ? hotelsRes.hotels.map((h) => `
-        <div class="detail-card">
-          <div class="name">${esc(h.name)}${ratingBadge(matchRating(hotelRatings, h.name))}</div>
-          <div class="meta">${esc(h.neighborhood)} · ★ ${h.rating} · ${esc(h.price_band)}</div>
-        </div>
-      `).join('')
-    : `<div class="meta" style="padding:8px 0">No curated hotels yet.</div>`;
-  if (hotelsRes.book_url) {
-    const btn = content.querySelector('#book-hotel-link');
-    btn.style.display = '';
-    btn.addEventListener('click', () => window.open(hotelsRes.book_url, '_blank'));
+  const tabsRoot = content.querySelector('.cat-tabs');
+  for (const cat of CATEGORIES) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'cat-tab' + (cat.key === activeCat ? ' active' : '');
+    btn.textContent = cat.label;
+    btn.addEventListener('click', () => {
+      activeCat = cat.key;
+      tabsRoot.querySelectorAll('.cat-tab').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      showCategory(cat);
+    });
+    tabsRoot.appendChild(btn);
   }
 
-  const dealsRoot = content.querySelector('#city-deals');
-  dealsRoot.innerHTML = (dealsRes.deals || []).length
-    ? dealsRes.deals.map((d) => `
-        <div class="detail-card">
-          <div class="name">${esc(d.title)}${ratingBadge(matchRating(dealRatings, d.vendor))}</div>
-          <div class="meta">${esc(d.vendor)} · ${esc(d.discount)}</div>
-        </div>
-      `).join('')
-    : `<div class="meta" style="padding:8px 0">No curated deals yet.</div>`;
-  if (dealsRes.book_url) {
-    const btn = content.querySelector('#book-deal-link');
-    btn.style.display = '';
-    btn.addEventListener('click', () => window.open(dealsRes.book_url, '_blank'));
+  async function showCategory(cat) {
+    const resultsRoot = content.querySelector('#city-cat-results');
+    const bookBtn = content.querySelector('#city-cat-book');
+    bookBtn.style.display = 'none';
+    if (!cache[cat.key]) {
+      resultsRoot.innerHTML = `<div class="skeleton" style="height:60px"></div>`;
+      const [partnerRes, ratingPois] = await Promise.all([
+        api.get(`/api/partners/${cat.endpoint}?city=${city.id}`).catch(() => null),
+        fetchRatings(city.id, cat.ratingCat),
+      ]);
+      cache[cat.key] = {
+        items: partnerRes ? (partnerRes[cat.itemsKey] || []) : [],
+        book_url: partnerRes ? partnerRes.book_url : null,
+        ratings: ratingPois,
+      };
+    }
+    if (activeCat !== cat.key) return; // a faster tab switch happened meanwhile
+    renderCategory(cat, cache[cat.key], resultsRoot, bookBtn);
   }
+
+  showCategory(CATEGORIES[0]);
+}
+
+function renderCategory(cat, data, resultsRoot, bookBtn) {
+  const { items, book_url, ratings } = data;
+  resultsRoot.innerHTML = items.length
+    ? items.map((item) => itemCardHTML(cat.key, item, ratings)).join('')
+    : `<div class="meta" style="padding:8px 0">No curated ${esc(cat.label.toLowerCase())} yet for this city.</div>`;
+  if (book_url) {
+    bookBtn.style.display = '';
+    bookBtn.textContent = cat.bookLabel;
+    bookBtn.onclick = () => window.open(book_url, '_blank');
+  }
+}
+
+function itemCardHTML(catKey, item, ratings) {
+  if (catKey === 'hotels') {
+    return `
+      <div class="detail-card">
+        <div class="name">${esc(item.name)}${ratingBadge(matchRating(ratings, item.name))}</div>
+        <div class="meta">${esc(item.neighborhood || '')} · ★ ${item.rating ?? '—'} · ${esc(item.price_band || '')}</div>
+      </div>
+    `;
+  }
+  if (catKey === 'dining') {
+    return `
+      <div class="detail-card">
+        <div class="name">${esc(item.title)}${ratingBadge(matchRating(ratings, item.vendor))}</div>
+        <div class="meta">${esc(item.vendor || '')} · ${esc(item.discount || '')}</div>
+      </div>
+    `;
+  }
+  // attractions
+  return `
+    <div class="detail-card">
+      <div class="name">${esc(item.name)}${ratingBadge(matchRating(ratings, item.name))}</div>
+      <div class="meta">${esc(item.category || '')} · ${esc(item.duration || '')} · ${esc(item.price_band || '')}</div>
+      ${item.summary ? `<div class="meta" style="margin-top:4px">${esc(item.summary)}</div>` : ''}
+    </div>
+  `;
 }
 
 function esc(s) {

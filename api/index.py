@@ -52,8 +52,8 @@ def _route_api(environ, start_response, path: str):
     if path.startswith("/api/translations"):
         from api import translations
         return translations.handle(environ, start_response, path)
-    if path in {"/api/cities", "/api/hotels", "/api/deals", "/api/tools",
-                "/api/maps", "/api/weather"}:
+    if path in {"/api/cities", "/api/hotels", "/api/deals", "/api/attractions",
+                "/api/tools", "/api/maps", "/api/weather"}:
         from api import dashboard
         return dashboard.handle(environ, start_response, path)
     if path.startswith("/api/itinerary"):

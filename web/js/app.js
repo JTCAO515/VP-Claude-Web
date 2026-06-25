@@ -1,4 +1,7 @@
-// VisePanda v8 — left sidebar + main router (Ask / Plan / Cities / Tools / Trips).
+// VisePanda v8 — left sidebar + main router (Ask / Trips(+Plan) / Cities / Tools).
+// Plan and Trips were merged into one tab: Trips shows the saved-trip list;
+// opening or creating a trip switches the same tab into the Plan-style
+// itinerary builder, with a "← All trips" link back to the list.
 
 import { api } from './api.js';
 import * as sidebar from './sidebar.js';
@@ -71,7 +74,11 @@ function setView(name, opts = {}) {
       },
     });
   } else if (name === 'plan') {
-    plan.mount({ container: main, tripId: opts.tripId || null });
+    plan.mount({
+      container: main,
+      tripId: opts.tripId || null,
+      onBackToTrips: () => setView('trips'),
+    });
   } else if (name === 'cities') {
     cities.mount({
       container: main,

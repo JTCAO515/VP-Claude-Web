@@ -180,6 +180,34 @@ TOOLS = [
 ]
 
 
+ATTRACTIONS = [
+    {"id": "a-forbidden-city", "city": "beijing", "name": "Forbidden City",
+     "category": "Landmark", "summary": "Imperial palace complex, 600 years of history.",
+     "duration": "2-3h", "price_band": "$"},
+    {"id": "a-great-wall", "city": "beijing", "name": "Great Wall (Mutianyu)",
+     "category": "Landmark", "summary": "The most accessible well-restored section from Beijing.",
+     "duration": "Half day", "price_band": "$$"},
+    {"id": "a-bund", "city": "shanghai", "name": "The Bund",
+     "category": "Scenic", "summary": "Riverside promenade facing the Pudong skyline.",
+     "duration": "1-2h", "price_band": "Free"},
+    {"id": "a-yuyuan", "city": "shanghai", "name": "Yuyuan Garden",
+     "category": "Garden", "summary": "Classical Ming-dynasty garden in the old city.",
+     "duration": "1-2h", "price_band": "$"},
+    {"id": "a-panda-base", "city": "chengdu", "name": "Chengdu Panda Base",
+     "category": "Wildlife", "summary": "Giant pandas in a research-park setting; go early morning.",
+     "duration": "Half day", "price_band": "$"},
+    {"id": "a-terracotta", "city": "xian", "name": "Terracotta Army",
+     "category": "Landmark", "summary": "Thousands of life-size warrior statues, 2,200 years old.",
+     "duration": "Half day", "price_band": "$$"},
+    {"id": "a-li-river", "city": "guilin", "name": "Li River Cruise",
+     "category": "Scenic", "summary": "Karst-peak river scenery between Guilin and Yangshuo.",
+     "duration": "Full day", "price_band": "$$$"},
+    {"id": "a-west-lake", "city": "hangzhou", "name": "West Lake",
+     "category": "Scenic", "summary": "UNESCO site — pagodas, causeways, and tea hills around the lake.",
+     "duration": "Half day", "price_band": "Free"},
+]
+
+
 # ============================================================
 # Handlers
 # ============================================================
@@ -207,6 +235,13 @@ def _deals(environ, start_response):
     city = params.get("city")
     items = [d for d in DEALS if not city or d["city"] == city]
     return json_response(start_response, {"ok": True, "deals": items})
+
+
+def _attractions(environ, start_response):
+    params = parse_query(environ)
+    city = params.get("city")
+    items = [a for a in ATTRACTIONS if not city or a["city"] == city]
+    return json_response(start_response, {"ok": True, "attractions": items})
 
 
 def _tools(environ, start_response):
@@ -277,6 +312,8 @@ def handle(environ, start_response, path: str):
         return _hotels(environ, start_response)
     if path == "/api/deals":
         return _deals(environ, start_response)
+    if path == "/api/attractions":
+        return _attractions(environ, start_response)
     if path == "/api/tools":
         return _tools(environ, start_response)
     if path == "/api/maps":
