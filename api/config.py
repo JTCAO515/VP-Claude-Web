@@ -9,7 +9,7 @@ import os
 import secrets
 from pathlib import Path
 
-VERSION = "9.0.0"
+VERSION = "9.0.1"
 APP_NAME = "VisePanda"
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -71,15 +71,27 @@ AMAP_SECURITY_CODE = _env("AMAP_SECURITY_CODE")
 # (biz_ext.rating) for dining and attraction categories.
 AMAP_WEB_SERVICE_KEY = _env("AMAP_WEB_SERVICE_KEY")
 
-# ---------- Ctrip / Trip.com Union (携程联盟) — hotel/flight/train deep links ----------
-# Ctrip Union retired its callable search API; the current integration model
-# is their "URL生成工具" (URL builder): pick a page type (hotel list, hotel
-# detail, train list, flight list) in their open-platform console, fill in
-# the search parameters, and it hands you a templated H5 deep link. There is
-# no request/response to call — AID + SID are affiliate-attribution IDs
-# baked directly into the URL query string, not secrets, so it's fine for
-# them to have a default here. Override via env var if the product owner's
-# affiliate IDs ever change.
+# ---------- Trip.com (携程国际版) — hotel/flight/train deep links ----------
+# Researched two integration paths for Trip.com (confirmed June 2026):
+#
+# 1. Trip.com Affiliate Program (trip.com/partners) — self-serve, free,
+#    approved in hours/days. What you get is a tracked deep-link/affiliate
+#    ID, NOT a structured query API. This is what we use: _ctrip_url() in
+#    api/partners.py builds H5 deep links with AID/SID baked into the
+#    query string, matching their "URL生成工具" deep-link model.
+# 2. Trip.com Open Platform (developers.trip.com / connect.trip.com) — a
+#    real OAuth2 API supporting booking confirm/cancel/modify/status, but
+#    per their own docs: "After reaching a cooperation agreement, you can
+#    get your appKey and appSecret from Trip.com's product support team."
+#    This requires a signed business agreement, not a self-serve signup —
+#    not realistic for this project. Revisit only if the product owner
+#    pursues a formal partnership.
+#
+# AID + SID are affiliate-attribution IDs baked directly into the URL
+# query string, not secrets — safe to ship a default. Override via env
+# var once the product owner registers their own Trip.com affiliate
+# account (the IDs below are a generic placeholder, not the product
+# owner's own account).
 CTRIP_AID = _env("CTRIP_AID", "8269906")
 CTRIP_SID = _env("CTRIP_SID", "314255103")
 

@@ -2,6 +2,37 @@
 
 All notable changes to VisePanda.
 
+## v9.0.1 — 2026-06-25
+
+Docs-only: researched whether Trip.com (携程国际版, the international arm of
+Ctrip) offers a usable API now that the domestic Ctrip Open Platform has
+retired its callable search API.
+
+### Findings (no code logic changed, only comments/docs updated)
+- **Trip.com Open Platform** (developers.trip.com / connect.trip.com) is a
+  real OAuth2 API supporting booking confirm/cancel/modify/status — but per
+  their own docs, credentials (`appKey`/`appSecret`) are only issued
+  *"after reaching a cooperation agreement"* with their product support
+  team. Not a self-serve signup; not realistic for this project without a
+  formal business deal.
+- **Trip.com Affiliate Program** (trip.com/partners) — free, self-serve,
+  approved within hours to days. This is the *only* genuinely accessible
+  path, and it only ever hands you a tracked deep-link/affiliate ID, never
+  a structured query API. Confirms the existing H5-deep-link approach in
+  `api/partners.py` (`_ctrip_url`) was already the right call.
+
+### Changed
+- `api/config.py`: `CTRIP_AID`/`CTRIP_SID` comment rewritten to document
+  both paths researched and why the affiliate program is the one in use.
+  Values are unchanged (still generic placeholder defaults) — the product
+  owner still needs to register at trip.com/partners and override them.
+- `README.md`, `docs/HANDOFF.md`, `docs/VERCEL_KEYS_GUIDE.md`: replaced
+  remaining "携程联盟" (domestic Ctrip Union) framing around the *current*
+  integration with "Trip.com (携程国际版)" + a direct registration
+  walkthrough in the Vercel guide. Historical version-log rows describing
+  what changed at v8.4.0 were left as-is (still factually accurate as
+  history) — only the rows describing *current/ongoing* state were updated.
+
 ## v9.0.0 — 2026-06-25
 
 New visual direction: warm cream/blush "新国风" palette with a cinnabar
