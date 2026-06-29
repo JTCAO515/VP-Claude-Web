@@ -2,6 +2,45 @@
 
 All notable changes to VisePanda.
 
+## v9.0.2 — 2026-06-29
+
+Docs-only follow-up: the product owner pointed at two specific
+connect.trip.com doc pages and asked to actually read them, rather than
+rely on the prior search-summary-based research.
+
+### Findings (no code logic changed, only comments/docs updated)
+- Read connect.trip.com's "Trip.com API" (Getting Started) and "OpenTravel
+  API" (Getting Started + Authentication) pages directly via browser
+  rendering (the pages are a JS SPA — plain WebFetch only sees a loading
+  skeleton, so this required actually navigating and capturing the
+  rendered DOM).
+- **Sharper conclusion than v9.0.1**: connect.trip.com's "Open platform"
+  isn't a gated-but-equivalent version of what VisePanda wants — it's a
+  **hotel/PMS supply-side connectivity API**. Hoteliers and channel-manager
+  companies use it to push room content/rates/availability *into*
+  Trip.com and receive reservation pushes back; it's explicitly not for
+  third-party apps to *query* Trip.com's inventory. Confirmed via the
+  doc's own framing (Content/Rates & Availability/Reservation/Promotions/
+  Membership — all supply-side concerns), its partnership gate text
+  ("companies are required to enter into a business-side cooperation
+  agreement"), and its auth model (SOAP+XML, OTA 2015B, with a
+  `CodeContext` partner ID "generated and provided by Ctrip" to an
+  already-onboarded hotel company — not a self-serve credential).
+- This means even a signed business deal wouldn't unlock hotel search for
+  VisePanda — that API solves "be a hotel's distribution channel," not
+  "be a travel app that searches Trip.com." The Trip.com Affiliate
+  Program (trip.com/partners) remains the only path that's actually
+  useful, unchanged from v9.0.1's conclusion — this update just upgrades
+  the confidence and precision of *why* the Open Platform path is a dead
+  end, from "probably too gated" to "solves a different problem entirely."
+
+### Changed
+- `api/config.py`: `CTRIP_AID`/`CTRIP_SID` comment rewritten with the
+  doc-verified explanation of why connect.trip.com's Open Platform is the
+  wrong API, not just a gated one. Explicit instruction not to revisit it.
+- `README.md`, `docs/HANDOFF.md`: "Booking & ratings" / known-gaps
+  sections updated with the same sharper framing.
+
 ## v9.0.1 — 2026-06-25
 
 Docs-only: researched whether Trip.com (携程国际版, the international arm of

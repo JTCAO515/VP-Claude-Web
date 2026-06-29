@@ -154,15 +154,20 @@ domestic Ctrip Open Platform also **retired its callable search API**
 (this changed mid-project — see CHANGELOG v8.4.0). What *is* realistically
 available, and what this app integrates:
 
-- **Trip.com (携程国际版) H5 deep links** — researched two paths here
-  (June 2026): Trip.com's **Open Platform** (developers.trip.com /
-  connect.trip.com) is a real OAuth2 API, but per their own docs
-  *"after reaching a cooperation agreement, you can get your appKey and
-  appSecret from Trip.com's product support team"* — i.e. it requires a
-  signed business deal, not a self-serve signup, so it's not realistic for
-  this project. The **Trip.com Affiliate Program** (trip.com/partners) is
-  free, self-serve, and approved within hours/days, but only ever hands
-  you a tracked deep-link ID, never a structured query API. `api/partners.py`
+- **Trip.com (携程国际版) H5 deep links** — read Trip.com's actual API docs
+  at connect.trip.com (June 2026) to confirm this. Their "Open platform"
+  (Trip.com API / OpenTravel API) is **not a gated version of what we
+  want — it's the wrong API entirely**: it's a hotel/PMS *supply-side*
+  connectivity API. Hoteliers and channel-manager companies use it to
+  push room content/rates/availability *into* Trip.com and receive
+  reservation pushes back — not for third-party apps to *query* Trip.com's
+  inventory. It also requires a signed business cooperation agreement and
+  uses SOAP+XML (OTA 2015B) with partner credentials Trip.com issues to
+  already-onboarded hotel companies. So even with a deal, it wouldn't do
+  what we want. The **Trip.com Affiliate Program** (trip.com/partners) is
+  the only path that's actually useful here: free, self-serve, approved
+  within hours/days, hands you a tracked deep-link ID (not a query API).
+  `api/partners.py`
   builds H5 deep links (hotel list, hotel detail, train list, flight list)
   with the affiliate ID baked into the query string via `CTRIP_AID`/`CTRIP_SID`
   (generic defaults already set — see env var table above); the user taps

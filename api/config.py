@@ -9,7 +9,7 @@ import os
 import secrets
 from pathlib import Path
 
-VERSION = "9.0.1"
+VERSION = "9.0.2"
 APP_NAME = "VisePanda"
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -72,20 +72,34 @@ AMAP_SECURITY_CODE = _env("AMAP_SECURITY_CODE")
 AMAP_WEB_SERVICE_KEY = _env("AMAP_WEB_SERVICE_KEY")
 
 # ---------- Trip.com (携程国际版) — hotel/flight/train deep links ----------
-# Researched two integration paths for Trip.com (confirmed June 2026):
+# Researched Trip.com's integration options (confirmed June 2026, including
+# a direct read of connect.trip.com's "Trip.com API" and "OpenTravel API"
+# docs):
 #
 # 1. Trip.com Affiliate Program (trip.com/partners) — self-serve, free,
 #    approved in hours/days. What you get is a tracked deep-link/affiliate
 #    ID, NOT a structured query API. This is what we use: _ctrip_url() in
 #    api/partners.py builds H5 deep links with AID/SID baked into the
 #    query string, matching their "URL生成工具" deep-link model.
-# 2. Trip.com Open Platform (developers.trip.com / connect.trip.com) — a
-#    real OAuth2 API supporting booking confirm/cancel/modify/status, but
-#    per their own docs: "After reaching a cooperation agreement, you can
-#    get your appKey and appSecret from Trip.com's product support team."
-#    This requires a signed business agreement, not a self-serve signup —
-#    not realistic for this project. Revisit only if the product owner
-#    pursues a formal partnership.
+# 2. connect.trip.com's "Open platform" (Trip.com API / OpenTravel API /
+#    CM OpenTravel API) is NOT a wrong-door-but-gated version of what we
+#    want — it's the WRONG API ENTIRELY. It's a hotel/PMS *supply-side*
+#    connectivity API: hoteliers and channel-manager companies use it to
+#    push room content, rates, and availability INTO Trip.com, and to
+#    receive reservation pushes back. It is not for third-party apps to
+#    query/search Trip.com's inventory. Confirmed via:
+#      - Doc framing: "Content / Rates & Availability / Reservation /
+#        Promotions / Membership" — all supply-side concerns.
+#      - Their own gate: "In order to establish a direct connectivity
+#        partnership with Trip.com, companies are required to enter into
+#        a business-side cooperation agreement."
+#      - Auth model: SOAP+XML (OTA 2015B), with a `CodeContext` partner ID
+#        "generated and provided by Ctrip" to an already-onboarded hotel/
+#        PMS company — not a self-serve credential.
+#    So even with a business deal, this wouldn't give VisePanda what it
+#    wants (search hotels, generate a bookable link). Don't revisit this
+#    path — it solves a different problem (being a hotel's distribution
+#    channel, not being a travel app that searches Trip.com).
 #
 # AID + SID are affiliate-attribution IDs baked directly into the URL
 # query string, not secrets — safe to ship a default. Override via env
